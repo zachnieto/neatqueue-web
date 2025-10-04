@@ -61,7 +61,10 @@ const Status = () => {
 									Shards: {status.shards}
 								</h1>
 								<h1 className="text-sm sm:text-base md:text-lg lg:text-xl">
-									Servers: {status.guilds}
+									Servers: {status.guilds.toLocaleString()}
+								</h1>
+								<h1 className="text-sm sm:text-base md:text-lg lg:text-xl">
+									Users: {status.member_count.toLocaleString()}
 								</h1>
 							</div>
 						))}
