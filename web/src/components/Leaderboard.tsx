@@ -311,16 +311,6 @@ const Leaderboard = ({
 		);
 	}
 
-	if (!leaderboardData || !currentMonthData) {
-		return (
-			<div className="flex items-center justify-center min-h-screen">
-				<div className="text-center">
-					<p className="text-xl text-gray-400">No leaderboard data available</p>
-				</div>
-			</div>
-		);
-	}
-
 	return (
 		<div className="min-h-screen py-8 px-4">
 			<div className="max-w-7xl mx-auto">
