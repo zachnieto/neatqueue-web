@@ -62,10 +62,12 @@ const MonthSelector = ({
 		return null;
 	}
 
-	const monthList = [
+	const hasAllTime = availableMonths.includes("alltime");
+
+	const monthList = hasAllTime ? [
 		"alltime",
 		...availableMonths.filter((month) => month !== "alltime"),
-	];
+	] : availableMonths;
 
 	return (
 		<div className="flex flex-col">
@@ -114,6 +116,11 @@ const Leaderboard = ({
 	const guildId = guildID || passedGuildId;
 	const channelId = channelID || passedChannelId;
 
+
+	const currentMonth = useMemo(() => {
+		return new Date().toISOString().slice(0, 7);
+	}, []);
+
 	const {
 		data: leaderboardData,
 		isLoading,
@@ -121,7 +128,7 @@ const Leaderboard = ({
 	} = useQuery({
 		queryKey: ["leaderboard", guildId, channelId, selectedMonth, currentPage],
 		queryFn: () =>
-			getLeaderboardV2(guildId, channelId, currentPage, [selectedMonth]),
+			getLeaderboardV2(guildId, channelId, currentPage, [selectedMonth, currentMonth]),
 		enabled: !!guildId && !!channelId,
 		staleTime: 30000, // 30 seconds
 	});
