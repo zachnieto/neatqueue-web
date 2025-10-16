@@ -169,10 +169,10 @@ const Wizard = ({
 		<>
 			<div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
 				<div className={`relative w-full ${widthClasses[width]} my-6 mx-auto px-4`}>
-					<div className="rounded-lg shadow-2xl relative flex flex-col w-full bg-stone-900 outline-none focus:outline-none border border-violet-500/30">
+					<div className="rounded-lg shadow-2xl relative flex flex-col w-full bg-stone-900 outline-none focus:outline-none border border-neutral-700">
 						{/* Header */}
-						<div className="flex items-center justify-between p-6 border-b border-violet-500/30">
-							<h3 className="text-3xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+						<div className="flex items-center justify-between p-6 border-b border-neutral-700">
+							<h3 className="text-3xl font-bold text-white">
 								{title}
 							</h3>
 							<button
@@ -294,7 +294,7 @@ const Wizard = ({
 						{/* Content */}
 						<div className="relative p-8 flex-auto overflow-y-auto max-h-96">
 							<div className="mb-6">
-								<h2 className="text-2xl font-bold mb-4 text-violet-300">
+								<h2 className="text-2xl font-bold mb-4 text-white">
 									{steps[currentStep].title}
 								</h2>
 								{steps[currentStep].content}
@@ -302,7 +302,7 @@ const Wizard = ({
 						</div>
 
 						{/* Footer */}
-						<div className="flex items-center justify-between p-6 border-t border-violet-500/30">
+						<div className="flex items-center justify-between p-6 border-t border-neutral-700">
 							<button
 								className={classNames(
 									"px-6 py-2 rounded-md font-medium transition-all",
@@ -327,7 +327,7 @@ const Wizard = ({
 
 								{currentStep < steps.length - 1 ? (
 									<button
-										className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2 rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+										className="bg-neutral-700 hover:bg-neutral-600 text-white px-6 py-2 rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
 										onClick={handleNext}
 										disabled={isProcessing}
 									>

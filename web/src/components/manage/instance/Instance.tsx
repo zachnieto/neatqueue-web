@@ -249,7 +249,7 @@ const Instance = ({
 
 	return (
 		<>
-			<div className="col-span-6 bg-stone-900 rounded shadow-md p-5 grid place-items-center">
+			<div className="col-span-1 md:col-span-2 bg-stone-900 rounded shadow-md p-5 grid place-items-center">
 				<h1 className="text-3xl">BETA</h1>
 				<h1 className="text-3xl">Private Instance</h1>
 

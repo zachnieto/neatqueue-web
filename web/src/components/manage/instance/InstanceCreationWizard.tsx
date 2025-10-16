@@ -65,7 +65,7 @@ const InstanceCreationWizard = ({
 							<li>A server to invite your bot to</li>
 						</ul>
 					</div>
-					<div className="bg-violet-900/30 border-l-4 border-violet-500 p-4 rounded">
+					<div className="bg-neutral-800/50 border-l-4 border-neutral-600 p-4 rounded">
 						<h3 className="font-bold mb-2">Benefits of Private Instances:</h3>
 						<ul className="list-disc list-inside space-y-1 text-sm">
 							<li>Dedicated resources for your server</li>
@@ -94,8 +94,8 @@ const InstanceCreationWizard = ({
 								className={classNames(
 									"p-6 rounded-lg border-2 transition-all text-left",
 									selectedInstance?.name === instance.name
-										? "border-violet-500 bg-violet-900/30 shadow-lg shadow-violet-500/20"
-										: "border-stone-700 bg-black/25 hover:border-violet-400/50",
+										? "border-neutral-500 bg-neutral-800/50 shadow-lg"
+										: "border-stone-700 bg-black/25 hover:border-neutral-500/50",
 								)}
 							>
 								<div className="flex items-start justify-between mb-3">
@@ -104,7 +104,7 @@ const InstanceCreationWizard = ({
 										className={classNames(
 											"w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
 											selectedInstance?.name === instance.name
-												? "border-violet-500 bg-violet-500"
+												? "border-neutral-400 bg-neutral-400"
 												: "border-stone-600",
 										)}
 									>
@@ -129,7 +129,7 @@ const InstanceCreationWizard = ({
 									{instance.description}
 								</p>
 								<div className="flex items-baseline">
-									<span className="text-3xl font-bold text-violet-400">
+									<span className="text-3xl font-bold text-white">
 										{instance.price}
 									</span>
 									<span className="text-sm text-gray-400 ml-2">
@@ -187,7 +187,7 @@ const InstanceCreationWizard = ({
 									setError("");
 								}}
 								placeholder="Paste your bot token here"
-								className="w-full px-4 py-3 rounded-lg bg-stone-800 border border-stone-700 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all text-white"
+								className="w-full px-4 py-3 rounded-lg bg-stone-800 border border-stone-700 focus:border-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-500/20 transition-all text-white"
 							/>
 						</label>
 
@@ -247,7 +247,7 @@ const InstanceCreationWizard = ({
 					<div className="bg-stone-800 rounded-lg p-6 space-y-4">
 						<div>
 							<h3 className="text-sm text-gray-400 mb-1">Instance Size</h3>
-							<p className="text-xl font-bold text-violet-400">
+							<p className="text-xl font-bold text-white">
 								{selectedInstance?.name}
 							</p>
 							<p className="text-sm text-gray-300">
