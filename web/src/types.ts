@@ -47,15 +47,14 @@ export type NodeStatus = {
 export type InstancePricing = {
 	price: number;
 	name: string;
+	description: string;
 };
 
 export type PrivateInstanceState = "running" | "stopped" | "terminated";
-export type PrivateInstanceBotState = "online" | "offline";
 
 export type PrivateInstance = {
 	id: string;
 	instance: PrivateInstanceState;
-	bot: PrivateInstanceBotState;
 	until: number;
 	price: number;
 	autoRenew?: boolean;

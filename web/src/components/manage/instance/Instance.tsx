@@ -23,6 +23,8 @@ import {
 import { classNames } from "../../../util/tailwind";
 import { calculateTimeLeft } from "../../../util/utility";
 import Modal from "../../Modal";
+import BotTokenWizard from "./BotTokenWizard";
+import InstanceCreationWizard from "./InstanceCreationWizard";
 import ExtendModal from "./ExtendModal";
 import TerminateModal from "./TerminateModal";
 
@@ -42,8 +44,8 @@ const Instance = ({
 	const [instanceModalOpen, setInstanceModalOpen] = useState<boolean>(false);
 	const [extendModalOpen, setExtendModalOpen] = useState<boolean>(false);
 	const [terminateModalOpen, setTerminateModalOpen] = useState<boolean>(false);
+	const [botTokenWizardOpen, setBotTokenWizardOpen] = useState<boolean>(false);
 	const [instanceTypes, setInstanceTypes] = useState<InstancePricing[]>([]);
-	const [selectedInstance, setSelectedInstance] = useState<InstancePricing>();
 	const [botToken, setBotToken] = useState<string>("");
 	const [autoRenew, setAutoRenewState] = useState<boolean>(false);
 
@@ -85,9 +87,11 @@ const Instance = ({
 	}, [privateInstance, privateInstance?.until]);
 
 	useEffect(() => {
+		if (!privateInstance) return;
+
 		let intervalId: NodeJS.Timer;
 		updateInstanceState();
-		intervalId = setInterval(updateInstanceState, 10000);
+		intervalId = setInterval(updateInstanceState, 5000);
 
 		return () => {
 			clearInterval(intervalId);
@@ -106,18 +110,25 @@ const Instance = ({
 		setAutoRenewState(!!data?.autoRenew);
 	};
 
-	const handlePurchase = async () => {
-		if (!selectedInstance || !botToken) return;
+	const handlePurchase = async (
+		instance: InstancePricing,
+		token: string,
+	) => {
 		setLoading(true);
 		setCurrentAction("purchase");
+		setInstanceModalOpen(false);
 		try {
-			await purchaseInstance(guildID, auth, selectedInstance.price, botToken!);
+			await purchaseInstance(guildID, auth, instance.price, token);
 			setSuccess("Instance is now being created");
+			await refreshPremiumData();
+			await updateInstanceState();
 		} catch (e: any) {
-			setError(e.response.data.detail);
+			setError(e.response?.data?.detail || e.message || "Failed to create instance");
+			throw e; // Re-throw so wizard can handle it
+		} finally {
+			setLoading(false);
+			setCurrentAction(null);
 		}
-		setLoading(false);
-		setCurrentAction(null);
 	};
 
 	const handleExtend = async () => {
@@ -236,46 +247,6 @@ const Instance = ({
 		return calculateTimeLeft(privateInstance.until);
 	};
 
-	const components = (
-		<div>
-			<div className="flex">
-				{instanceTypes.map((instance: InstancePricing, i: number) => (
-					<div
-						key={i}
-						className="m-1 max-w-sm rounded overflow-hidden shadow-lg bg-black/25 text-white text-center"
-					>
-						<div className="px-6 py-4">
-							<div className="font-bold text-2xl mb-2">{instance.name}</div>
-							<div className="font-bold text-xl mb-2">
-								{instance.price} Credits
-							</div>
-							<button
-								onClick={() => setSelectedInstance(instance)}
-								className={classNames(
-									"btn-primary",
-									selectedInstance !== instance
-										? "opacity-50 hover:opacity-100"
-										: "",
-								)}
-							>
-								Select
-							</button>
-						</div>
-					</div>
-				))}
-			</div>
-
-			<div className="flex justify-center items-center mt-7 gap-2">
-				<h1 className="text-xl">Bot Token (required): </h1>
-				<input
-					onChange={(e) => setBotToken(e.target.value)}
-					value={botToken}
-					className="text-center rounded w-80 text-black px-2"
-				/>
-			</div>
-		</div>
-	);
-
 	return (
 		<>
 			<div className="col-span-6 bg-stone-900 rounded shadow-md p-5 grid place-items-center">
@@ -325,17 +296,6 @@ const Instance = ({
 								</span>
 							</h1>
 
-							<h1 className="text-2xl text-center mb-5">
-								Bot Status:{" "}
-								<span
-									className={
-										statusColor[privateInstance.bot as keyof typeof statusColor]
-									}
-								>
-									{_.capitalize(privateInstance.bot)}
-								</span>
-							</h1>
-
 							<div className="flex gap-3 justify-center">
 								<div className="flex items-center gap-2 mr-4">
 									<input
@@ -378,32 +338,40 @@ const Instance = ({
 									Delete
 								</button>
 							</div>
-							<div className="flex justify-center items-center mt-7 gap-1">
-								<h1 className="text-xl">Bot Token: </h1>
-								<input
-									onChange={(e) => setBotToken(e.target.value)}
-									value={botToken}
-									className="text-center rounded w-80 text-black px-2"
-								/>
+							<div className="flex flex-col items-center mt-7 gap-2">
+								<div className="flex items-center gap-1">
+									<h1 className="text-xl">Bot Token: </h1>
+									<input
+										onChange={(e) => setBotToken(e.target.value)}
+										value={botToken}
+										placeholder="Enter new bot token"
+										className="text-center rounded w-80 text-black px-2"
+									/>
+									<button
+										disabled={loading || !botToken}
+										onClick={updateBotToken}
+										className="btn-primary"
+									>
+										{currentAction === "updateToken" ? "Setting…" : "Set"}
+									</button>
+								</div>
 								<button
-									disabled={loading || !botToken}
-									onClick={updateBotToken}
-									className="btn-primary"
+									onClick={() => setBotTokenWizardOpen(true)}
+									className="text-blue-400 hover:text-blue-300 text-sm underline transition-colors"
 								>
-									{currentAction === "updateToken" ? "Setting…" : "Set"}
+									Need help getting a bot token?
 								</button>
 							</div>
 						</div>
 					))}
 			</div>
 
-			<Modal
-				onSubmit={handlePurchase}
-				visible={instanceModalOpen}
+			<InstanceCreationWizard
+				visible={instanceModalOpen && !botTokenWizardOpen}
 				setVisibility={setInstanceModalOpen}
-				title="Private Instance"
-				submitText="Confirm"
-				component={components}
+				instanceTypes={instanceTypes}
+				onComplete={handlePurchase}
+				onOpenBotGuide={() => setBotTokenWizardOpen(true)}
 			/>
 
 			{privateInstance && (
@@ -426,6 +394,8 @@ const Instance = ({
 					/>
 				</>
 			)}
+
+			<BotTokenWizard visible={botTokenWizardOpen} setVisibility={setBotTokenWizardOpen} />
 		</>
 	);
 };

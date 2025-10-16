@@ -58,12 +58,12 @@ const Manage = () => {
 							setError={setError}
 							setSuccess={setSuccess}
 						/>
-						{/*<Instance*/}
-						{/*  guildID={guildID}*/}
-						{/*  setError={setError}*/}
-						{/*  setSuccess={setSuccess}*/}
-						{/*  refreshPremiumData={refreshPremiumData}*/}
-						{/*/>*/}
+						<Instance
+						guildID={guildID}
+						setError={setError}
+						setSuccess={setSuccess}
+						refreshPremiumData={refreshPremiumData}
+						/>
 					</>
 				)}
 			</div>
