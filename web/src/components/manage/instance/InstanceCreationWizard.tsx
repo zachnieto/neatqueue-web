@@ -36,19 +36,10 @@ const InstanceCreationWizard = ({
 			return;
 		}
 
-		try {
-			await onComplete(selectedInstance, botToken);
-			// Reset state
-			setSelectedInstance(null);
-			setBotToken("");
-		} catch (e: any) {
-			showToast("Error Creating Instance", {
-				message: e.message || "An error occurred",
-				variant: "error",
-				duration: 7000,
-			});
-			throw e; // Re-throw so wizard stays open
-		}
+		await onComplete(selectedInstance, botToken);
+		// Reset state
+		setSelectedInstance(null);
+		setBotToken("");
 	};
 
 	const handleCancel = () => {

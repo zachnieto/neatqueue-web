@@ -113,17 +113,16 @@ const Instance = ({
 	const handlePurchase = async (instance: InstancePricing, token: string) => {
 		setLoading(true);
 		setCurrentAction("purchase");
-		setInstanceModalOpen(false);
 		try {
 			await purchaseInstance(guildID, auth, instance.price, token);
 			setSuccess("Instance is now being created");
 			await refreshPremiumData();
 			await updateInstanceState();
+			setInstanceModalOpen(false);
 		} catch (e: any) {
 			setError(
 				e.response?.data?.detail || e.message || "Failed to create instance",
 			);
-			throw e; // Re-throw so wizard can handle it
 		} finally {
 			setLoading(false);
 			setCurrentAction(null);

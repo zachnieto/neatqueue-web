@@ -154,10 +154,10 @@ export const purchaseInstance = async (
 	};
 
 	const resp = await axios.post(
-		`${API_BASE}/api/instance/new`,
+		`${API_BASE}/api/instance/${guildID}`,
 		{
-			details: { price, guildID },
-			token: { token: botToken },
+			price,
+			bot_token: botToken,
 		},
 		config,
 	);
