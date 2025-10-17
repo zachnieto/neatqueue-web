@@ -24,8 +24,8 @@ import { classNames } from "../../../util/tailwind";
 import { calculateTimeLeft } from "../../../util/utility";
 import Modal from "../../Modal";
 import BotTokenWizard from "./BotTokenWizard";
-import InstanceCreationWizard from "./InstanceCreationWizard";
 import ExtendModal from "./ExtendModal";
+import InstanceCreationWizard from "./InstanceCreationWizard";
 import TerminateModal from "./TerminateModal";
 
 const Instance = ({
@@ -110,10 +110,7 @@ const Instance = ({
 		setAutoRenewState(!!data?.autoRenew);
 	};
 
-	const handlePurchase = async (
-		instance: InstancePricing,
-		token: string,
-	) => {
+	const handlePurchase = async (instance: InstancePricing, token: string) => {
 		setLoading(true);
 		setCurrentAction("purchase");
 		setInstanceModalOpen(false);
@@ -123,7 +120,9 @@ const Instance = ({
 			await refreshPremiumData();
 			await updateInstanceState();
 		} catch (e: any) {
-			setError(e.response?.data?.detail || e.message || "Failed to create instance");
+			setError(
+				e.response?.data?.detail || e.message || "Failed to create instance",
+			);
 			throw e; // Re-throw so wizard can handle it
 		} finally {
 			setLoading(false);
@@ -395,7 +394,10 @@ const Instance = ({
 				</>
 			)}
 
-			<BotTokenWizard visible={botTokenWizardOpen} setVisibility={setBotTokenWizardOpen} />
+			<BotTokenWizard
+				visible={botTokenWizardOpen}
+				setVisibility={setBotTokenWizardOpen}
+			/>
 		</>
 	);
 };

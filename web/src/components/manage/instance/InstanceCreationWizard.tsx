@@ -1,13 +1,17 @@
 import { useState } from "react";
-import Wizard, { type WizardStep } from "../../Wizard";
+import { useToast } from "../../../hooks/useToast";
 import type { InstancePricing } from "../../../types";
 import { classNames } from "../../../util/tailwind";
+import Wizard, { type WizardStep } from "../../Wizard";
 
 type InstanceCreationWizardProps = {
 	visible: boolean;
 	setVisibility: (visibility: boolean) => void;
 	instanceTypes: InstancePricing[];
-	onComplete: (selectedInstance: InstancePricing, botToken: string) => Promise<void>;
+	onComplete: (
+		selectedInstance: InstancePricing,
+		botToken: string,
+	) => Promise<void>;
 	onOpenBotGuide: () => void;
 };
 
@@ -18,13 +22,17 @@ const InstanceCreationWizard = ({
 	onComplete,
 	onOpenBotGuide,
 }: InstanceCreationWizardProps) => {
-	const [selectedInstance, setSelectedInstance] = useState<InstancePricing | null>(null);
+	const { showToast } = useToast();
+	const [selectedInstance, setSelectedInstance] =
+		useState<InstancePricing | null>(null);
 	const [botToken, setBotToken] = useState<string>("");
-	const [error, setError] = useState<string>("");
 
 	const handleComplete = async () => {
 		if (!selectedInstance || !botToken) {
-			setError("Please complete all steps");
+			showToast("Incomplete", {
+				message: "Please complete all steps",
+				variant: "error",
+			});
 			return;
 		}
 
@@ -33,9 +41,12 @@ const InstanceCreationWizard = ({
 			// Reset state
 			setSelectedInstance(null);
 			setBotToken("");
-			setError("");
 		} catch (e: any) {
-			setError(e.message || "An error occurred");
+			showToast("Error Creating Instance", {
+				message: e.message || "An error occurred",
+				variant: "error",
+				duration: 7000,
+			});
 			throw e; // Re-throw so wizard stays open
 		}
 	};
@@ -44,13 +55,12 @@ const InstanceCreationWizard = ({
 		// Reset state when canceling
 		setSelectedInstance(null);
 		setBotToken("");
-		setError("");
 	};
 
 	const steps: WizardStep[] = [
 		{
-			title: "Welcome to Private Instances",
-			shortLabel: "Welcome",
+			title: "Private Instance Setup",
+			shortLabel: "Overview",
 			content: (
 				<div className="space-y-4">
 					<p className="text-lg">
@@ -58,20 +68,17 @@ const InstanceCreationWizard = ({
 						bot!
 					</p>
 					<div className="bg-blue-900/30 border-l-4 border-blue-500 p-4 rounded">
-						<h3 className="font-bold mb-2">What you'll need:</h3>
+						<h3 className="mb-2">What you'll need:</h3>
 						<ul className="list-disc list-inside space-y-1 text-sm">
 							<li>A Discord bot token (we'll help you create one)</li>
 							<li>Credits to purchase the instance</li>
-							<li>A server to invite your bot to</li>
 						</ul>
 					</div>
 					<div className="bg-neutral-800/50 border-l-4 border-neutral-600 p-4 rounded">
-						<h3 className="font-bold mb-2">Benefits of Private Instances:</h3>
+						<h3 className="mb-2">Benefits of Private Instances:</h3>
 						<ul className="list-disc list-inside space-y-1 text-sm">
 							<li>Dedicated resources for your server</li>
 							<li>Custom bot identity (name, avatar, status)</li>
-							<li>Full control over bot permissions</li>
-							<li>Priority support and updates</li>
 						</ul>
 					</div>
 				</div>
@@ -99,7 +106,7 @@ const InstanceCreationWizard = ({
 								)}
 							>
 								<div className="flex items-start justify-between mb-3">
-									<h3 className="font-bold text-2xl">{instance.name}</h3>
+									<h3 className="text-2xl">{instance.name}</h3>
 									<div
 										className={classNames(
 											"w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
@@ -129,9 +136,7 @@ const InstanceCreationWizard = ({
 									{instance.description}
 								</p>
 								<div className="flex items-baseline">
-									<span className="text-3xl font-bold text-white">
-										{instance.price}
-									</span>
+									<span className="text-3xl text-white">{instance.price}</span>
 									<span className="text-sm text-gray-400 ml-2">
 										credits / 30 days
 									</span>
@@ -151,10 +156,12 @@ const InstanceCreationWizard = ({
 			),
 			validate: () => {
 				if (!selectedInstance) {
-					setError("Please select an instance size");
+					showToast("Instance Size Required", {
+						message: "Please select an instance size to continue",
+						variant: "error",
+					});
 					return false;
 				}
-				setError("");
 				return true;
 			},
 		},
@@ -168,23 +175,14 @@ const InstanceCreationWizard = ({
 						you create it!
 					</p>
 
-					<div className="bg-yellow-900/30 border-l-4 border-yellow-500 p-4 rounded">
-						<p className="text-sm">
-							<strong>Don't have a bot token?</strong> Click the button below to
-							see our step-by-step guide on creating a Discord bot and obtaining
-							your token.
-						</p>
-					</div>
-
 					<div className="space-y-3">
 						<label className="block">
-							<span className="text-lg font-medium mb-2 block">Bot Token:</span>
+							<span className="text-lg mb-2 block">Bot Token:</span>
 							<input
 								type="password"
 								value={botToken}
 								onChange={(e) => {
 									setBotToken(e.target.value);
-									setError("");
 								}}
 								placeholder="Paste your bot token here"
 								className="w-full px-4 py-3 rounded-lg bg-stone-800 border border-stone-700 focus:border-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-500/20 transition-all text-white"
@@ -194,7 +192,7 @@ const InstanceCreationWizard = ({
 						<button
 							type="button"
 							onClick={onOpenBotGuide}
-							className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
+							className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-all flex items-center justify-center gap-2"
 						>
 							<svg
 								className="w-5 h-5"
@@ -224,14 +222,20 @@ const InstanceCreationWizard = ({
 			),
 			validate: () => {
 				if (!botToken || botToken.trim().length === 0) {
-					setError("Please enter a bot token");
+					showToast("Bot Token Required", {
+						message: "Please enter your Discord bot token to continue",
+						variant: "error",
+					});
 					return false;
 				}
 				if (botToken.length < 50) {
-					setError("Bot token appears to be invalid (too short)");
+					showToast("Invalid Bot Token", {
+						message:
+							"Bot token appears to be too short. Please check and try again.",
+						variant: "error",
+					});
 					return false;
 				}
-				setError("");
 				return true;
 			},
 		},
@@ -247,9 +251,7 @@ const InstanceCreationWizard = ({
 					<div className="bg-stone-800 rounded-lg p-6 space-y-4">
 						<div>
 							<h3 className="text-sm text-gray-400 mb-1">Instance Size</h3>
-							<p className="text-xl font-bold text-white">
-								{selectedInstance?.name}
-							</p>
+							<p className="text-xl text-white">{selectedInstance?.name}</p>
 							<p className="text-sm text-gray-300">
 								{selectedInstance?.description}
 							</p>
@@ -257,7 +259,7 @@ const InstanceCreationWizard = ({
 
 						<div className="border-t border-stone-700 pt-4">
 							<h3 className="text-sm text-gray-400 mb-1">Cost</h3>
-							<p className="text-2xl font-bold">
+							<p className="text-2xl">
 								{selectedInstance?.price}{" "}
 								<span className="text-lg text-gray-400">credits / 30 days</span>
 							</p>
@@ -274,10 +276,12 @@ const InstanceCreationWizard = ({
 					</div>
 
 					<div className="bg-blue-900/30 border-l-4 border-blue-500 p-4 rounded">
-						<h3 className="font-bold mb-2">What happens next?</h3>
+						<h3 className="mb-2">What happens next?</h3>
 						<ol className="list-decimal list-inside space-y-1 text-sm">
 							<li>Your credits will be deducted</li>
-							<li>Your instance will be created (this may take a few minutes)</li>
+							<li>
+								Your instance will be created (this may take a few minutes)
+							</li>
 							<li>Your bot will come online and be ready to use</li>
 							<li>You can manage your instance from this dashboard</li>
 						</ol>
@@ -306,14 +310,8 @@ const InstanceCreationWizard = ({
 				onCancel={handleCancel}
 				allowStepNavigation={true}
 			/>
-			{error && (
-				<div className="fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-[60]">
-					{error}
-				</div>
-			)}
 		</>
 	);
 };
 
 export default InstanceCreationWizard;
-

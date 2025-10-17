@@ -60,8 +60,29 @@ const Wizard = ({
 	const handleStepChange = async (newStep: number) => {
 		if (isProcessing) return;
 
-		// Don't allow navigation beyond current step unless allowStepNavigation is true
-		if (!allowStepNavigation && newStep > currentStep) return;
+		// Allow going back to previous steps or advancing to the immediate next step
+		// But prevent skipping multiple steps ahead
+		if (newStep > currentStep + 1) return;
+
+		// If advancing forward, validate current step first
+		if (newStep > currentStep) {
+			const currentStepData = steps[currentStep];
+			if (currentStepData.validate) {
+				setIsProcessing(true);
+				try {
+					const isValid = await currentStepData.validate();
+					if (!isValid) {
+						setIsProcessing(false);
+						return;
+					}
+				} catch (error) {
+					console.error("Validation error:", error);
+					setIsProcessing(false);
+					return;
+				}
+				setIsProcessing(false);
+			}
+		}
 
 		const currentStepData = steps[currentStep];
 
@@ -94,26 +115,6 @@ const Wizard = ({
 
 	const handleNext = async () => {
 		if (isProcessing) return;
-
-		const currentStepData = steps[currentStep];
-
-		// Validate current step if validation function exists
-		if (currentStepData.validate) {
-			setIsProcessing(true);
-			try {
-				const isValid = await currentStepData.validate();
-				if (!isValid) {
-					setIsProcessing(false);
-					return;
-				}
-			} catch (error) {
-				console.error("Validation error:", error);
-				setIsProcessing(false);
-				return;
-			}
-			setIsProcessing(false);
-		}
-
 		if (currentStep < steps.length - 1) {
 			await handleStepChange(currentStep + 1);
 		}
@@ -168,13 +169,13 @@ const Wizard = ({
 	return (
 		<>
 			<div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
-				<div className={`relative w-full ${widthClasses[width]} my-6 mx-auto px-4`}>
+				<div
+					className={`relative w-full ${widthClasses[width]} my-6 mx-auto px-4`}
+				>
 					<div className="rounded-lg shadow-2xl relative flex flex-col w-full bg-stone-900 outline-none focus:outline-none border border-neutral-700">
 						{/* Header */}
 						<div className="flex items-center justify-between p-6 border-b border-neutral-700">
-							<h3 className="text-3xl font-bold text-white">
-								{title}
-							</h3>
+							<h3 className="text-3xl text-white">{title}</h3>
 							<button
 								className="text-gray-400 hover:text-white transition-colors disabled:opacity-50"
 								onClick={handleClose}
@@ -234,23 +235,21 @@ const Wizard = ({
 									return (
 										<button
 											key={index}
-											onClick={() =>
-												allowStepNavigation
-													? handleStepChange(index)
-													: null
-											}
-											disabled={
-												isProcessing ||
-												(!allowStepNavigation && index !== currentStep)
-											}
+											onClick={() => {
+												if (index < currentStep || index === currentStep + 1) {
+													handleStepChange(index);
+												}
+											}}
+											disabled={isProcessing || index > currentStep + 1}
 											className={classNames(
 												"flex flex-col items-center space-y-2 transition-all",
-												index <= currentStep
-													? "opacity-100"
-													: "opacity-40 hover:opacity-60",
-												allowStepNavigation
-													? "cursor-pointer"
-													: "cursor-default",
+												index < currentStep
+													? "opacity-100 cursor-pointer hover:opacity-90"
+													: index === currentStep
+														? "opacity-100 cursor-default"
+														: index === currentStep + 1
+															? "opacity-80 cursor-pointer hover:opacity-100"
+															: "opacity-40 cursor-not-allowed",
 												isProcessing ? "pointer-events-none" : "",
 											)}
 										>
@@ -294,7 +293,7 @@ const Wizard = ({
 						{/* Content */}
 						<div className="relative p-8 flex-auto overflow-y-auto max-h-96">
 							<div className="mb-6">
-								<h2 className="text-2xl font-bold mb-4 text-white">
+								<h2 className="text-2xl mb-4 text-white">
 									{steps[currentStep].title}
 								</h2>
 								{steps[currentStep].content}
@@ -353,4 +352,3 @@ const Wizard = ({
 };
 
 export default Wizard;
-

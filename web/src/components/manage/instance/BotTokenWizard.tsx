@@ -65,7 +65,7 @@ const BotTokenWizard = ({
 				<div className="space-y-4">
 					<ol className="list-decimal list-inside space-y-3 text-lg">
 						<li>In your application, navigate to the "Bot" tab on the left</li>
-                        <li>(Optional) Customize the bot's username and avatar</li>
+						<li>(Optional) Customize the bot's username and avatar</li>
 						<li>
 							Scroll down to the "Privileged Gateway Intents" section and enable
 							the following:
@@ -89,7 +89,7 @@ const BotTokenWizard = ({
 				</div>
 			),
 		},
-        
+
 		{
 			title: "Step 3: Set Bot Permissions",
 			shortLabel: "Permissions",
@@ -99,14 +99,16 @@ const BotTokenWizard = ({
 						Configure the bot's installation settings and permissions:
 					</p>
 					<ol className="list-decimal list-inside space-y-3 text-lg">
-						<li>Navigate to the <strong>Installation</strong> tab</li>
+						<li>
+							Navigate to the <strong>Installation</strong> tab
+						</li>
 						<li>
 							Under "Installation Contexts", select{" "}
 							<strong>Guild Install</strong>
 						</li>
 						<li>
-							Under "Install Link", select the <strong>Discord Provided Link</strong>{" "}
-							option
+							Under "Install Link", select the{" "}
+							<strong>Discord Provided Link</strong> option
 						</li>
 						<li>
 							Under "Default Install Settings", for scopes select:
@@ -137,8 +139,8 @@ const BotTokenWizard = ({
 						</li>
 						<li>Click "Save Changes" at the bottom</li>
 						<li>
-							Copy the Install Link and open it in your browser to invite the bot
-							to your server
+							Copy the Install Link and open it in your browser to invite the
+							bot to your server
 						</li>
 					</ol>
 					<div className="bg-green-900/30 border-l-4 border-green-500 p-4 rounded mt-4">
@@ -189,4 +191,3 @@ const BotTokenWizard = ({
 };
 
 export default BotTokenWizard;
-
