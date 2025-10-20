@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "../../../hooks/useToast";
 import type { InstancePricing } from "../../../types";
 import { classNames } from "../../../util/tailwind";
@@ -28,6 +28,10 @@ const InstanceCreationWizard = ({
 	const [botToken, setBotToken] = useState<string>("");
 
 	const multipleInstanceOptions = instanceTypes.length > 1;
+
+	useEffect(() => {
+		setSelectedInstance(instanceTypes[0] || null);
+	}, [instanceTypes]);
 
 	const handleComplete = async () => {
 		if (!selectedInstance || !botToken) {

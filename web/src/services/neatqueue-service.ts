@@ -245,8 +245,8 @@ export const updateToken = async (
 		},
 	};
 
-	const resp = await axios.put(
-		`${API_BASE}/api/instance/updatetoken/${guildID}`,
+	const resp = await axios.patch(
+		`${API_BASE}/api/instance/${guildID}`,
 		{
 			token: botToken,
 		},
@@ -266,10 +266,35 @@ export const setAutoRenew = async (
 		},
 	};
 
-	const resp = await axios.put(
-		`${API_BASE}/api/instance/autorenew/${guildID}?enabled=${enabled}`,
-		{},
+	const resp = await axios.patch(
+		`${API_BASE}/api/instance/${guildID}`,
+		{
+			auto_renew: enabled,
+		},
 		config,
+	);
+	return resp.data;
+};
+
+// Unified function to update instance configuration (token and/or auto_renew)
+export const updateInstanceConfig = async (
+	guildID: string,
+	oauth: Auth,
+	config: {
+		token?: string;
+		auto_renew?: boolean;
+	},
+) => {
+	const axiosConfig = {
+		headers: {
+			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
+		},
+	};
+
+	const resp = await axios.patch(
+		`${API_BASE}/api/instance/${guildID}`,
+		config,
+		axiosConfig,
 	);
 	return resp.data;
 };
