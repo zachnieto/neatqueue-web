@@ -9,6 +9,7 @@ export type WizardStep = {
 	validate?: () => boolean | Promise<boolean>; // Optional validation before proceeding
 	onEnter?: () => void | Promise<void>; // Called when entering this step
 	onExit?: () => void | Promise<void>; // Called when leaving this step
+	hidden?: boolean; // Whether this step is hidden
 };
 
 type WizardProps = {
@@ -39,6 +40,10 @@ const Wizard = ({
 	const [currentStep, setCurrentStep] = useState(0);
 	const [isProcessing, setIsProcessing] = useState(false);
 
+	const displayedSteps = steps.filter((step) => !step.hidden);
+	const currentStepData = displayedSteps[currentStep];
+
+
 	const widthClasses = {
 		sm: "max-w-sm",
 		md: "max-w-md",
@@ -66,7 +71,6 @@ const Wizard = ({
 
 		// If advancing forward, validate current step first
 		if (newStep > currentStep) {
-			const currentStepData = steps[currentStep];
 			if (currentStepData.validate) {
 				setIsProcessing(true);
 				try {
@@ -84,8 +88,6 @@ const Wizard = ({
 			}
 		}
 
-		const currentStepData = steps[currentStep];
-
 		// Call onExit for current step
 		if (currentStepData.onExit) {
 			setIsProcessing(true);
@@ -102,7 +104,7 @@ const Wizard = ({
 		setCurrentStep(newStep);
 
 		// Call onEnter for new step
-		const newStepData = steps[newStep];
+		const newStepData = displayedSteps[newStep];
 		if (newStepData.onEnter) {
 			setIsProcessing(true);
 			try {
@@ -115,7 +117,7 @@ const Wizard = ({
 
 	const handleNext = async () => {
 		if (isProcessing) return;
-		if (currentStep < steps.length - 1) {
+		if (currentStep < displayedSteps.length - 1) {
 			await handleStepChange(currentStep + 1);
 		}
 	};
@@ -128,8 +130,6 @@ const Wizard = ({
 
 	const handleComplete = async () => {
 		if (isProcessing) return;
-
-		const currentStepData = steps[currentStep];
 
 		// Validate final step
 		if (currentStepData.validate) {
@@ -202,10 +202,10 @@ const Wizard = ({
 							<div className="px-6 pt-4">
 								<div className="flex justify-between items-center mb-2">
 									<span className="text-sm text-gray-400">
-										Step {currentStep + 1} of {steps.length}
+										Step {currentStep + 1} of {displayedSteps.length}
 									</span>
 									<span className="text-sm text-gray-400">
-										{Math.round(((currentStep + 1) / steps.length) * 100)}%
+										{Math.round(((currentStep + 1) / displayedSteps.length) * 100)}%
 										Complete
 									</span>
 								</div>
@@ -213,7 +213,7 @@ const Wizard = ({
 									<div
 										className="bg-gradient-to-r from-violet-500 to-purple-500 h-2 rounded-full transition-all duration-300"
 										style={{
-											width: `${((currentStep + 1) / steps.length) * 100}%`,
+											width: `${((currentStep + 1) / displayedSteps.length) * 100}%`,
 										}}
 									/>
 								</div>
@@ -223,12 +223,12 @@ const Wizard = ({
 						{/* Step Indicators */}
 						<div className="px-6 pt-6 pb-2">
 							<div className="flex justify-between">
-								{steps.map((step, index) => {
+								{displayedSteps.map((step, index) => {
 									const shortLabel =
 										step.shortLabel ||
 										(index === 0
 											? "Start"
-											: index === steps.length - 1
+											: index === displayedSteps.length - 1
 												? "Finish"
 												: `Step ${index}`);
 
@@ -294,9 +294,9 @@ const Wizard = ({
 						<div className="relative p-8 flex-auto overflow-y-auto max-h-96">
 							<div className="mb-6">
 								<h2 className="text-2xl mb-4 text-white">
-									{steps[currentStep].title}
+									{displayedSteps[currentStep].title}
 								</h2>
-								{steps[currentStep].content}
+								{displayedSteps[currentStep].content}
 							</div>
 						</div>
 
@@ -324,7 +324,7 @@ const Wizard = ({
 									Cancel
 								</button>
 
-								{currentStep < steps.length - 1 ? (
+								{currentStep < displayedSteps.length - 1 ? (
 									<button
 										className="bg-neutral-700 hover:bg-neutral-600 text-white px-6 py-2 rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
 										onClick={handleNext}

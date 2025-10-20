@@ -24,8 +24,10 @@ const InstanceCreationWizard = ({
 }: InstanceCreationWizardProps) => {
 	const { showToast } = useToast();
 	const [selectedInstance, setSelectedInstance] =
-		useState<InstancePricing | null>(null);
+		useState<InstancePricing | null>(instanceTypes[0] || null);
 	const [botToken, setBotToken] = useState<string>("");
+
+	const multipleInstanceOptions = instanceTypes.length > 1;
 
 	const handleComplete = async () => {
 		if (!selectedInstance || !botToken) {
@@ -78,6 +80,7 @@ const InstanceCreationWizard = ({
 		{
 			title: "Select Instance Size",
 			shortLabel: "Size",
+			hidden: !multipleInstanceOptions,
 			content: (
 				<div className="space-y-4">
 					<p className="text-lg mb-4">
@@ -240,15 +243,15 @@ const InstanceCreationWizard = ({
 					</p>
 
 					<div className="bg-stone-800 rounded-lg p-6 space-y-4">
-						<div>
+						{multipleInstanceOptions && <div className="border-b border-stone-700 pb-4">
 							<h3 className="text-sm text-gray-400 mb-1">Instance Size</h3>
 							<p className="text-xl text-white">{selectedInstance?.name}</p>
 							<p className="text-sm text-gray-300">
 								{selectedInstance?.description}
 							</p>
-						</div>
+						</div>}
 
-						<div className="border-t border-stone-700 pt-4">
+						<div className="border-b border-stone-700 pb-4">
 							<h3 className="text-sm text-gray-400 mb-1">Cost</h3>
 							<p className="text-2xl">
 								{selectedInstance?.price}{" "}
@@ -256,7 +259,7 @@ const InstanceCreationWizard = ({
 							</p>
 						</div>
 
-						<div className="border-t border-stone-700 pt-4">
+						<div>
 							<h3 className="text-sm text-gray-400 mb-1">Bot Token</h3>
 							<p className="text-sm font-mono text-gray-300">
 								{botToken.length > 20

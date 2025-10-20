@@ -36,6 +36,7 @@ export type PremiumData = {
 		| undefined;
 	credits: number;
 	plans: Plans;
+	occupied: boolean;
 };
 export type NodeStatus = {
 	status: string;

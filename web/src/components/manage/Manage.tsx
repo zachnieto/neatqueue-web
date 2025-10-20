@@ -39,6 +39,17 @@ const Manage = () => {
 		showToast("Success", { message, variant: "success" });
 	};
 
+	if (!premiumData?.occupied) {
+		return (
+			<div className="min-h-screen">
+				<div className="text-center mb-5">
+					<h1 className="text-5xl">{guild.name}</h1>
+					<p className="text-xl text-gray-400">Please invite the bot to your server to get started.</p>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="min-h-screen">
 			<div className="text-center mb-5">
