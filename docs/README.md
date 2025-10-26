@@ -27,6 +27,47 @@ Starting a queue is super simple with NeatQueue, just run one of the following c
 <hr style="border:3px solid gray">
 
 # Premium Commands
+## Bot Customization
+### `/bot avatar`
+#### Description
+ Set the bot's avatar.
+#### Usage: `/bot avatar (file)`
+#### Arguments:
+`file`: *(Optional)* The new avatar for the bot, omit to reset.
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
+### `/bot banner`
+#### Description
+ Set the bot's banner.
+#### Usage: `/bot banner (file)`
+#### Arguments:
+`file`: *(Optional)* The new banner for the bot, omit to reset.
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
+### `/bot bio`
+#### Description
+ Set the bot's bio.
+#### Usage: `/bot bio (bio)`
+#### Arguments:
+`bio`: *(Optional)* The new bio for the bot, omit to reset.
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
+### `/bot nickname`
+#### Description
+ Set the bot's nickname.
+#### Usage: `/bot nickname (name)`
+#### Arguments:
+`name`: *(Optional)* The new nickname for the bot, omit to reset.
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+<hr style="border:3px solid gray">
+
 ## Language
 ### `/language overrides set`
 #### Description
@@ -1425,6 +1466,39 @@ Substitute yourself for the given player.
 
 ---
 
+### `/player role ban`
+#### Description
+ Ban a user from selecting a specific role.
+#### Usage: `/player role ban [user] [role]`
+#### Arguments:
+`user`: *(Required)* The user to ban from the role.\
+`role`: *(Required)* The role to ban the user from.
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
+### `/player role set`
+#### Description
+ Set a specific user's preferred role.
+#### Usage: `/player role set [user] [role]`
+#### Arguments:
+`user`: *(Required)* The user to modify.\
+`role`: *(Required)* The role to set as preferred.
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
+### `/player role unban`
+#### Description
+ Unban a user from a specific role.
+#### Usage: `/player role unban [user] [role]`
+#### Arguments:
+`user`: *(Required)* The user to unban from the role.\
+`role`: *(Required)* The role to unban the user from.
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
 ### `/player sub`
 #### Description
  Substitute the first player for the second player.
@@ -1636,9 +1710,10 @@ Substitute yourself for the given player.
 ### `/matchmaking leniency`
 #### Description
  Every 15 seconds, how much the range will increase for a better chance at a match.
-#### Usage: `/matchmaking leniency [value]`
+#### Usage: `/matchmaking leniency [value] (maximum)`
 #### Arguments:
-`value`: *(Required)* How much to increase the range by.
+`value`: *(Required)* How much to increase the range by.\
+`maximum`: *(Optional)* 
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
 
 ---
@@ -2080,12 +2155,32 @@ Substitute yourself for the given player.
 <hr style="border:3px solid gray">
 
 ## Party Queue
+### `/partyqueue maxrange`
+#### Description
+ Set the max range of MMRs in a party that can enter the queue.
+#### Usage: `/partyqueue maxrange (max_range)`
+#### Arguments:
+`max_range`: *(Optional)* The max range of MMRs, or omit to remove.
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
 ### `/partyqueue maxsize`
 #### Description
  Set the max party size that can enter the queue.
 #### Usage: `/partyqueue maxsize (max_size)`
 #### Arguments:
 `max_size`: *(Optional)* The max party size, or omit to remove.
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
+### `/partyqueue minsize`
+#### Description
+ Set the min party size that can enter the queue.
+#### Usage: `/partyqueue minsize (min_size)`
+#### Arguments:
+`min_size`: *(Optional)* The min party size, or omit to remove.
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
 
 ---
