@@ -162,3 +162,23 @@ export type QueueGameData = {
 	queue_name: string;
 	games: QueueGame[];
 };
+
+export type Player = {
+	name: string;
+	id: number;
+	mmr: number;
+	mmr_change: number;
+	team_num: number;
+};
+
+export type MatchHistory = {
+	game: string;
+	time: string;
+	teams: Player[][];
+	winner: number;
+	game_num: number;
+	lobby_details: string;
+	team_names: string[];
+	channel: string;
+	queue_channel: string;
+};

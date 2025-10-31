@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getLeaderboardV2 } from "../services/neatqueue-service";
 import type { LeaderboardPlayer, LeaderboardV2Response } from "../types";
 import { classNames } from "../util/tailwind";
-import { displayPercent, getWinRateColor } from "../util/utility";
+import {
+	displayPercent,
+	getWinRateColor,
+	handleKeyDown,
+} from "../util/utility";
 import ExpandedStats from "./ExpandedStats";
 
 type PlayerData = LeaderboardPlayer["stats"];
@@ -73,9 +77,9 @@ const MonthSelector = ({
 
 	return (
 		<div className="flex flex-col">
-			<label className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wide">
+			<span className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wide">
 				Time Period
-			</label>
+			</span>
 			<select
 				value={selectedMonth}
 				onChange={(e) => onMonthChange(e.target.value)}
@@ -298,9 +302,29 @@ const Leaderboard = ({
 			<div className="max-w-7xl mx-auto">
 				{/* Header */}
 				<div className="mb-6 text-center">
-					<h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
+					<h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
 						{formatQueueName(leaderboardData.queue_name)}
 					</h1>
+					<Link
+						to={`/history/${guildId}?queue=${encodeURIComponent(leaderboardData.queue_name)}`}
+						className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-neutral-700 hover:bg-neutral-600 text-white transition-colors shadow-lg"
+					>
+						<svg
+							className="w-4 h-4 mr-2 mb-1"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							aria-hidden="true"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
+						</svg>
+						Match History
+					</Link>
 				</div>
 
 				<div className="space-y-4">
@@ -324,14 +348,15 @@ const Leaderboard = ({
 					{/* Column Toggle Controls with Desktop Month Selector */}
 					<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-2 md:p-4 shadow-2xl">
 						{/* Desktop: Combined layout */}
-						<div className="hidden md:flex md:items-end md:gap-4 mb-4">
+						<div className="hidden md:flex md:items-end md:gap-4">
 							<div className="flex-1">
-								<label className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wide block">
+								<span className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wide block">
 									Displayed Stats
-								</label>
+								</span>
 								<div className="flex flex-wrap gap-2">
 									{TABLE_STATS.map((stat: SortKey) => (
 										<button
+											type="button"
 											key={stat}
 											onClick={() => toggleColumn(stat)}
 											className={classNames(
@@ -365,6 +390,7 @@ const Leaderboard = ({
 						<div className="md:hidden flex flex-wrap gap-1">
 							{TABLE_STATS.map((stat: SortKey) => (
 								<button
+									type="button"
 									key={stat}
 									onClick={() => toggleColumn(stat)}
 									className={classNames(
@@ -395,6 +421,7 @@ const Leaderboard = ({
 									</div>
 									{visibleColumns.map((column) => (
 										<button
+											type="button"
 											key={column}
 											onClick={() => handleColumnHeaderClick(column)}
 											className="min-w-[80px] text-xs font-bold text-gray-300 uppercase tracking-wider text-center hover:text-white transition-colors cursor-pointer flex items-center justify-center gap-1"
@@ -442,6 +469,13 @@ const Leaderboard = ({
 													onClick={() =>
 														setExpandedPlayerId(isExpanded ? null : player.id)
 													}
+													onKeyDown={(e) => {
+														handleKeyDown(e, () =>
+															setExpandedPlayerId(
+																isExpanded ? null : player.id,
+															),
+														);
+													}}
 												>
 													<div className="flex items-center gap-4">
 														{/* Rank */}
@@ -580,6 +614,7 @@ const Leaderboard = ({
 
 											<div className="flex items-center space-x-2">
 												<button
+													type="button"
 													onClick={() => setCurrentPage(currentPage - 1)}
 													disabled={!currentMonthData.pagination.previous_page}
 													className={classNames(
@@ -598,6 +633,7 @@ const Leaderboard = ({
 												</span>
 
 												<button
+													type="button"
 													onClick={() => setCurrentPage(currentPage + 1)}
 													disabled={!currentMonthData.pagination.next_page}
 													className={classNames(
@@ -646,6 +682,13 @@ const Leaderboard = ({
 													onClick={() =>
 														setExpandedPlayerId(isExpanded ? null : player.id)
 													}
+													onKeyDown={(e) => {
+														handleKeyDown(e, () =>
+															setExpandedPlayerId(
+																isExpanded ? null : player.id,
+															),
+														);
+													}}
 												>
 													{/* Rank */}
 													<div className="flex flex-col items-center justify-center w-10">
@@ -693,6 +736,7 @@ const Leaderboard = ({
 																	const colors = getWinRateColor(winrateValue);
 																	return (
 																		<button
+																			type="button"
 																			key={column}
 																			onClick={(e) => {
 																				e.stopPropagation();
@@ -722,6 +766,7 @@ const Leaderboard = ({
 																}
 																return (
 																	<button
+																		type="button"
 																		key={column}
 																		onClick={(e) => {
 																			e.stopPropagation();
@@ -785,6 +830,7 @@ const Leaderboard = ({
 										</div>
 										<div className="flex items-center justify-center gap-2">
 											<button
+												type="button"
 												onClick={() => setCurrentPage(currentPage - 1)}
 												disabled={!currentMonthData.pagination.previous_page}
 												className={classNames(
@@ -798,6 +844,7 @@ const Leaderboard = ({
 											</button>
 
 											<button
+												type="button"
 												onClick={() => setCurrentPage(currentPage + 1)}
 												disabled={!currentMonthData.pagination.next_page}
 												className={classNames(

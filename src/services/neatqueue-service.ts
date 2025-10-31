@@ -3,6 +3,7 @@ import globalState from "../state";
 import type {
 	Auth,
 	InstancePricing,
+	MatchHistory,
 	NodeStatus,
 	PrivateInstance,
 } from "../types";
@@ -37,13 +38,19 @@ export const getLeaderboardV2 = async (
 	});
 
 	if (months && months.length > 0) {
-		months.forEach((month) => params.append("month", month));
+		for (const month of months) {
+			params.append("month", month);
+		}
 	}
 	if (includeFields && includeFields.length > 0) {
-		includeFields.forEach((field) => params.append("include_fields", field));
+		for (const field of includeFields) {
+			params.append("include_fields", field);
+		}
 	}
 	if (excludeFields && excludeFields.length > 0) {
-		excludeFields.forEach((field) => params.append("exclude_fields", field));
+		for (const field of excludeFields) {
+			params.append("exclude_fields", field);
+		}
 	}
 
 	const resp = await axios.get(
@@ -106,7 +113,7 @@ export const transferCredits = async (
 		},
 	};
 
-	const resp = await axios.post(
+	await axios.post(
 		`${API_BASE}/transfercredits`,
 		{
 			server_id: fromGuildID,
@@ -309,4 +316,19 @@ export const updateInstanceConfig = async (
 		axiosConfig,
 	);
 	return resp.data;
+};
+
+export const getHistory = async (
+	guildID: string,
+	limit: number = 1000,
+	startDate: string,
+	endDate: string,
+) => {
+	const resp = await axios.get(
+		`${API_BASE}/api/history/${guildID}?limit=${limit}&start_date=${startDate}&end_date=${endDate}`,
+	);
+	return resp.data as {
+		data: MatchHistory[];
+		total?: number;
+	};
 };

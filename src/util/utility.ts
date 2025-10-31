@@ -78,3 +78,12 @@ export const getWinRateColor = (winrate: number): WinRateColors => {
 		};
 	}
 };
+
+export const handleKeyDown = (
+	e: React.KeyboardEvent<HTMLDivElement>,
+	action: () => void,
+) => {
+	if (e.key === "Enter" || e.key === " ") {
+		action();
+	}
+};
