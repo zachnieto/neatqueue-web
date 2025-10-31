@@ -3,12 +3,18 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getLeaderboardV2 } from "../services/neatqueue-service";
-import { type LeaderboardPlayer, LeaderboardV2Response } from "../types";
+import {
+	type LeaderboardPlayer,
+	LeaderboardV2Response,
+} from "../types";
 import { classNames } from "../util/tailwind";
-import { displayPercent } from "../util/utility";
+import { displayPercent, getWinRateColor } from "../util/utility";
+import ExpandedStats from "./ExpandedStats";
 
 type PlayerData = LeaderboardPlayer["stats"];
-type SortKey = Exclude<keyof PlayerData, "ign" | "rank" | "decay"> | "wl";
+type SortKey =
+	| Exclude<keyof PlayerData, "ign" | "rank" | "decay" | "parsed_stats">
+	| "wl";
 type SortDirection = "asc" | "desc";
 
 const TABLE_STATS: SortKey[] = [
@@ -23,9 +29,7 @@ const TABLE_STATS: SortKey[] = [
 	"winrate",
 ];
 
-const EXPANDED_STATS: SortKey[] = ["current_rank", ...TABLE_STATS];
-
-const STAT_LABELS: Record<SortKey, string> = {
+const STAT_LABELS: Record<string, string> = {
 	mmr: "MMR",
 	wl: "W/L",
 	wins: "Wins",
@@ -35,7 +39,9 @@ const STAT_LABELS: Record<SortKey, string> = {
 	peak_mmr: "Peak MMR",
 	peak_streak: "Peak Streak",
 	winrate: "Win Rate",
-	current_rank: "Rank",
+	current_rank: "Current Rank",
+	rank: "Rank",
+	decay: "Decay",
 };
 
 const DEFAULT_COLUMNS: SortKey[] = ["mmr", "wl", "winrate"];
@@ -123,7 +129,7 @@ const Leaderboard = ({
 		data: leaderboardData,
 		isLoading,
 		error,
-	} = useQuery({
+	} = useQuery<LeaderboardV2Response, Error>({
 		queryKey: ["leaderboard", guildId, channelId, selectedMonth, currentPage],
 		queryFn: () =>
 			getLeaderboardV2(guildId, channelId, currentPage, [
@@ -133,6 +139,11 @@ const Leaderboard = ({
 		enabled: !!guildId && !!channelId,
 		staleTime: 30000, // 30 seconds
 	});
+
+	const showMonthSelector = useMemo(() => {
+		if (!leaderboardData) return false;
+		return leaderboardData?.available_months.length > 1 && leaderboardData?.available_months[0] !== "alltime";
+	}, [leaderboardData]);
 
 	const currentMonthData = useMemo(() => {
 		if (!leaderboardData) return null;
@@ -234,60 +245,23 @@ const Leaderboard = ({
 		return { icon: null, bg: "", border: "" };
 	};
 
-	const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
-		if (key === "wl") {
-			const wins = player?.stats?.wins || 0;
-			const losses = player?.stats?.losses || 0;
-			return `${wins} - ${losses}`;
-		}
+const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
+	if (key === "wl") {
+		const wins = player?.stats?.wins || 0;
+		const losses = player?.stats?.losses || 0;
+		return `${wins} - ${losses}`;
+	}
 
-		const value = player?.stats?.[key as keyof PlayerData];
-		if (value == null) return "0";
-		if (key === "winrate" && typeof value === "number")
-			return displayPercent(value);
-		if ((key === "mmr" || key === "peak_mmr") && typeof value === "number")
-			return Math.round(value).toString();
-		return value?.toString() || "0";
-	};
+	const value = player?.stats?.[key as keyof PlayerData];
+	if (value == null) return "0";
+	if (key === "winrate" && typeof value === "number")
+		return displayPercent(value);
+	if ((key === "mmr" || key === "peak_mmr") && typeof value === "number")
+		return Math.round(value).toString();
+	return value?.toString() || "0";
+};
 
-	const getWinRateColor = (winrate: number) => {
-		// Interpolate between red (0%), yellow (45%), and green (55%+)
-		// This favors green more heavily since 50% is average
-		const percentage = winrate * 100;
-
-		if (percentage <= 45) {
-			// Interpolate from red to yellow (0% to 45%)
-			const ratio = percentage / 45;
-			const red = 220; // Starting red value
-			const green = Math.round(180 * ratio); // Interpolate to yellow
-			return {
-				border: `rgb(${red}, ${green}, 0)`,
-				bg: `rgba(${red}, ${green}, 0, 0.2)`,
-				text: `rgb(${red}, ${green + 20}, 0)`,
-			};
-		} else if (percentage <= 55) {
-			// Interpolate from yellow to green (45% to 55%)
-			const ratio = (percentage - 45) / 10;
-			const red = Math.round(220 * (1 - ratio)); // Fade out red quickly
-			const green = Math.round(180 + 75 * ratio); // Increase green
-			return {
-				border: `rgb(${red}, ${green}, 0)`,
-				bg: `rgba(${red}, ${green}, 0, 0.2)`,
-				text: `rgb(${Math.max(red - 20, 0)}, ${green}, 0)`,
-			};
-		} else {
-			// Full green for 55%+ (good performance)
-			const ratio = Math.min((percentage - 55) / 45, 1); // 55% to 100%
-			const green = Math.round(200 + 55 * ratio); // Brighter green for higher winrates
-			return {
-				border: `rgb(0, ${green}, 0)`,
-				bg: `rgba(0, ${green}, 0, 0.2)`,
-				text: `rgb(0, ${Math.min(green + 20, 255)}, 0)`,
-			};
-		}
-	};
-
-	if (isLoading) {
+	if (isLoading || !leaderboardData) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
 				<div className="text-center">
@@ -331,7 +305,7 @@ const Leaderboard = ({
 
 				<div className="space-y-4">
 					{/* Mobile Month Selector - Separate on mobile */}
-					<div className="md:hidden">
+					{showMonthSelector && <div className="md:hidden">
 						<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-2 shadow-2xl">
 							<MonthSelector
 								availableMonths={leaderboardData.available_months}
@@ -343,7 +317,7 @@ const Leaderboard = ({
 								formatMonthDisplay={formatMonthDisplay}
 							/>
 						</div>
-					</div>
+					</div>}
 
 					{/* Column Toggle Controls with Desktop Month Selector */}
 					<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-2 md:p-4 shadow-2xl">
@@ -370,7 +344,7 @@ const Leaderboard = ({
 									))}
 								</div>
 							</div>
-							<div className="w-48 flex-shrink-0">
+							{showMonthSelector && <div className="w-48 flex-shrink-0">
 								<MonthSelector
 									availableMonths={leaderboardData.available_months}
 									selectedMonth={selectedMonth}
@@ -380,7 +354,7 @@ const Leaderboard = ({
 									}}
 									formatMonthDisplay={formatMonthDisplay}
 								/>
-							</div>
+							</div>}
 						</div>
 
 						{/* Mobile: Just column toggles */}
@@ -433,7 +407,7 @@ const Leaderboard = ({
 							</div>
 
 							{/* Table Body */}
-							<div className="divide-y divide-neutral-800">
+							<div className="divide-y divide-neutral-700">
 								{sortedPlayers.length === 0 ? (
 									<div className="text-center py-12">
 										<p className="text-gray-400">No players found</p>
@@ -452,7 +426,7 @@ const Leaderboard = ({
 											<div
 												key={player.id}
 												className={classNames(
-													"transition-all duration-200",
+													"transition-all duration-200 bg-neutral-800",
 													rankInfo.bg,
 												)}
 											>
@@ -547,58 +521,25 @@ const Leaderboard = ({
 												</div>
 
 												{/* Expanded Stats View */}
-												<div
-													className={classNames(
-														"overflow-hidden transition-all duration-300 ease-in-out",
-														isExpanded
-															? "max-h-96 opacity-100"
-															: "max-h-0 opacity-0",
-													)}
-												>
-													<div className="border-t border-neutral-800 px-6 py-4 bg-neutral-800/50">
-														<div className="grid grid-cols-5 gap-3">
-															{EXPANDED_STATS.map((stat) => {
-																if (stat === "winrate") {
-																	const winrateValue =
-																		player?.stats?.winrate || 0;
-																	const colors = getWinRateColor(winrateValue);
-																	return (
-																		<div
-																			key={stat}
-																			className="bg-neutral-900 rounded-lg p-4 text-center border border-neutral-700"
-																		>
-																			<div className="text-xs text-gray-400 mb-2 uppercase tracking-wide">
-																				{STAT_LABELS[stat]}
-																			</div>
-																			<div
-																				className="text-xl font-bold px-2 py-1 rounded border inline-block"
-																				style={{
-																					borderColor: colors.border,
-																					backgroundColor: colors.bg,
-																				}}
-																			>
-																				{displayPercent(winrateValue)}
-																			</div>
-																		</div>
-																	);
-																}
-																return (
-																	<div
-																		key={stat}
-																		className="bg-neutral-900 rounded-lg p-4 text-center border border-neutral-700"
-																	>
-																		<div className="text-xs text-gray-400 mb-2 uppercase tracking-wide">
-																			{STAT_LABELS[stat]}
-																		</div>
-																		<div className="text-xl font-bold text-white">
-																			{formatStatValue(player, stat)}
-																		</div>
-																	</div>
-																);
-															})}
-														</div>
-													</div>
-												</div>
+                                                <div
+                                                    className={classNames(
+                                                        "overflow-hidden transition-all duration-300 ease-in-out",
+                                                        isExpanded
+                                                            ? "max-h-[2000px] opacity-100"
+                                                            : "max-h-0 opacity-0",
+                                                    )}
+                                                >
+                                                    <div className="border-t border-neutral-800 px-6 py-4 bg-neutral-800/50">
+									<ExpandedStats
+										player={player}
+										variant="desktop"
+										guildId={guildId}
+										queueName={leaderboardData.queue_name}
+										selectedMonth={currentMonthData?.month ?? selectedMonth}
+										isExpanded={isExpanded}
+									/>
+                                                    </div>
+                                                </div>
 											</div>
 										);
 									})
@@ -668,14 +609,15 @@ const Leaderboard = ({
 								)}
 						</div>
 
-						{/* Mobile Card View */}
-						<div className="md:hidden space-y-2">
-							{sortedPlayers.length === 0 ? (
-								<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-8 text-center">
-									<p className="text-gray-400">No players found</p>
-								</div>
-							) : (
-								sortedPlayers.map((player, index) => {
+					{/* Mobile Card View */}
+					<div className="md:hidden bg-neutral-900 rounded-xl border border-neutral-700 shadow-2xl overflow-hidden">
+						{sortedPlayers.length === 0 ? (
+							<div className="p-8 text-center">
+								<p className="text-gray-400">No players found</p>
+							</div>
+						) : (
+							<div className="divide-y divide-neutral-700">
+								{sortedPlayers.map((player, index) => {
 									const rank =
 										index +
 										1 +
@@ -688,7 +630,7 @@ const Leaderboard = ({
 										<div
 											key={player.id}
 											className={classNames(
-												"bg-neutral-800 rounded-lg border border-neutral-700 shadow-lg transition-all duration-200",
+												"transition-all duration-200 bg-neutral-800",
 												rankInfo.bg,
 											)}
 										>
@@ -804,97 +746,65 @@ const Leaderboard = ({
 												className={classNames(
 													"overflow-hidden transition-all duration-300 ease-in-out",
 													isExpanded
-														? "max-h-96 opacity-100"
+														? "max-h-[2000px] opacity-100"
 														: "max-h-0 opacity-0",
 												)}
 											>
-												<div className="border-t border-neutral-700 p-3 bg-neutral-900/50">
-													<div className="grid grid-cols-3 gap-2">
-														{EXPANDED_STATS.map((stat) => {
-															if (stat === "winrate") {
-																const winrateValue =
-																	player?.stats?.winrate || 0;
-																const colors = getWinRateColor(winrateValue);
-																return (
-																	<div
-																		key={stat}
-																		className="bg-neutral-800 rounded-lg p-3 text-center border border-neutral-700"
-																	>
-																		<div className="text-xs text-gray-400 mb-2 uppercase tracking-wide">
-																			{STAT_LABELS[stat]}
-																		</div>
-																		<div
-																			className="text-lg font-bold px-2 py-1 rounded border inline-block"
-																			style={{
-																				borderColor: colors.border,
-																				backgroundColor: colors.bg,
-																			}}
-																		>
-																			{displayPercent(winrateValue)}
-																		</div>
-																	</div>
-																);
-															}
-															return (
-																<div
-																	key={stat}
-																	className="bg-neutral-800 rounded-lg p-3 text-center border border-neutral-700"
-																>
-																	<div className="text-xs text-gray-400 mb-2 uppercase tracking-wide">
-																		{STAT_LABELS[stat]}
-																	</div>
-																	<div className="text-lg font-bold text-white">
-																		{formatStatValue(player, stat)}
-																	</div>
-																</div>
-															);
-														})}
-													</div>
+												<div className="border-t border-neutral-800 p-3 bg-neutral-800/50">
+										<ExpandedStats
+											player={player}
+											variant="mobile"
+											guildId={guildId}
+											queueName={leaderboardData.queue_name}
+											selectedMonth={currentMonthData?.month ?? selectedMonth}
+											isExpanded={isExpanded}
+										/>
 												</div>
 											</div>
 										</div>
 									);
-								})
-							)}
+								})}
+							</div>
+						)}
 
-							{/* Mobile Pagination */}
-							{currentMonthData?.pagination &&
-								currentMonthData.pagination.total_pages > 1 && (
-									<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-4">
-										<div className="text-xs text-gray-400 text-center mb-3">
-											Page {currentPage} of{" "}
-											{currentMonthData.pagination.total_pages}
-										</div>
-										<div className="flex items-center justify-center gap-2">
-											<button
-												onClick={() => setCurrentPage(currentPage - 1)}
-												disabled={!currentMonthData.pagination.previous_page}
-												className={classNames(
-													"px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200",
-													currentMonthData.pagination.previous_page
-														? "bg-neutral-700 hover:bg-neutral-600 text-white"
-														: "bg-neutral-900 text-gray-500 cursor-not-allowed",
-												)}
-											>
-												← Prev
-											</button>
-
-											<button
-												onClick={() => setCurrentPage(currentPage + 1)}
-												disabled={!currentMonthData.pagination.next_page}
-												className={classNames(
-													"px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200",
-													currentMonthData.pagination.next_page
-														? "bg-neutral-700 hover:bg-neutral-600 text-white"
-														: "bg-neutral-900 text-gray-500 cursor-not-allowed",
-												)}
-											>
-												Next →
-											</button>
-										</div>
+						{/* Mobile Pagination */}
+						{currentMonthData?.pagination &&
+							currentMonthData.pagination.total_pages > 1 && (
+								<div className="bg-neutral-800 px-4 py-4 border-t border-neutral-700">
+									<div className="text-xs text-gray-400 text-center mb-3">
+										Page {currentPage} of{" "}
+										{currentMonthData.pagination.total_pages}
 									</div>
-								)}
-						</div>
+									<div className="flex items-center justify-center gap-2">
+										<button
+											onClick={() => setCurrentPage(currentPage - 1)}
+											disabled={!currentMonthData.pagination.previous_page}
+											className={classNames(
+												"px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200",
+												currentMonthData.pagination.previous_page
+													? "bg-neutral-700 hover:bg-neutral-600 text-white shadow-lg"
+													: "bg-neutral-800 text-gray-500 cursor-not-allowed",
+											)}
+										>
+											← Prev
+										</button>
+
+										<button
+											onClick={() => setCurrentPage(currentPage + 1)}
+											disabled={!currentMonthData.pagination.next_page}
+											className={classNames(
+												"px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200",
+												currentMonthData.pagination.next_page
+													? "bg-neutral-700 hover:bg-neutral-600 text-white shadow-lg"
+													: "bg-neutral-800 text-gray-500 cursor-not-allowed",
+											)}
+										>
+											Next →
+										</button>
+									</div>
+								</div>
+							)}
+					</div>
 					</div>
 				</div>
 			</div>

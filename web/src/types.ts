@@ -88,6 +88,8 @@ export type LeaderboardFilters = {
 	exclude_fields: string[];
 };
 
+export type ParsedStats = Record<string, number | null>;
+
 export type PlayerData = {
 	mmr: number;
 	wins: number;
@@ -101,13 +103,14 @@ export type PlayerData = {
 	rank: number | null;
 	winrate: number;
 	current_rank: number;
+ 	parsed_stats?: ParsedStats;
 };
 
 export type LeaderboardPlayer = {
 	id: string;
 	name: string;
 	avatar_url: string;
-	color: number;
+	color: number | string;
 	data: PlayerData;
 	stats: PlayerData; // Alias for backward compatibility
 };
@@ -135,4 +138,27 @@ export type LeaderboardV2Response = {
 	filters: LeaderboardFilters;
 	available_months: string[];
 	months: MonthData[];
+};
+
+export type QueueGameStats = Partial<PlayerData> & {
+	parsed_stats?: ParsedStats;
+	[key: string]: unknown;
+};
+
+export type QueueGame = {
+	result: string;
+	mmr_change: number;
+	mmr: number;
+	initial_stats?: QueueGameStats;
+	updated_stats?: QueueGameStats;
+	timestamp: string;
+	game_num: number;
+	parsed_stats?: ParsedStats;
+};
+
+export type QueueGameData = {
+	guild_id: number;
+	player_id: number;
+	queue_name: string;
+	games: QueueGame[];
 };

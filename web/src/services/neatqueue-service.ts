@@ -52,6 +52,18 @@ export const getLeaderboardV2 = async (
 	return resp.data;
 };
 
+export const getPlayerGames = async (
+	guildID: string,
+	playerID: string,
+	queueName: string,
+) => {
+	const encodedQueueName = encodeURIComponent(queueName);
+	const resp = await axios.get(
+		`${API_BASE}/api/v2/playergames/${guildID}/${playerID}/${encodedQueueName}`,
+	);
+	return resp.data;
+};
+
 export const getPremium = async (guildID: string, oauth: Auth) => {
 	const config = {
 		headers: {
