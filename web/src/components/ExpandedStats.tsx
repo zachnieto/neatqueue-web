@@ -1,15 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
-import Highcharts from "highcharts";
 import HighchartsReact from "@highcharts/react/Highcharts";
+import { useQuery } from "@tanstack/react-query";
+import Highcharts from "highcharts";
+import { useEffect, useMemo, useState } from "react";
 import { getPlayerGames } from "../services/neatqueue-service";
-import {
-	type LeaderboardPlayer,
-	type QueueGame,
-	type QueueGameData,
-} from "../types";
+import type { LeaderboardPlayer, QueueGame, QueueGameData } from "../types";
 import { classNames } from "../util/tailwind";
-import { displayPercent, getWinRateColor, WinRateColors } from "../util/utility";
+import {
+	displayPercent,
+	getWinRateColor,
+	type WinRateColors,
+} from "../util/utility";
 
 type PlayerData = LeaderboardPlayer["stats"];
 type SortKey =
@@ -121,7 +121,6 @@ const TOP_LEVEL_STATS_ORDER = [
 	"decay",
 ] as const;
 
-
 const formatStatLabel = (key: string) => {
 	if (STAT_LABELS[key]) {
 		return STAT_LABELS[key];
@@ -198,15 +197,14 @@ const buildTopLevelStatEntries = (player: LeaderboardPlayer): StatEntry[] => {
 	if (!stats) return [];
 
 	const statsRecord = stats as PlayerData & Record<string, unknown>;
-	const rawKeys = Object.keys(statsRecord).filter((key) => !IGNORED_STATS.includes(key as keyof PlayerData));
+	const rawKeys = Object.keys(statsRecord).filter(
+		(key) => !IGNORED_STATS.includes(key as keyof PlayerData),
+	);
 	const orderedKeys: string[] = [];
 
 	TOP_LEVEL_STATS_ORDER.forEach((key) => {
 		if (key === "wl") {
-			if (
-				typeof stats.wins === "number" &&
-				typeof stats.losses === "number"
-			) {
+			if (typeof stats.wins === "number" && typeof stats.losses === "number") {
 				orderedKeys.push("wl");
 			}
 			return;
@@ -227,10 +225,7 @@ const buildTopLevelStatEntries = (player: LeaderboardPlayer): StatEntry[] => {
 
 	orderedKeys.forEach((key) => {
 		if (key === "wl") {
-			if (
-				typeof stats.wins === "number" &&
-				typeof stats.losses === "number"
-			) {
+			if (typeof stats.wins === "number" && typeof stats.losses === "number") {
 				const winsDisplay = numberFormatter.format(stats.wins);
 				const lossesDisplay = numberFormatter.format(stats.losses);
 				entries.push({
@@ -360,7 +355,11 @@ const getStatValueFromGame = (
 	selection: StatSelection,
 ): number | null => {
 	if (selection.type === "parsed") {
-		console.log(selection.key, game.updated_stats?.parsed_stats?.[selection.key], game.updated_stats?.parsed_stats);
+		console.log(
+			selection.key,
+			game.updated_stats?.parsed_stats?.[selection.key],
+			game.updated_stats?.parsed_stats,
+		);
 		return game.updated_stats?.parsed_stats?.[selection.key] ?? null;
 	}
 
@@ -405,8 +404,14 @@ const ExpandedStats = ({
 	selectedMonth: string;
 	isExpanded: boolean;
 }) => {
-	const topLevelEntries = useMemo(() => buildTopLevelStatEntries(player), [player]);
-	const parsedStatGroups = useMemo(() => buildParsedStatEntries(player), [player]);
+	const topLevelEntries = useMemo(
+		() => buildTopLevelStatEntries(player),
+		[player],
+	);
+	const parsedStatGroups = useMemo(
+		() => buildParsedStatEntries(player),
+		[player],
+	);
 	const [selectedStat, setSelectedStat] = useState<StatSelection>({
 		type: "topLevel",
 		key: "mmr",
@@ -463,30 +468,21 @@ const ExpandedStats = ({
 		setXAxisMode("game");
 	}, [player.id, resolvedQueueName, topLevelEntries, parsedStatGroups]);
 
-	const {
-		data: playerGamesData,
-		isLoading: isGamesLoading,
-	} = useQuery<QueueGameData>({
-		queryKey: [
-			"player-games",
-			guildId,
-			player.id,
-			resolvedQueueName,
-		],
-		queryFn: () => getPlayerGames(guildId, player.id, resolvedQueueName),
-		enabled:
-			isExpanded &&
-			Boolean(guildId) &&
-			Boolean(resolvedQueueName) &&
-			Boolean(player?.id),
-		staleTime: 30000,
-	});
+	const { data: playerGamesData, isLoading: isGamesLoading } =
+		useQuery<QueueGameData>({
+			queryKey: ["player-games", guildId, player.id, resolvedQueueName],
+			queryFn: () => getPlayerGames(guildId, player.id, resolvedQueueName),
+			enabled:
+				isExpanded &&
+				Boolean(guildId) &&
+				Boolean(resolvedQueueName) &&
+				Boolean(player?.id),
+			staleTime: 30000,
+		});
 
 	const games = useMemo(() => {
 		const rawGames = playerGamesData?.games ?? [];
-		return [...rawGames].sort(
-			(a, b) => (a.game_num ?? 0) - (b.game_num ?? 0),
-		);
+		return [...rawGames].sort((a, b) => (a.game_num ?? 0) - (b.game_num ?? 0));
 	}, [playerGamesData]);
 
 	const seriesData = useMemo<ChartPoint[]>(() => {
@@ -505,7 +501,8 @@ const ExpandedStats = ({
 				}
 
 				const gameNumber = game.game_num ?? index + 1;
-				const xValue = xAxisMode === "date" ? (timestampMs as number) : gameNumber;
+				const xValue =
+					xAxisMode === "date" ? (timestampMs as number) : gameNumber;
 				const formattedValue = formatNumericValue(statValue, selectedStat.key);
 				const timestamp = game.timestamp ?? "";
 				const result = game.result ?? "";
@@ -524,84 +521,87 @@ const ExpandedStats = ({
 			.filter((point): point is ChartPoint => point !== null);
 	}, [games, selectedStat, xAxisMode]);
 
-	const chartOptions = useMemo<Highcharts.Options>(() => ({
-		chart: {
-			backgroundColor: "transparent",
-			height: 300,
-			style: {
-				fontFamily: "Inter, sans-serif",
-			},
-		},
-		title: { text: undefined },
-		credits: { enabled: false },
-		xAxis: {
-			type: xAxisMode === "date" ? "datetime" : "linear",
-			title: { text: xAxisMode === "date" ? "Date" : "Game #" },
-			labels: { style: { color: "#9ca3af" } },
-			gridLineColor: "rgba(255,255,255,0.08)",
-			...(xAxisMode === "game" && { allowDecimals: false }),
-		},
-		yAxis: {
-			title: { text: selectedStat.label },
-			labels: { 
-				style: { color: "#9ca3af" },
-				formatter: function() {
-					return formatNumericValue(this.value as number, selectedStat.key);
-				}
-			},
-			gridLineColor: "rgba(255,255,255,0.08)",
-		},
-		legend: { enabled: false },
-		plotOptions: {
-			series: {
-				animation: false,
-				marker: {
-					enabled: true,
-					radius: 3,
+	const chartOptions = useMemo<Highcharts.Options>(
+		() => ({
+			chart: {
+				backgroundColor: "transparent",
+				height: 300,
+				style: {
+					fontFamily: "Inter, sans-serif",
 				},
 			},
-		},
-		series: [
-			{
-				type: "line",
-				name: selectedStat.label,
-				data: seriesData,
-				color: "#38bdf8",
-				lineWidth: 2,
+			title: { text: undefined },
+			credits: { enabled: false },
+			xAxis: {
+				type: xAxisMode === "date" ? "datetime" : "linear",
+				title: { text: xAxisMode === "date" ? "Date" : "Game #" },
+				labels: { style: { color: "#9ca3af" } },
+				gridLineColor: "rgba(255,255,255,0.08)",
+				...(xAxisMode === "game" && { allowDecimals: false }),
 			},
-		],
-		tooltip: {
-			backgroundColor: "rgba(38, 38, 38)",
-			borderColor: "rgba(38, 38, 38)",
-			opacity: 0.5,
-			style: { color: "#f9fafb" },
-			formatter(this: Highcharts.Point) {
-				const point = this as Highcharts.Point & {
-					custom?: ChartPoint["custom"];
-				};
-				const custom = point.custom;
-				const lines: string[] = [];
-				const valueLabel =
-					custom?.formattedValue ??
-					(typeof this.y === "number"
-						? formatNumericValue(this.y, selectedStat.key)
-						: undefined);
-				if (valueLabel !== undefined) {
-					lines.push(`${selectedStat.label}: <b>${valueLabel}</b>`);
-				}
-				if (custom?.gameNumber !== undefined) {
-					lines.push(`Game #: ${custom.gameNumber}`);
-				}
-				if (custom?.timestamp) {
-					lines.push(`Date: ${custom.timestamp}`);
-				}
-				if (custom?.result) {
-					lines.push(`Result: ${custom.result} MMR`);
-				}
-				return lines.join("<br/>") || "";
+			yAxis: {
+				title: { text: selectedStat.label },
+				labels: {
+					style: { color: "#9ca3af" },
+					formatter: function () {
+						return formatNumericValue(this.value as number, selectedStat.key);
+					},
+				},
+				gridLineColor: "rgba(255,255,255,0.08)",
 			},
-		},
-	}), [seriesData, selectedStat, xAxisMode]);
+			legend: { enabled: false },
+			plotOptions: {
+				series: {
+					animation: false,
+					marker: {
+						enabled: true,
+						radius: 3,
+					},
+				},
+			},
+			series: [
+				{
+					type: "line",
+					name: selectedStat.label,
+					data: seriesData,
+					color: "#38bdf8",
+					lineWidth: 2,
+				},
+			],
+			tooltip: {
+				backgroundColor: "rgba(38, 38, 38)",
+				borderColor: "rgba(38, 38, 38)",
+				opacity: 0.5,
+				style: { color: "#f9fafb" },
+				formatter(this: Highcharts.Point) {
+					const point = this as Highcharts.Point & {
+						custom?: ChartPoint["custom"];
+					};
+					const custom = point.custom;
+					const lines: string[] = [];
+					const valueLabel =
+						custom?.formattedValue ??
+						(typeof this.y === "number"
+							? formatNumericValue(this.y, selectedStat.key)
+							: undefined);
+					if (valueLabel !== undefined) {
+						lines.push(`${selectedStat.label}: <b>${valueLabel}</b>`);
+					}
+					if (custom?.gameNumber !== undefined) {
+						lines.push(`Game #: ${custom.gameNumber}`);
+					}
+					if (custom?.timestamp) {
+						lines.push(`Date: ${custom.timestamp}`);
+					}
+					if (custom?.result) {
+						lines.push(`Result: ${custom.result} MMR`);
+					}
+					return lines.join("<br/>") || "";
+				},
+			},
+		}),
+		[seriesData, selectedStat, xAxisMode],
+	);
 
 	const isDesktop = variant === "desktop";
 	const containerClass = isDesktop ? "space-y-6" : "space-y-4";
@@ -626,11 +626,7 @@ const ExpandedStats = ({
 		isGamesLoading;
 
 	if (!hasAnyData) {
-		return (
-			<div className="text-sm text-gray-400 italic">
-				No data found.
-			</div>
-		);
+		return <div className="text-sm text-gray-400 italic">No data found.</div>;
 	}
 
 	const handleSelectTopLevel = (entry: StatEntry) => {
@@ -768,7 +764,7 @@ const ExpandedStats = ({
 							</div>
 						</div>
 					</div>
-					<div className={classNames("mt-4")}> 
+					<div className={classNames("mt-4")}>
 						{isGamesLoading ? (
 							<div className="flex h-full items-center justify-center text-sm text-gray-400">
 								Loading player history...
@@ -792,7 +788,9 @@ const ExpandedStats = ({
 
 			{parsedStatGroups.length > 0 && (
 				<div className={sectionClass}>
-					<div className={gridClass}>{parsedStatGroups.map(renderGroupedCard)}</div>
+					<div className={gridClass}>
+						{parsedStatGroups.map(renderGroupedCard)}
+					</div>
 				</div>
 			)}
 		</div>

@@ -36,7 +36,6 @@ export const floatToPrice = (num: number) => {
 	return Math.ceil(num * 100) / 100;
 };
 
-
 export type WinRateColors = {
 	border: string;
 	bg: string;

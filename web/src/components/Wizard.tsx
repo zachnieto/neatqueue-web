@@ -43,7 +43,6 @@ const Wizard = ({
 	const displayedSteps = steps.filter((step) => !step.hidden);
 	const currentStepData = displayedSteps[currentStep];
 
-
 	const widthClasses = {
 		sm: "max-w-sm",
 		md: "max-w-md",
@@ -205,8 +204,10 @@ const Wizard = ({
 										Step {currentStep + 1} of {displayedSteps.length}
 									</span>
 									<span className="text-sm text-gray-400">
-										{Math.round(((currentStep + 1) / displayedSteps.length) * 100)}%
-										Complete
+										{Math.round(
+											((currentStep + 1) / displayedSteps.length) * 100,
+										)}
+										% Complete
 									</span>
 								</div>
 								<div className="w-full bg-stone-800 rounded-full h-2">

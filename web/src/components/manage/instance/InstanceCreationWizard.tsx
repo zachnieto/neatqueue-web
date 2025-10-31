@@ -247,13 +247,15 @@ const InstanceCreationWizard = ({
 					</p>
 
 					<div className="bg-stone-800 rounded-lg p-6 space-y-4">
-						{multipleInstanceOptions && <div className="border-b border-stone-700 pb-4">
-							<h3 className="text-sm text-gray-400 mb-1">Instance Size</h3>
-							<p className="text-xl text-white">{selectedInstance?.name}</p>
-							<p className="text-sm text-gray-300">
-								{selectedInstance?.description}
-							</p>
-						</div>}
+						{multipleInstanceOptions && (
+							<div className="border-b border-stone-700 pb-4">
+								<h3 className="text-sm text-gray-400 mb-1">Instance Size</h3>
+								<p className="text-xl text-white">{selectedInstance?.name}</p>
+								<p className="text-sm text-gray-300">
+									{selectedInstance?.description}
+								</p>
+							</div>
+						)}
 
 						<div className="border-b border-stone-700 pb-4">
 							<h3 className="text-sm text-gray-400 mb-1">Cost</h3>

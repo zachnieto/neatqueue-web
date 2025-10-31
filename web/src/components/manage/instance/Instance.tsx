@@ -364,13 +364,15 @@ const Instance = ({
 					))}
 			</div>
 
-			{instanceTypes.length > 0 && <InstanceCreationWizard
-				visible={instanceModalOpen && !botTokenWizardOpen}
-				setVisibility={setInstanceModalOpen}
-				instanceTypes={instanceTypes}
-				onComplete={handlePurchase}
-				onOpenBotGuide={() => setBotTokenWizardOpen(true)}
-			/>}
+			{instanceTypes.length > 0 && (
+				<InstanceCreationWizard
+					visible={instanceModalOpen && !botTokenWizardOpen}
+					setVisibility={setInstanceModalOpen}
+					instanceTypes={instanceTypes}
+					onComplete={handlePurchase}
+					onOpenBotGuide={() => setBotTokenWizardOpen(true)}
+				/>
+			)}
 
 			{privateInstance && (
 				<>

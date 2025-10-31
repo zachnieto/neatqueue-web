@@ -103,7 +103,7 @@ export type PlayerData = {
 	rank: number | null;
 	winrate: number;
 	current_rank: number;
- 	parsed_stats?: ParsedStats;
+	parsed_stats?: ParsedStats;
 };
 
 export type LeaderboardPlayer = {

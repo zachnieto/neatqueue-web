@@ -3,10 +3,7 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getLeaderboardV2 } from "../services/neatqueue-service";
-import {
-	type LeaderboardPlayer,
-	LeaderboardV2Response,
-} from "../types";
+import type { LeaderboardPlayer, LeaderboardV2Response } from "../types";
 import { classNames } from "../util/tailwind";
 import { displayPercent, getWinRateColor } from "../util/utility";
 import ExpandedStats from "./ExpandedStats";
@@ -142,7 +139,10 @@ const Leaderboard = ({
 
 	const showMonthSelector = useMemo(() => {
 		if (!leaderboardData) return false;
-		return leaderboardData?.available_months.length > 1 && leaderboardData?.available_months[0] !== "alltime";
+		return (
+			leaderboardData?.available_months.length > 1 &&
+			leaderboardData?.available_months[0] !== "alltime"
+		);
 	}, [leaderboardData]);
 
 	const currentMonthData = useMemo(() => {
@@ -245,21 +245,21 @@ const Leaderboard = ({
 		return { icon: null, bg: "", border: "" };
 	};
 
-const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
-	if (key === "wl") {
-		const wins = player?.stats?.wins || 0;
-		const losses = player?.stats?.losses || 0;
-		return `${wins} - ${losses}`;
-	}
+	const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
+		if (key === "wl") {
+			const wins = player?.stats?.wins || 0;
+			const losses = player?.stats?.losses || 0;
+			return `${wins} - ${losses}`;
+		}
 
-	const value = player?.stats?.[key as keyof PlayerData];
-	if (value == null) return "0";
-	if (key === "winrate" && typeof value === "number")
-		return displayPercent(value);
-	if ((key === "mmr" || key === "peak_mmr") && typeof value === "number")
-		return Math.round(value).toString();
-	return value?.toString() || "0";
-};
+		const value = player?.stats?.[key as keyof PlayerData];
+		if (value == null) return "0";
+		if (key === "winrate" && typeof value === "number")
+			return displayPercent(value);
+		if ((key === "mmr" || key === "peak_mmr") && typeof value === "number")
+			return Math.round(value).toString();
+		return value?.toString() || "0";
+	};
 
 	if (isLoading || !leaderboardData) {
 		return (
@@ -305,19 +305,21 @@ const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
 
 				<div className="space-y-4">
 					{/* Mobile Month Selector - Separate on mobile */}
-					{showMonthSelector && <div className="md:hidden">
-						<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-2 shadow-2xl">
-							<MonthSelector
-								availableMonths={leaderboardData.available_months}
-								selectedMonth={selectedMonth}
-								onMonthChange={(month) => {
-									setSelectedMonth(month);
-									setCurrentPage(1);
-								}}
-								formatMonthDisplay={formatMonthDisplay}
-							/>
+					{showMonthSelector && (
+						<div className="md:hidden">
+							<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-2 shadow-2xl">
+								<MonthSelector
+									availableMonths={leaderboardData.available_months}
+									selectedMonth={selectedMonth}
+									onMonthChange={(month) => {
+										setSelectedMonth(month);
+										setCurrentPage(1);
+									}}
+									formatMonthDisplay={formatMonthDisplay}
+								/>
+							</div>
 						</div>
-					</div>}
+					)}
 
 					{/* Column Toggle Controls with Desktop Month Selector */}
 					<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-2 md:p-4 shadow-2xl">
@@ -344,17 +346,19 @@ const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
 									))}
 								</div>
 							</div>
-							{showMonthSelector && <div className="w-48 flex-shrink-0">
-								<MonthSelector
-									availableMonths={leaderboardData.available_months}
-									selectedMonth={selectedMonth}
-									onMonthChange={(month) => {
-										setSelectedMonth(month);
-										setCurrentPage(1);
-									}}
-									formatMonthDisplay={formatMonthDisplay}
-								/>
-							</div>}
+							{showMonthSelector && (
+								<div className="w-48 flex-shrink-0">
+									<MonthSelector
+										availableMonths={leaderboardData.available_months}
+										selectedMonth={selectedMonth}
+										onMonthChange={(month) => {
+											setSelectedMonth(month);
+											setCurrentPage(1);
+										}}
+										formatMonthDisplay={formatMonthDisplay}
+									/>
+								</div>
+							)}
 						</div>
 
 						{/* Mobile: Just column toggles */}
@@ -521,25 +525,27 @@ const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
 												</div>
 
 												{/* Expanded Stats View */}
-                                                <div
-                                                    className={classNames(
-                                                        "overflow-hidden transition-all duration-300 ease-in-out",
-                                                        isExpanded
-                                                            ? "max-h-[2000px] opacity-100"
-                                                            : "max-h-0 opacity-0",
-                                                    )}
-                                                >
-                                                    <div className="border-t border-neutral-800 px-6 py-4 bg-neutral-800/50">
-									<ExpandedStats
-										player={player}
-										variant="desktop"
-										guildId={guildId}
-										queueName={leaderboardData.queue_name}
-										selectedMonth={currentMonthData?.month ?? selectedMonth}
-										isExpanded={isExpanded}
-									/>
-                                                    </div>
-                                                </div>
+												<div
+													className={classNames(
+														"overflow-hidden transition-all duration-300 ease-in-out",
+														isExpanded
+															? "max-h-[2000px] opacity-100"
+															: "max-h-0 opacity-0",
+													)}
+												>
+													<div className="border-t border-neutral-800 px-6 py-4 bg-neutral-800/50">
+														<ExpandedStats
+															player={player}
+															variant="desktop"
+															guildId={guildId}
+															queueName={leaderboardData.queue_name}
+															selectedMonth={
+																currentMonthData?.month ?? selectedMonth
+															}
+															isExpanded={isExpanded}
+														/>
+													</div>
+												</div>
 											</div>
 										);
 									})
@@ -609,82 +615,111 @@ const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
 								)}
 						</div>
 
-					{/* Mobile Card View */}
-					<div className="md:hidden bg-neutral-900 rounded-xl border border-neutral-700 shadow-2xl overflow-hidden">
-						{sortedPlayers.length === 0 ? (
-							<div className="p-8 text-center">
-								<p className="text-gray-400">No players found</p>
-							</div>
-						) : (
-							<div className="divide-y divide-neutral-700">
-								{sortedPlayers.map((player, index) => {
-									const rank =
-										index +
-										1 +
-										(currentPage - 1) *
-											(currentMonthData?.pagination?.per_page || 50);
-									const rankInfo = getRankBadge(index + 1);
-									const isExpanded = expandedPlayerId === player.id;
+						{/* Mobile Card View */}
+						<div className="md:hidden bg-neutral-900 rounded-xl border border-neutral-700 shadow-2xl overflow-hidden">
+							{sortedPlayers.length === 0 ? (
+								<div className="p-8 text-center">
+									<p className="text-gray-400">No players found</p>
+								</div>
+							) : (
+								<div className="divide-y divide-neutral-700">
+									{sortedPlayers.map((player, index) => {
+										const rank =
+											index +
+											1 +
+											(currentPage - 1) *
+												(currentMonthData?.pagination?.per_page || 50);
+										const rankInfo = getRankBadge(index + 1);
+										const isExpanded = expandedPlayerId === player.id;
 
-									return (
-										<div
-											key={player.id}
-											className={classNames(
-												"transition-all duration-200 bg-neutral-800",
-												rankInfo.bg,
-											)}
-										>
-											{/* Compact Row Layout - Clickable */}
+										return (
 											<div
-												className="flex items-center gap-2 p-3 cursor-pointer hover:bg-black/20 transition-colors duration-200"
-												onClick={() =>
-													setExpandedPlayerId(isExpanded ? null : player.id)
-												}
+												key={player.id}
+												className={classNames(
+													"transition-all duration-200 bg-neutral-800",
+													rankInfo.bg,
+												)}
 											>
-												{/* Rank */}
-												<div className="flex flex-col items-center justify-center w-10">
-													{rankInfo.icon && (
-														<span className="text-lg leading-none">
-															{rankInfo.icon}
-														</span>
-													)}
-													<span
-														className={classNames(
-															"text-xs font-bold",
-															rank <= 3 ? "text-white" : "text-gray-300",
-														)}
-													>
-														#{rank}
-													</span>
-												</div>
-
-												{/* Avatar */}
-												<img
-													src={player.avatar_url ?? "/pixelart-logo.png"}
-													alt={player.name}
-													className="w-10 h-10 rounded-full border-2 border-neutral-600"
-												/>
-
-												{/* Player Name & Stats */}
-												<div className="flex-1 min-w-0">
-													<div className="flex items-baseline gap-1.5 mb-1">
-														<h3 className="text-sm font-semibold text-white truncate">
-															{player.name}
-														</h3>
-														{player?.stats?.ign && (
-															<span className="text-xs text-gray-400 truncate">
-																({player.stats.ign})
+												{/* Compact Row Layout - Clickable */}
+												<div
+													className="flex items-center gap-2 p-3 cursor-pointer hover:bg-black/20 transition-colors duration-200"
+													onClick={() =>
+														setExpandedPlayerId(isExpanded ? null : player.id)
+													}
+												>
+													{/* Rank */}
+													<div className="flex flex-col items-center justify-center w-10">
+														{rankInfo.icon && (
+															<span className="text-lg leading-none">
+																{rankInfo.icon}
 															</span>
 														)}
+														<span
+															className={classNames(
+																"text-xs font-bold",
+																rank <= 3 ? "text-white" : "text-gray-300",
+															)}
+														>
+															#{rank}
+														</span>
 													</div>
 
-													{/* Inline Stats */}
-													<div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-														{visibleColumns.map((column) => {
-															if (column === "winrate") {
-																const winrateValue =
-																	player?.stats?.winrate || 0;
-																const colors = getWinRateColor(winrateValue);
+													{/* Avatar */}
+													<img
+														src={player.avatar_url ?? "/pixelart-logo.png"}
+														alt={player.name}
+														className="w-10 h-10 rounded-full border-2 border-neutral-600"
+													/>
+
+													{/* Player Name & Stats */}
+													<div className="flex-1 min-w-0">
+														<div className="flex items-baseline gap-1.5 mb-1">
+															<h3 className="text-sm font-semibold text-white truncate">
+																{player.name}
+															</h3>
+															{player?.stats?.ign && (
+																<span className="text-xs text-gray-400 truncate">
+																	({player.stats.ign})
+																</span>
+															)}
+														</div>
+
+														{/* Inline Stats */}
+														<div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+															{visibleColumns.map((column) => {
+																if (column === "winrate") {
+																	const winrateValue =
+																		player?.stats?.winrate || 0;
+																	const colors = getWinRateColor(winrateValue);
+																	return (
+																		<button
+																			key={column}
+																			onClick={(e) => {
+																				e.stopPropagation();
+																				handleColumnHeaderClick(column);
+																			}}
+																			className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+																		>
+																			<span className="text-xs text-gray-400">
+																				{STAT_LABELS[column]}:
+																			</span>
+																			<div
+																				className="inline-flex items-center px-1.5 py-0.5 rounded border text-xs font-bold"
+																				style={{
+																					borderColor: colors.border,
+																					backgroundColor: colors.bg,
+																				}}
+																			>
+																				{displayPercent(winrateValue)}
+																			</div>
+																			{sortKey === column && (
+																				<span className="text-xs text-gray-400">
+																					{sortDirection === "desc" ? "↓" : "↑"}
+																				</span>
+																			)}
+																		</button>
+																	);
+																}
 																return (
 																	<button
 																		key={column}
@@ -697,15 +732,9 @@ const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
 																		<span className="text-xs text-gray-400">
 																			{STAT_LABELS[column]}:
 																		</span>
-																		<div
-																			className="inline-flex items-center px-1.5 py-0.5 rounded border text-xs font-bold"
-																			style={{
-																				borderColor: colors.border,
-																				backgroundColor: colors.bg,
-																			}}
-																		>
-																			{displayPercent(winrateValue)}
-																		</div>
+																		<span className="text-xs font-semibold text-white">
+																			{formatStatValue(player, column)}
+																		</span>
 																		{sortKey === column && (
 																			<span className="text-xs text-gray-400">
 																				{sortDirection === "desc" ? "↓" : "↑"}
@@ -713,98 +742,77 @@ const formatStatValue = (player: LeaderboardPlayer, key: SortKey) => {
 																		)}
 																	</button>
 																);
+															})}
+														</div>
+													</div>
+												</div>
+
+												{/* Expanded Stats View */}
+												<div
+													className={classNames(
+														"overflow-hidden transition-all duration-300 ease-in-out",
+														isExpanded
+															? "max-h-[2000px] opacity-100"
+															: "max-h-0 opacity-0",
+													)}
+												>
+													<div className="border-t border-neutral-800 p-3 bg-neutral-800/50">
+														<ExpandedStats
+															player={player}
+															variant="mobile"
+															guildId={guildId}
+															queueName={leaderboardData.queue_name}
+															selectedMonth={
+																currentMonthData?.month ?? selectedMonth
 															}
-															return (
-																<button
-																	key={column}
-																	onClick={(e) => {
-																		e.stopPropagation();
-																		handleColumnHeaderClick(column);
-																	}}
-																	className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
-																>
-																	<span className="text-xs text-gray-400">
-																		{STAT_LABELS[column]}:
-																	</span>
-																	<span className="text-xs font-semibold text-white">
-																		{formatStatValue(player, column)}
-																	</span>
-																	{sortKey === column && (
-																		<span className="text-xs text-gray-400">
-																			{sortDirection === "desc" ? "↓" : "↑"}
-																		</span>
-																	)}
-																</button>
-															);
-														})}
+															isExpanded={isExpanded}
+														/>
 													</div>
 												</div>
 											</div>
-
-											{/* Expanded Stats View */}
-											<div
-												className={classNames(
-													"overflow-hidden transition-all duration-300 ease-in-out",
-													isExpanded
-														? "max-h-[2000px] opacity-100"
-														: "max-h-0 opacity-0",
-												)}
-											>
-												<div className="border-t border-neutral-800 p-3 bg-neutral-800/50">
-										<ExpandedStats
-											player={player}
-											variant="mobile"
-											guildId={guildId}
-											queueName={leaderboardData.queue_name}
-											selectedMonth={currentMonthData?.month ?? selectedMonth}
-											isExpanded={isExpanded}
-										/>
-												</div>
-											</div>
-										</div>
-									);
-								})}
-							</div>
-						)}
-
-						{/* Mobile Pagination */}
-						{currentMonthData?.pagination &&
-							currentMonthData.pagination.total_pages > 1 && (
-								<div className="bg-neutral-800 px-4 py-4 border-t border-neutral-700">
-									<div className="text-xs text-gray-400 text-center mb-3">
-										Page {currentPage} of{" "}
-										{currentMonthData.pagination.total_pages}
-									</div>
-									<div className="flex items-center justify-center gap-2">
-										<button
-											onClick={() => setCurrentPage(currentPage - 1)}
-											disabled={!currentMonthData.pagination.previous_page}
-											className={classNames(
-												"px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200",
-												currentMonthData.pagination.previous_page
-													? "bg-neutral-700 hover:bg-neutral-600 text-white shadow-lg"
-													: "bg-neutral-800 text-gray-500 cursor-not-allowed",
-											)}
-										>
-											← Prev
-										</button>
-
-										<button
-											onClick={() => setCurrentPage(currentPage + 1)}
-											disabled={!currentMonthData.pagination.next_page}
-											className={classNames(
-												"px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200",
-												currentMonthData.pagination.next_page
-													? "bg-neutral-700 hover:bg-neutral-600 text-white shadow-lg"
-													: "bg-neutral-800 text-gray-500 cursor-not-allowed",
-											)}
-										>
-											Next →
-										</button>
-									</div>
+										);
+									})}
 								</div>
 							)}
-					</div>
+
+							{/* Mobile Pagination */}
+							{currentMonthData?.pagination &&
+								currentMonthData.pagination.total_pages > 1 && (
+									<div className="bg-neutral-800 px-4 py-4 border-t border-neutral-700">
+										<div className="text-xs text-gray-400 text-center mb-3">
+											Page {currentPage} of{" "}
+											{currentMonthData.pagination.total_pages}
+										</div>
+										<div className="flex items-center justify-center gap-2">
+											<button
+												onClick={() => setCurrentPage(currentPage - 1)}
+												disabled={!currentMonthData.pagination.previous_page}
+												className={classNames(
+													"px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200",
+													currentMonthData.pagination.previous_page
+														? "bg-neutral-700 hover:bg-neutral-600 text-white shadow-lg"
+														: "bg-neutral-800 text-gray-500 cursor-not-allowed",
+												)}
+											>
+												← Prev
+											</button>
+
+											<button
+												onClick={() => setCurrentPage(currentPage + 1)}
+												disabled={!currentMonthData.pagination.next_page}
+												className={classNames(
+													"px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200",
+													currentMonthData.pagination.next_page
+														? "bg-neutral-700 hover:bg-neutral-600 text-white shadow-lg"
+														: "bg-neutral-800 text-gray-500 cursor-not-allowed",
+												)}
+											>
+												Next →
+											</button>
+										</div>
+									</div>
+								)}
+						</div>
 					</div>
 				</div>
 			</div>
