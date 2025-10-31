@@ -211,7 +211,6 @@ Shows the leaderboard for the current queue's game.
 #### Arguments:
 `page`: *(Optional)* The desired page number.\
 `type`: *(Optional)* The type of leaderboard to display.\
-&emsp;&emsp;&emsp; Options: `MMR, Peak MMR, Points, MVPs, Games, Wins, Losses, Winrate, Streak, Peak Streak`\
 `queue_name`: *(Optional)* The queue name to view.
 
 <hr style="border:3px solid gray">
@@ -1346,11 +1345,14 @@ Substitute yourself for the given player.
 
 ### `/mmr multipliers set`
 #### Description
- Sets the MMR multiplier for the given role for wins.
-#### Usage: `/mmr multipliers set [role] [multiplier]`
+ Sets the MMR multiplier for the given role.
+#### Usage: `/mmr multipliers set [role] [multiplier] (apply_to_wins) (apply_to_losses) (apply_to_ties)`
 #### Arguments:
 `role`: *(Required)* \
-`multiplier`: *(Required)* Multiplier value. (Ex: 1.2 for a 20% boost).
+`multiplier`: *(Required)* Multiplier value. (Ex: 1.2 for a 20% boost).\
+`apply_to_wins`: *(Optional)* Apply this multiplier to wins (Default: True).\
+`apply_to_losses`: *(Optional)* Apply this multiplier to losses (Default: False).\
+`apply_to_ties`: *(Optional)* Apply this multiplier to ties (Default: False).
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
 
 ---
@@ -1904,120 +1906,13 @@ Substitute yourself for the given player.
 
 ---
 
-### `/add game`
+### `/add stats`
 #### Description
- Increment the players games, use a negative number to decrement.
-#### Usage: `/add game (games) (user) (role)`
+ Increment the stats for a player or role, use a negative number to decrement.
+#### Usage: `/add stats [stat] [value] (user) (role)`
 #### Arguments:
-`games`: *(Optional)* Enter the desired games to add.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/add loss`
-#### Description
- Increment the players losses, use a negative number to decrement.
-#### Usage: `/add loss (losses) (user) (role)`
-#### Arguments:
-`losses`: *(Optional)* Enter the desired losses to add.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/add mmr`
-#### Description
- Increment the players mmr, use a negative number to decrement.
-#### Usage: `/add mmr (mmr) (user) (role)`
-#### Arguments:
-`mmr`: *(Optional)* Enter the desired mmr to add.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/add mvps`
-#### Description
- Increment the players MVPs, use a negative number to decrement.
-#### Usage: `/add mvps [mvps] (user) (role)`
-#### Arguments:
-`mvps`: *(Required)* Enter the desired MVPs to add.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/add peakmmr`
-#### Description
- Increment the players peak mmr, use a negative number to decrement.
-#### Usage: `/add peakmmr [mmr] (user) (role)`
-#### Arguments:
-`mmr`: *(Required)* Enter the desired mmr to add.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/add peakstreak`
-#### Description
- Increment the players peak streak, use a negative number to decrement.
-#### Usage: `/add peakstreak [streak] (user) (role)`
-#### Arguments:
-`streak`: *(Required)* Enter the desired streak to add.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/add points`
-#### Description
- Increment the players points (not MMR), use a negative number to decrement.
-#### Usage: `/add points [points] (user) (role)`
-#### Arguments:
-`points`: *(Required)* Enter the desired points to add.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/add streak`
-#### Description
- Increment the players streak, use a negative number to decrement.
-#### Usage: `/add streak (streak) (user) (role)`
-#### Arguments:
-`streak`: *(Optional)* Enter the desired streak to add.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/add win`
-#### Description
- Increment the players wins, use a negative number to decrement.
-#### Usage: `/add win (wins) (user) (role)`
-#### Arguments:
-`wins`: *(Optional)* Enter the desired wins to add.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/set games`
-#### Description
- Sets the players games.
-#### Usage: `/set games [games] (user) (role)`
-#### Arguments:
-`games`: *(Required)* Enter the desired games.\
+`stat`: *(Required)* The stat to increment.\
+`value`: *(Required)* The value to increment.\
 `user`: *(Optional)* The user to modify.\
 `role`: *(Optional)* The role to modify.
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
@@ -2036,96 +1931,13 @@ Substitute yourself for the given player.
 
 ---
 
-### `/set losses`
+### `/set stats`
 #### Description
- Sets the players losses.
-#### Usage: `/set losses [losses] (user) (role)`
+ Sets the stats for a player or role.
+#### Usage: `/set stats [stat] [value] (user) (role)`
 #### Arguments:
-`losses`: *(Required)* Enter the desired losses.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/set mmr`
-#### Description
- Sets the players mmr.
-#### Usage: `/set mmr [mmr] (user) (role)`
-#### Arguments:
-`mmr`: *(Required)* Enter the desired mmr.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/set mvps`
-#### Description
- Sets the players MVPs.
-#### Usage: `/set mvps [mvps] (user) (role)`
-#### Arguments:
-`mvps`: *(Required)* The new MVPs amount.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/set peakmmr`
-#### Description
- Sets the players peak mmr.
-#### Usage: `/set peakmmr [mmr] (user) (role)`
-#### Arguments:
-`mmr`: *(Required)* Enter the desired mmr.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/set peakstreak`
-#### Description
- Sets the players peak streak.
-#### Usage: `/set peakstreak [streak] (user) (role)`
-#### Arguments:
-`streak`: *(Required)* Enter the desired streak.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/set points`
-#### Description
- Sets the players points (not MMR).
-#### Usage: `/set points [points] (user) (role)`
-#### Arguments:
-`points`: *(Required)* The new points amount.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/set streak`
-#### Description
- Sets the players streak.
-#### Usage: `/set streak [streak] (user) (role)`
-#### Arguments:
-`streak`: *(Required)* Enter the desired streak.\
-`user`: *(Optional)* The user to modify.\
-`role`: *(Optional)* The role to modify.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/set wins`
-#### Description
- Sets the players wins.
-#### Usage: `/set wins [wins] (user) (role)`
-#### Arguments:
-`wins`: *(Required)* Enter the desired wins.\
+`stat`: *(Required)* The stat to set.\
+`value`: *(Required)* The value to set.\
 `user`: *(Optional)* The user to modify.\
 `role`: *(Optional)* The role to modify.
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
@@ -2415,29 +2227,6 @@ Substitute yourself for the given player.
 
 ---
 
-### `/autoroles games remove`
-#### Description
- Removes a condition where player roles are changed based on games.
-#### Usage: `/autoroles games remove [role]`
-#### Arguments:
-`role`: *(Required)* Enter the role.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles games set`
-#### Description
- (Ranks) Adds a condition in which player roles are changed based on games.
-#### Usage: `/autoroles games set [role] [lower_value] [upper_value] (only_one_allowed)`
-#### Arguments:
-`role`: *(Required)* Role.\
-`lower_value`: *(Required)* The lowest number of games required to gain the role.\
-`upper_value`: *(Required)* The upper number of games to lose the role.\
-`only_one_allowed`: *(Optional)* (Default: True) If this role is assigned, no other games autoroles will be allowed.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
 ### `/autoroles ingame`
 #### Description
  Assign a role to players who are in a match that is removed after.
@@ -2464,8 +2253,7 @@ Substitute yourself for the given player.
 #### Usage: `/autoroles leaderboardposition remove [role] [stat]`
 #### Arguments:
 `role`: *(Required)* Enter the role.\
-`stat`: *(Required)* Stat which autoroles leaderboard position applies to.\
-&emsp;&emsp;&emsp; Options: `MMR, Peak MMR, Points, MVPs, Games, Wins, Losses, Winrate, Streak, Peak Streak`
+`stat`: *(Required)* Stat which autoroles leaderboard position applies to.
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
 
 ---
@@ -2477,79 +2265,8 @@ Substitute yourself for the given player.
 #### Arguments:
 `role`: *(Required)* Enter the role.\
 `stat`: *(Required)* Type of leaderboard stat to use.\
-&emsp;&emsp;&emsp; Options: `MMR, Peak MMR, Points, MVPs, Games, Wins, Losses, Winrate, Streak, Peak Streak`\
 `lower_value`: *(Required)* (Inclusive) Leaderboard position range 1.\
 `upper_value`: *(Optional)* (Inclusive) Leaderboard position range 2, or omit for no range.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles losses remove`
-#### Description
- Removes a condition where player roles are changed based on losses.
-#### Usage: `/autoroles losses remove [role]`
-#### Arguments:
-`role`: *(Required)* Enter the role.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles losses set`
-#### Description
- (Ranks) Adds a condition in which player roles are changed based on losses.
-#### Usage: `/autoroles losses set [role] [lower_value] [upper_value] (only_one_allowed)`
-#### Arguments:
-`role`: *(Required)* Role.\
-`lower_value`: *(Required)* The lowest number of losses required to gain the role.\
-`upper_value`: *(Required)* The upper number of losses to lose the role.\
-`only_one_allowed`: *(Optional)* (Default: True) If this role is assigned, no other loss autoroles will be allowed.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles mmr remove`
-#### Description
- Removes a condition where player roles are changed based on MMR.
-#### Usage: `/autoroles mmr remove [role]`
-#### Arguments:
-`role`: *(Required)* Enter the role.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles mmr set`
-#### Description
- (Ranks) Adds a condition in which player roles are changed based on MMR.
-#### Usage: `/autoroles mmr set [role] [lower_rating] [upper_rating] (lower_lose_rating) (only_one_allowed)`
-#### Arguments:
-`role`: *(Required)* Role.\
-`lower_rating`: *(Required)* The lowest MMR required to gain the role.\
-`upper_rating`: *(Required)* The upper MMR rating to lose the role.\
-`lower_lose_rating`: *(Optional)* (Default: lower_rating) The MMR the player must fall below to lose the role.\
-`only_one_allowed`: *(Optional)* (Default: True) If this role is assigned, no other MMR autoroles will be allowed.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles mvps remove`
-#### Description
- Removes a condition where player roles are changed based on mvps.
-#### Usage: `/autoroles mvps remove [role]`
-#### Arguments:
-`role`: *(Required)* Enter the role.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles mvps set`
-#### Description
- (Ranks) Adds a condition in which player roles are changed based on mvps.
-#### Usage: `/autoroles mvps set [role] [lower_value] [upper_value] (only_one_allowed)`
-#### Arguments:
-`role`: *(Required)* Role.\
-`lower_value`: *(Required)* The lowest number of mvps required to gain the role.\
-`upper_value`: *(Required)* The upper number of mvps to lose the role.\
-`only_one_allowed`: *(Optional)* (Default: True) If this role is assigned, no other mvps autoroles will be allowed.
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
 
 ---
@@ -2561,29 +2278,6 @@ Substitute yourself for the given player.
 #### Arguments:
 `toggle`: *(Required)* If players get a DM for role/rank changes.\
 &emsp;&emsp;&emsp; Options: `Enabled, Disabled`
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles points remove`
-#### Description
- Removes a condition where player roles are changed based on Points.
-#### Usage: `/autoroles points remove [role]`
-#### Arguments:
-`role`: *(Required)* Enter the role.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles points set`
-#### Description
- (Ranks) Adds a condition in which player roles are changed based on points.
-#### Usage: `/autoroles points set [role] [lower_value] [upper_value] (only_one_allowed)`
-#### Arguments:
-`role`: *(Required)* Role.\
-`lower_value`: *(Required)* The lowest number of points required to gain the role.\
-`upper_value`: *(Required)* The upper number of points to lose the role.\
-`only_one_allowed`: *(Optional)* (Default: True) If this role is assigned, no other Point autoroles will be allowed.
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
 
 ---
@@ -2606,71 +2300,28 @@ Substitute yourself for the given player.
 
 ---
 
-### `/autoroles streaks remove`
+### `/autoroles stats remove`
 #### Description
- Removes a condition where player roles are changed based on streaks.
-#### Usage: `/autoroles streaks remove [role]`
+ Removes a condition where player roles are changed based on stats.
+#### Usage: `/autoroles stats remove [role] [stat]`
 #### Arguments:
-`role`: *(Required)* Enter the role.
+`role`: *(Required)* Enter the role.\
+`stat`: *(Required)* Stat which autoroles stats applies to.
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
 
 ---
 
-### `/autoroles streaks set`
+### `/autoroles stats set`
 #### Description
- (Ranks) Adds a condition in which player roles are changed based on streaks.
-#### Usage: `/autoroles streaks set [role] [lower_value] [upper_value] (only_one_allowed)`
+ (Ranks) Adds a condition in which player roles are changed based on stats.
+#### Usage: `/autoroles stats set [role] [stat] [lower_rating] [upper_rating] (lower_lose_rating) (only_one_allowed)`
 #### Arguments:
 `role`: *(Required)* Role.\
-`lower_value`: *(Required)* The lowest number of streaks required to gain the role.\
-`upper_value`: *(Required)* The upper number of streaks to lose the role.\
-`only_one_allowed`: *(Optional)* (Default: True) If this role is assigned, no other streaks autoroles will be allowed.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles winrate remove`
-#### Description
- Removes a condition where player roles are changed based on winrate.
-#### Usage: `/autoroles winrate remove [role]`
-#### Arguments:
-`role`: *(Required)* Enter the role.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles winrate set`
-#### Description
- (Ranks) Adds a condition in which player roles are changed based on winrate.
-#### Usage: `/autoroles winrate set [role] [lower_value] [upper_value] (only_one_allowed)`
-#### Arguments:
-`role`: *(Required)* Role.\
-`lower_value`: *(Required)* The lowest winrate value (0 to 100) required to gain the role.\
-`upper_value`: *(Required)* The upper winrate value (0 to 100) to lose the role.\
-`only_one_allowed`: *(Optional)* (Default: True) If this role is assigned, no other winrate autoroles will be allowed.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles wins remove`
-#### Description
- Removes a condition where player roles are changed based on wins.
-#### Usage: `/autoroles wins remove [role]`
-#### Arguments:
-`role`: *(Required)* Enter the role.
-#### Usage Permissions: `Staff Role or Manage Channels Permission`
-
----
-
-### `/autoroles wins set`
-#### Description
- (Ranks) Adds a condition in which player roles are changed based on wins.
-#### Usage: `/autoroles wins set [role] [lower_value] [upper_value] (only_one_allowed)`
-#### Arguments:
-`role`: *(Required)* Role.\
-`lower_value`: *(Required)* The lowest number of wins required to gain the role.\
-`upper_value`: *(Required)* The upper number of wins to lose the role.\
-`only_one_allowed`: *(Optional)* (Default: True) If this role is assigned, no other wins autoroles will be allowed.
+`stat`: *(Required)* \
+`lower_rating`: *(Required)* The lowest stat value required to gain the role.\
+`upper_rating`: *(Required)* The upper stat value to lose the role.\
+`lower_lose_rating`: *(Optional)* (Default: lower_rating) The stat value the player must fall below to lose the role.\
+`only_one_allowed`: *(Optional)* (Default: True) If this role is assigned, no other stat autoroles will be allowed.
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
 
 <hr style="border:3px solid gray">
@@ -3041,6 +2692,26 @@ Substitute yourself for the given player.
 <hr style="border:3px solid gray">
 
 ## Select Winner
+### `/outcome autoresolution setup`
+#### Description
+ Run a setup wizard to configure auto resolution.
+#### Usage: `/outcome autoresolution setup`
+
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
+### `/outcome autoresolution toggle`
+#### Description
+ Toggle auto resolution for the current queue.
+#### Usage: `/outcome autoresolution toggle [toggle]`
+#### Arguments:
+`toggle`: *(Required)* If auto resolution is enabled or disabled.\
+&emsp;&emsp;&emsp; Options: `Enabled, Disabled`
+#### Usage Permissions: `Staff Role or Manage Channels Permission`
+
+---
+
 ### `/outcome cancel`
 #### Description
  Cancel the given game.
@@ -3370,10 +3041,9 @@ Substitute yourself for the given player.
 ### `/statsconfig rankupautorole`
 #### Description
  Sets what autorole criteria is used for displaying rank ups in /stats.
-#### Usage: `/statsconfig rankupautorole [autorole]`
+#### Usage: `/statsconfig rankupautorole [stat]`
 #### Arguments:
-`autorole`: *(Required)* (Default: MMR) Which autorole to use.\
-&emsp;&emsp;&emsp; Options: `MMR, Points, Wins, Losses, Games, Streak, Winrate, MVPs`
+`stat`: *(Required)* Stat key to use for rank-up autorole (supports built-in and parsed stats).
 #### Usage Permissions: `Staff Role or Manage Channels Permission`
 
 <hr style="border:3px solid gray">

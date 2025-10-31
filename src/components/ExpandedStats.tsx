@@ -12,22 +12,6 @@ import {
 } from "../util/utility";
 
 type PlayerData = LeaderboardPlayer["stats"];
-type SortKey =
-	| Exclude<keyof PlayerData, "ign" | "rank" | "decay" | "parsed_stats">
-	| "wl";
-type SortDirection = "asc" | "desc";
-
-const TABLE_STATS: SortKey[] = [
-	"mmr",
-	"wl",
-	"wins",
-	"losses",
-	"totalgames",
-	"streak",
-	"peak_mmr",
-	"peak_streak",
-	"winrate",
-];
 
 const STAT_LABELS: Record<string, string> = {
 	mmr: "MMR",
@@ -44,57 +28,7 @@ const STAT_LABELS: Record<string, string> = {
 	decay: "Decay",
 };
 
-const DEFAULT_COLUMNS: SortKey[] = ["mmr", "wl", "winrate"];
-
 const IGNORED_STATS: (keyof PlayerData)[] = ["current_rank", "decay"];
-
-interface LeaderboardProps {
-	passedGuildId?: string;
-	passedChannelId?: string;
-}
-
-interface MonthSelectorProps {
-	availableMonths: string[];
-	selectedMonth: string;
-	onMonthChange: (month: string) => void;
-	formatMonthDisplay: (month: string) => string;
-}
-
-const MonthSelector = ({
-	availableMonths,
-	selectedMonth,
-	onMonthChange,
-	formatMonthDisplay,
-}: MonthSelectorProps) => {
-	if (availableMonths.length <= 1 || availableMonths[0] === "alltime") {
-		return null;
-	}
-
-	const hasAllTime = availableMonths.includes("alltime");
-
-	const monthList = hasAllTime
-		? ["alltime", ...availableMonths.filter((month) => month !== "alltime")]
-		: availableMonths;
-
-	return (
-		<div className="flex flex-col">
-			<label className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wide">
-				Time Period
-			</label>
-			<select
-				value={selectedMonth}
-				onChange={(e) => onMonthChange(e.target.value)}
-				className="w-full bg-neutral-800 text-white border border-neutral-700 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-neutral-600 cursor-pointer hover:bg-neutral-800 transition-colors"
-			>
-				{monthList.map((month: string) => (
-					<option key={month} value={month}>
-						{formatMonthDisplay(month)}
-					</option>
-				))}
-			</select>
-		</div>
-	);
-};
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 const decimalFormatter = new Intl.NumberFormat("en-US", {
@@ -355,11 +289,6 @@ const getStatValueFromGame = (
 	selection: StatSelection,
 ): number | null => {
 	if (selection.type === "parsed") {
-		console.log(
-			selection.key,
-			game.updated_stats?.parsed_stats?.[selection.key],
-			game.updated_stats?.parsed_stats,
-		);
 		return game.updated_stats?.parsed_stats?.[selection.key] ?? null;
 	}
 
@@ -378,11 +307,10 @@ const getStatValueFromGame = (
 			if (wins == null || totalGames == null) return null;
 			return wins / totalGames;
 		}
-		case "mmr": {
-			return game.mmr;
-		}
 		default: {
-			const value = game.updated_stats?.[selection.key];
+			const value =
+				game[selection.key as keyof QueueGame] ??
+				game.updated_stats?.[selection.key];
 			if (value == null) return null;
 			return value as number;
 		}
