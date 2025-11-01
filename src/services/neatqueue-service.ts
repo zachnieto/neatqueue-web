@@ -59,14 +59,14 @@ export const getLeaderboardV2 = async (
 	return resp.data;
 };
 
-export const getPlayerGames = async (
+export const getPlayerStats = async (
 	guildID: string,
 	playerID: string,
 	queueName: string,
 ) => {
 	const encodedQueueName = encodeURIComponent(queueName);
 	const resp = await axios.get(
-		`${API_BASE}/api/v2/playergames/${guildID}/${playerID}/${encodedQueueName}`,
+		`${API_BASE}/api/v1/playerstats/${guildID}/${playerID}/${encodedQueueName}?include_games=True`,
 	);
 	return resp.data;
 };

@@ -2,7 +2,7 @@ import HighchartsReact from "@highcharts/react/Highcharts";
 import { useQuery } from "@tanstack/react-query";
 import Highcharts from "highcharts";
 import { useEffect, useMemo, useState } from "react";
-import { getPlayerGames } from "../services/neatqueue-service";
+import { getPlayerStats } from "../services/neatqueue-service";
 import type { LeaderboardPlayer, QueueGame, QueueGameData } from "../types";
 import { classNames } from "../util/tailwind";
 import {
@@ -396,10 +396,10 @@ const ExpandedStats = ({
 		setXAxisMode("game");
 	}, [player.id, resolvedQueueName, topLevelEntries, parsedStatGroups]);
 
-	const { data: playerGamesData, isLoading: isGamesLoading } =
+	const { data: playerStatsData, isLoading: isStatsLoading } =
 		useQuery<QueueGameData>({
 			queryKey: ["player-games", guildId, player.id, resolvedQueueName],
-			queryFn: () => getPlayerGames(guildId, player.id, resolvedQueueName),
+			queryFn: () => getPlayerStats(guildId, player.id, resolvedQueueName),
 			enabled:
 				isExpanded &&
 				Boolean(guildId) &&
@@ -409,9 +409,9 @@ const ExpandedStats = ({
 		});
 
 	const games = useMemo(() => {
-		const rawGames = playerGamesData?.games ?? [];
+		const rawGames = playerStatsData?.games ?? [];
 		return [...rawGames].sort((a, b) => (a.game_num ?? 0) - (b.game_num ?? 0));
-	}, [playerGamesData]);
+	}, [playerStatsData]);
 
 	const seriesData = useMemo<ChartPoint[]>(() => {
 		if (!games.length) return [];
@@ -551,7 +551,7 @@ const ExpandedStats = ({
 		topLevelEntries.length > 0 ||
 		parsedStatGroups.length > 0 ||
 		seriesData.length > 0 ||
-		isGamesLoading;
+		isStatsLoading;
 
 	if (!hasAnyData) {
 		return <div className="text-sm text-gray-400 italic">No data found.</div>;
@@ -693,7 +693,7 @@ const ExpandedStats = ({
 						</div>
 					</div>
 					<div className={classNames("mt-4")}>
-						{isGamesLoading ? (
+						{isStatsLoading ? (
 							<div className="flex h-full items-center justify-center text-sm text-gray-400">
 								Loading player history...
 							</div>
