@@ -457,6 +457,33 @@ const ExpandedStats = ({
 				style: {
 					fontFamily: "Inter, sans-serif",
 				},
+				zoomType: "x",
+				panning: {
+					enabled: true,
+					type: "x",
+				},
+				zooming: {
+					resetButton: {
+						theme: {
+							fill: "transparent",
+							stroke: "rgb(64, 64, 70)",
+							r: 6,
+							style: {
+								color: "rgb(209, 213, 219)",
+								fontSize: "12px",
+								fontWeight: "600",
+							},
+							states: {
+								hover: {
+									fill: "rgba(64, 64, 70, 0.6)",
+									style: {
+										color: "rgb(209, 213, 219)",
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			title: { text: undefined },
 			credits: { enabled: false },
