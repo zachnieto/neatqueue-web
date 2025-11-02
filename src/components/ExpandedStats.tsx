@@ -110,7 +110,7 @@ type GroupedStat = {
 };
 
 type StatSelection = {
-	type: "topLevel" | "parsed";
+	type: "topLevel" | "parsedComputed" | "parsedRaw";
 	key: string;
 	label: string;
 };
@@ -120,6 +120,7 @@ type ChartPoint = {
 	y: number;
 	custom: {
 		gameNumber: number;
+		matchNumber: number;
 		timestamp: string;
 		result: string;
 		formattedValue: string;
@@ -288,8 +289,12 @@ const getStatValueFromGame = (
 	game: QueueGame,
 	selection: StatSelection,
 ): number | null => {
-	if (selection.type === "parsed") {
+	if (selection.type === "parsedComputed") {
 		return game.updated_stats?.parsed_stats?.[selection.key] ?? null;
+	}
+
+	if (selection.type === "parsedRaw") {
+		return game?.parsed_stats?.[selection.key] ?? null;
 	}
 
 	switch (selection.key) {
@@ -352,50 +357,6 @@ const ExpandedStats = ({
 		[selectedMonth, queueName],
 	);
 
-	useEffect(() => {
-		const mmrEntry = topLevelEntries.find((entry) => entry.statKey === "mmr");
-		if (mmrEntry) {
-			setSelectedStat({
-				type: "topLevel",
-				key: "mmr",
-				label: mmrEntry.label,
-			});
-			setXAxisMode("game");
-			return;
-		}
-
-		if (topLevelEntries.length > 0) {
-			const entry = topLevelEntries[0];
-			setSelectedStat({
-				type: "topLevel",
-				key: entry.statKey,
-				label: entry.label,
-			});
-			setXAxisMode("game");
-			return;
-		}
-
-		for (const group of parsedStatGroups) {
-			if (group.values.length > 0) {
-				const value = group.values[0];
-				setSelectedStat({
-					type: "parsed",
-					key: value.rawKey,
-					label: `${group.baseLabel} (${value.label})`,
-				});
-				setXAxisMode("game");
-				return;
-			}
-		}
-
-		setSelectedStat({
-			type: "topLevel",
-			key: "mmr",
-			label: formatStatLabel("mmr"),
-		});
-		setXAxisMode("game");
-	}, [player.id, resolvedQueueName, topLevelEntries, parsedStatGroups]);
-
 	const { data: playerStatsData, isLoading: isStatsLoading } =
 		useQuery<QueueGameData>({
 			queryKey: ["player-games", guildId, player.id, resolvedQueueName],
@@ -416,9 +377,12 @@ const ExpandedStats = ({
 	const seriesData = useMemo<ChartPoint[]>(() => {
 		if (!games.length) return [];
 
+		console.log(selectedStat);
+
 		return games
 			.map((game, index) => {
 				const statValue = getStatValueFromGame(game, selectedStat);
+				console.log(selectedStat, statValue);
 				if (statValue == null) {
 					return null;
 				}
@@ -428,9 +392,10 @@ const ExpandedStats = ({
 					return null;
 				}
 
-				const gameNumber = game.game_num ?? index + 1;
+				const actualMatchNumber = game.game_num;
+				const playerGameNumber = index + 1;
 				const xValue =
-					xAxisMode === "date" ? (timestampMs as number) : gameNumber;
+					xAxisMode === "date" ? (timestampMs as number) : playerGameNumber;
 				const formattedValue = formatNumericValue(statValue, selectedStat.key);
 				const timestamp = game.timestamp ?? "";
 				const result = game.result ?? "";
@@ -439,7 +404,8 @@ const ExpandedStats = ({
 					x: xValue,
 					y: statValue,
 					custom: {
-						gameNumber,
+						gameNumber: playerGameNumber,
+						matchNumber: actualMatchNumber,
 						timestamp,
 						result,
 						formattedValue,
@@ -489,7 +455,7 @@ const ExpandedStats = ({
 			credits: { enabled: false },
 			xAxis: {
 				type: xAxisMode === "date" ? "datetime" : "linear",
-				title: { text: xAxisMode === "date" ? "Date" : "Game #" },
+				title: { text: xAxisMode === "date" ? "Date" : "Games" },
 				labels: { style: { color: "#9ca3af" } },
 				gridLineColor: "rgba(255,255,255,0.08)",
 				...(xAxisMode === "game" && { allowDecimals: false }),
@@ -545,8 +511,14 @@ const ExpandedStats = ({
 					if (custom?.gameNumber !== undefined) {
 						lines.push(`Game #: ${custom.gameNumber}`);
 					}
+					if (custom?.matchNumber !== undefined) {
+						lines.push(`Queue #: ${custom.matchNumber}`);
+					}
 					if (custom?.timestamp) {
-						lines.push(`Date: ${custom.timestamp}`);
+						const timestampMs = parseTimestampToMs(custom.timestamp);
+						if (timestampMs !== null) {
+							lines.push(`Date: ${new Date(timestampMs).toLocaleString()}`);
+						}
 					}
 					if (custom?.result) {
 						lines.push(`Result: ${custom.result} MMR`);
@@ -594,9 +566,18 @@ const ExpandedStats = ({
 
 	const handleSelectParsed = (group: GroupedStat, value: GroupedStatValue) => {
 		setSelectedStat({
-			type: "parsed",
+			type: "parsedComputed",
 			key: value.rawKey,
 			label: `${group.baseLabel} (${value.label})`,
+		});
+	};
+
+	const handleSelectGroupedCard = (group: GroupedStat) => {
+		// Select the group using baseName as the key
+		setSelectedStat({
+			type: "parsedRaw",
+			key: group.baseName,
+			label: group.baseLabel,
 		});
 	};
 
@@ -637,23 +618,51 @@ const ExpandedStats = ({
 	};
 
 	const renderGroupedCard = (group: GroupedStat) => {
-		const groupCardClass = isDesktop
-			? "bg-neutral-800 rounded-lg p-3 border border-neutral-700"
-			: "bg-neutral-800 rounded-lg p-2 border border-neutral-700";
 		const groupValueClass = isDesktop
 			? "text-lg font-bold text-white"
 			: "text-base font-bold text-white";
 		const subStatClass = "text-xs text-gray-400";
 
+		// Check if the group is selected (using baseName as key)
+		const isGroupSelected =
+			selectedStat.type === "parsedRaw" &&
+			selectedStat.key === group.baseName &&
+			selectedStat.label === group.baseLabel;
+
+		// Check if any value in this group is currently selected (for individual items)
+		const isGroupActive = group.values.some(
+			(value) =>
+				selectedStat.type === "parsedRaw" && selectedStat.key === value.rawKey,
+		);
+
+		const groupCardClass = isDesktop
+			? "bg-neutral-800 rounded-lg p-3 border border-neutral-700"
+			: "bg-neutral-800 rounded-lg p-2 border border-neutral-700";
+
 		return (
-			<div key={group.baseName} className={groupCardClass}>
-				<div className="text-xs text-gray-400 uppercase tracking-wide font-semibold">
+			<div
+				key={group.baseName}
+				className={classNames(
+					groupCardClass,
+					isGroupSelected || isGroupActive
+						? "border-sky-400 shadow-lg shadow-sky-500/20"
+						: "",
+				)}
+			>
+				<button
+					type="button"
+					onClick={() => handleSelectGroupedCard(group)}
+					className={classNames(
+						"w-full text-left mb-2 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded",
+						"text-xs text-gray-400 uppercase tracking-wide font-semibold hover:text-gray-300",
+					)}
+				>
 					{group.baseLabel}
-				</div>
+				</button>
 				<div>
 					{group.values.map((value) => {
 						const isActive =
-							selectedStat.type === "parsed" &&
+							selectedStat.type === "parsedComputed" &&
 							selectedStat.key === value.rawKey;
 						return (
 							<button
