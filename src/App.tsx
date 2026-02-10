@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Admin from "./components/admin/Admin";
 import Dashboard from "./components/Dashboard";
 import Footer from "./components/Footer";
-import Guide from "./components/Guide";
 import Home from "./components/home/Home";
 import Leaderboard from "./components/Leaderboard";
 import Manage from "./components/manage/Manage";
@@ -50,7 +49,6 @@ function App() {
 							/>
 							<Route path="/status" element={<Status />} />
 							<Route path="/privacy" element={<Privacy />} />
-							<Route path="/guide" element={<Guide />} />
 
 							<Route element={<LoggedInRoutes />}>
 								<Route path="/dashboard" element={<Dashboard />} />

@@ -22,14 +22,8 @@ const navigation = [
 		requiresLogin: false,
 	},
 	{
-		name: "Guide",
-		href: "/guide",
-		current: false,
-		requiresLogin: false,
-	},
-	{
 		name: "API",
-		href: "https://api.neatqueue.com/docs",
+		href: "https://docs.neatqueue.com/api",
 		current: false,
 		requiresLogin: false,
 	},
