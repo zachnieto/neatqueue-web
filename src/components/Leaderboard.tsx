@@ -118,6 +118,7 @@ const Leaderboard = ({
 		useState<SortKey[]>(DEFAULT_COLUMNS);
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 	const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
+	const [isDownloadingCSV, setIsDownloadingCSV] = useState(false);
 
 	const guildId = guildID || passedGuildId;
 	const channelId = channelID || passedChannelId;
@@ -265,6 +266,104 @@ const Leaderboard = ({
 		return value?.toString() || "0";
 	};
 
+	const fetchAllLeaderboardData = async () => {
+		if (!guildId || !channelId || !currentMonthData) return [];
+
+		const totalPages = currentMonthData.pagination.total_pages;
+		const allPlayers: LeaderboardPlayer[] = [];
+
+		// Fetch all pages
+		for (let page = 1; page <= totalPages; page++) {
+			try {
+				const data = await getLeaderboardV2(guildId, channelId, page, [
+					selectedMonth,
+					currentMonth,
+				]);
+				const monthData = data.months.find(
+					(m: any) => m.month === selectedMonth,
+				);
+				if (monthData?.data) {
+					allPlayers.push(...monthData.data);
+				}
+			} catch (error) {
+				console.error(`Error fetching page ${page}:`, error);
+			}
+		}
+
+		return allPlayers;
+	};
+
+	const convertToCSV = (players: LeaderboardPlayer[]) => {
+		// Define CSV headers
+		const headers = [
+			"Rank",
+			"Player Name",
+			"IGN",
+			"MMR",
+			"Wins",
+			"Losses",
+			"Total Games",
+			"Win Rate",
+			"Streak",
+			"Peak MMR",
+			"Peak Streak",
+		];
+
+		// Create CSV rows
+		const rows = players.map((player, index) => {
+			const rank = index + 1;
+			const stats = player.stats;
+			return [
+				rank,
+				`"${player.name.replace(/"/g, '""')}"`, // Escape quotes in name
+				stats.ign ? `"${stats.ign.replace(/"/g, '""')}"` : "",
+				Math.round(stats.mmr || 0),
+				stats.wins || 0,
+				stats.losses || 0,
+				stats.totalgames || 0,
+				`${((stats.winrate || 0) * 100).toFixed(1)}%`,
+				stats.streak || 0,
+				Math.round(stats.peak_mmr || 0),
+				stats.peak_streak || 0,
+			].join(",");
+		});
+
+		// Combine headers and rows
+		return [headers.join(","), ...rows].join("\n");
+	};
+
+	const downloadCSV = async () => {
+		setIsDownloadingCSV(true);
+		try {
+			const allPlayers = await fetchAllLeaderboardData();
+			const csv = convertToCSV(allPlayers);
+
+			// Create blob and download
+			const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+			const link = document.createElement("a");
+			const url = URL.createObjectURL(blob);
+
+			// Generate filename with queue name and month
+			const queueName = leaderboardData?.queue_name || "leaderboard";
+			const monthDisplay =
+				selectedMonth === "alltime" ? "alltime" : selectedMonth;
+			const filename = `${queueName}_${monthDisplay}_leaderboard.csv`;
+
+			link.setAttribute("href", url);
+			link.setAttribute("download", filename);
+			link.style.visibility = "hidden";
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error("Error downloading CSV:", error);
+			alert("Failed to download CSV. Please try again.");
+		} finally {
+			setIsDownloadingCSV(false);
+		}
+	};
+
 	if (isLoading || !leaderboardData) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
@@ -305,26 +404,6 @@ const Leaderboard = ({
 					<h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
 						{formatQueueName(leaderboardData.queue_name)}
 					</h1>
-					<Link
-						to={`/history/${guildId}?queue=${encodeURIComponent(leaderboardData.queue_name)}`}
-						className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-neutral-700 hover:bg-neutral-600 text-white transition-colors shadow-lg"
-					>
-						<svg
-							className="w-4 h-4 mr-2 mb-1"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							aria-hidden="true"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-							/>
-						</svg>
-						Match History
-					</Link>
 				</div>
 
 				<div className="space-y-4">
@@ -384,25 +463,175 @@ const Leaderboard = ({
 									/>
 								</div>
 							)}
-						</div>
-
-						{/* Mobile: Just column toggles */}
-						<div className="md:hidden flex flex-wrap gap-1">
-							{TABLE_STATS.map((stat: SortKey) => (
+							<div className="flex gap-2 ml-auto self-end">
+								<Link
+									to={`/history/${guildId}?queue=${encodeURIComponent(leaderboardData.queue_name)}`}
+									className="bg-neutral-700 hover:bg-neutral-600 text-white border border-neutral-600 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+								>
+									<svg
+										className="w-4 h-4"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										aria-hidden="true"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
+									</svg>
+									<span>Match History</span>
+								</Link>
 								<button
 									type="button"
-									key={stat}
-									onClick={() => toggleColumn(stat)}
+									onClick={downloadCSV}
+									disabled={isDownloadingCSV}
 									className={classNames(
-										"px-2 py-1 rounded-md font-medium transition-all duration-200 text-xs",
-										visibleColumns.includes(stat)
-											? "bg-neutral-700 text-white shadow-md"
-											: "bg-neutral-800 text-gray-400 hover:bg-neutral-700 hover:text-gray-200",
+										"bg-neutral-700 hover:bg-neutral-600 text-white border border-neutral-600 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-200 shadow-md flex items-center justify-center gap-2",
+										isDownloadingCSV ? "opacity-50 cursor-not-allowed" : "",
 									)}
 								>
-									{STAT_LABELS[stat]}
+									{isDownloadingCSV ? (
+										<>
+											<svg
+												className="animate-spin h-4 w-4"
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+											>
+												<circle
+													className="opacity-25"
+													cx="12"
+													cy="12"
+													r="10"
+													stroke="currentColor"
+													strokeWidth="4"
+												></circle>
+												<path
+													className="opacity-75"
+													fill="currentColor"
+													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+												></path>
+											</svg>
+											<span>Downloading...</span>
+										</>
+									) : (
+										<>
+											<svg
+												className="w-4 h-4"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+												/>
+											</svg>
+											<span>Download CSV</span>
+										</>
+									)}
 								</button>
-							))}
+							</div>
+						</div>
+
+						{/* Mobile: Column toggles and CSV download */}
+						<div className="md:hidden">
+							<div className="flex flex-wrap gap-1 mb-3">
+								{TABLE_STATS.map((stat: SortKey) => (
+									<button
+										type="button"
+										key={stat}
+										onClick={() => toggleColumn(stat)}
+										className={classNames(
+											"px-2 py-1 rounded-md font-medium transition-all duration-200 text-xs",
+											visibleColumns.includes(stat)
+												? "bg-neutral-700 text-white shadow-md"
+												: "bg-neutral-800 text-gray-400 hover:bg-neutral-700 hover:text-gray-200",
+										)}
+									>
+										{STAT_LABELS[stat]}
+									</button>
+								))}
+							</div>
+							<div className="flex gap-2">
+								<Link
+									to={`/history/${guildId}?queue=${encodeURIComponent(leaderboardData.queue_name)}`}
+									className="flex-1 bg-neutral-700 hover:bg-neutral-600 text-white border border-neutral-600 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+								>
+									<svg
+										className="w-4 h-4"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										aria-hidden="true"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
+									</svg>
+									<span>Match History</span>
+								</Link>
+								<button
+									type="button"
+									onClick={downloadCSV}
+									disabled={isDownloadingCSV}
+									className={classNames(
+										"flex-1 bg-neutral-700 hover:bg-neutral-600 text-white border border-neutral-600 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-200 shadow-md flex items-center justify-center gap-2",
+										isDownloadingCSV ? "opacity-50 cursor-not-allowed" : "",
+									)}
+								>
+									{isDownloadingCSV ? (
+										<>
+											<svg
+												className="animate-spin h-4 w-4"
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+											>
+												<circle
+													className="opacity-25"
+													cx="12"
+													cy="12"
+													r="10"
+													stroke="currentColor"
+													strokeWidth="4"
+												></circle>
+												<path
+													className="opacity-75"
+													fill="currentColor"
+													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+												></path>
+											</svg>
+											<span>Downloading...</span>
+										</>
+									) : (
+										<>
+											<svg
+												className="w-4 h-4"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+												/>
+											</svg>
+											<span>Download CSV</span>
+										</>
+									)}
+								</button>
+							</div>
 						</div>
 					</div>
 
