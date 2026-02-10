@@ -6,6 +6,7 @@ import { getLeaderboardV2 } from "../services/neatqueue-service";
 import type { LeaderboardPlayer, LeaderboardV2Response } from "../types";
 import { classNames } from "../util/tailwind";
 import {
+	delay,
 	displayPercent,
 	getWinRateColor,
 	handleKeyDown,
@@ -119,6 +120,7 @@ const Leaderboard = ({
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 	const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
 	const [isDownloadingCSV, setIsDownloadingCSV] = useState(false);
+	const [downloadProgress, setDownloadProgress] = useState(0);
 
 	const guildId = guildID || passedGuildId;
 	const channelId = channelID || passedChannelId;
@@ -134,7 +136,7 @@ const Leaderboard = ({
 	} = useQuery<LeaderboardV2Response, Error>({
 		queryKey: ["leaderboard", guildId, channelId, selectedMonth, currentPage],
 		queryFn: () =>
-			getLeaderboardV2(guildId, channelId, currentPage, [
+			getLeaderboardV2(guildId, channelId, currentPage, 100, [
 				selectedMonth,
 				currentMonth,
 			]),
@@ -267,23 +269,39 @@ const Leaderboard = ({
 	};
 
 	const fetchAllLeaderboardData = async () => {
-		if (!guildId || !channelId || !currentMonthData) return [];
+		if (!guildId || !channelId || !currentMonthData) {
+			return [];
+		}
 
-		const totalPages = currentMonthData.pagination.total_pages;
+		let totalPages = 100000;
+		// Use the actual month from currentMonthData, which already has the correct fallback logic
+		const actualMonth = currentMonthData.month;
+
 		const allPlayers: LeaderboardPlayer[] = [];
 
-		// Fetch all pages
+		// Fetch all pages with rate limiting (30 requests per minute = 1 request every 2 seconds)
 		for (let page = 1; page <= totalPages; page++) {
 			try {
-				const data = await getLeaderboardV2(guildId, channelId, page, [
+				console.log(`Fetching page ${page}`, totalPages);
+				const data = await getLeaderboardV2(guildId, channelId, page, 500, [
 					selectedMonth,
 					currentMonth,
 				]);
-				const monthData = data.months.find(
-					(m: any) => m.month === selectedMonth,
-				);
+
+				// Use actualMonth (from currentMonthData) instead of selectedMonth
+				const monthData =
+					data.months.find((m: any) => m.month === actualMonth) ||
+					data.months[0]; // Fallback to first month if not found
+				totalPages = monthData.pagination.total_pages;
 				if (monthData?.data) {
 					allPlayers.push(...monthData.data);
+				}
+
+				// Update progress
+				setDownloadProgress(Math.round((page / totalPages) * 100));
+
+				if (page < totalPages) {
+					await new Promise((resolve) => setTimeout(resolve, 500));
 				}
 			} catch (error) {
 				console.error(`Error fetching page ${page}:`, error);
@@ -334,8 +352,15 @@ const Leaderboard = ({
 
 	const downloadCSV = async () => {
 		setIsDownloadingCSV(true);
+		setDownloadProgress(0);
 		try {
 			const allPlayers = await fetchAllLeaderboardData();
+
+			if (allPlayers.length === 0) {
+				alert("No player data available to download.");
+				return;
+			}
+
 			const csv = convertToCSV(allPlayers);
 
 			// Create blob and download
@@ -361,6 +386,7 @@ const Leaderboard = ({
 			alert("Failed to download CSV. Please try again.");
 		} finally {
 			setIsDownloadingCSV(false);
+			setDownloadProgress(0);
 		}
 	};
 
@@ -495,27 +521,39 @@ const Leaderboard = ({
 								>
 									{isDownloadingCSV ? (
 										<>
-											<svg
-												className="animate-spin h-4 w-4"
-												xmlns="http://www.w3.org/2000/svg"
-												fill="none"
-												viewBox="0 0 24 24"
-											>
-												<circle
-													className="opacity-25"
-													cx="12"
-													cy="12"
-													r="10"
-													stroke="currentColor"
-													strokeWidth="4"
-												></circle>
-												<path
-													className="opacity-75"
-													fill="currentColor"
-													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-												></path>
-											</svg>
-											<span>Downloading...</span>
+											<div className="relative w-4 h-4">
+												<svg className="w-4 h-4 -rotate-90" viewBox="0 0 36 36">
+													<circle
+														cx="18"
+														cy="18"
+														r="16"
+														fill="none"
+														className="stroke-neutral-500"
+														strokeWidth="3"
+													/>
+													<circle
+														cx="18"
+														cy="18"
+														r="16"
+														fill="none"
+														className="stroke-white"
+														strokeWidth="3"
+														strokeDasharray={`${(downloadProgress * 100.53) / 100} 100.53`}
+														strokeLinecap="round"
+													/>
+													<text
+														x="18"
+														y="18"
+														className="fill-white text-[10px] font-bold"
+														textAnchor="middle"
+														dominantBaseline="central"
+														transform="rotate(90 18 18)"
+													>
+														{downloadProgress}
+													</text>
+												</svg>
+											</div>
+											<span>{downloadProgress}%</span>
 										</>
 									) : (
 										<>
@@ -590,27 +628,39 @@ const Leaderboard = ({
 								>
 									{isDownloadingCSV ? (
 										<>
-											<svg
-												className="animate-spin h-4 w-4"
-												xmlns="http://www.w3.org/2000/svg"
-												fill="none"
-												viewBox="0 0 24 24"
-											>
-												<circle
-													className="opacity-25"
-													cx="12"
-													cy="12"
-													r="10"
-													stroke="currentColor"
-													strokeWidth="4"
-												></circle>
-												<path
-													className="opacity-75"
-													fill="currentColor"
-													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-												></path>
-											</svg>
-											<span>Downloading...</span>
+											<div className="relative w-4 h-4">
+												<svg className="w-4 h-4 -rotate-90" viewBox="0 0 36 36">
+													<circle
+														cx="18"
+														cy="18"
+														r="16"
+														fill="none"
+														className="stroke-neutral-500"
+														strokeWidth="3"
+													/>
+													<circle
+														cx="18"
+														cy="18"
+														r="16"
+														fill="none"
+														className="stroke-white"
+														strokeWidth="3"
+														strokeDasharray={`${(downloadProgress * 100.53) / 100} 100.53`}
+														strokeLinecap="round"
+													/>
+													<text
+														x="18"
+														y="18"
+														className="fill-white text-[10px] font-bold"
+														textAnchor="middle"
+														dominantBaseline="central"
+														transform="rotate(90 18 18)"
+													>
+														{downloadProgress}
+													</text>
+												</svg>
+											</div>
+											<span>{downloadProgress}%</span>
 										</>
 									) : (
 										<>

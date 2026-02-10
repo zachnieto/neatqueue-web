@@ -29,12 +29,14 @@ export const getLeaderboardV2 = async (
 	guildID: string,
 	channelID: string,
 	page: number = 1,
+	pageSize: number = 100,
 	months?: string[],
 	includeFields?: string[],
 	excludeFields?: string[],
 ) => {
 	const params = new URLSearchParams({
 		page: page.toString(),
+		page_size: pageSize.toString(),
 	});
 
 	if (months && months.length > 0) {
