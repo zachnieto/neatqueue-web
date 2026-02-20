@@ -1,4 +1,3 @@
-import { useHookstate } from "@hookstate/core";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import {
@@ -8,12 +7,10 @@ import {
 	getInstanceTypes,
 	purchaseInstance,
 	rebootInstance,
-	setAutoRenew,
 	startInstance,
 	stopInstance,
-	updateToken,
+	updateInstanceConfig,
 } from "../../../services/neatqueue-service";
-import globalState from "../../../state";
 import {
 	type InstancePricing,
 	type PrivateInstance,
@@ -39,8 +36,6 @@ const Instance = ({
 	setSuccess: (s: string) => void;
 	refreshPremiumData: () => Promise<void>;
 }) => {
-	const state = useHookstate(globalState);
-	const { auth } = state.get();
 	const [instanceModalOpen, setInstanceModalOpen] = useState<boolean>(false);
 	const [extendModalOpen, setExtendModalOpen] = useState<boolean>(false);
 	const [terminateModalOpen, setTerminateModalOpen] = useState<boolean>(false);
@@ -105,7 +100,7 @@ const Instance = ({
 	}, []);
 
 	const updateInstanceState = async () => {
-		const data = await getInstance(guildID, auth);
+		const data = await getInstance(guildID);
 		setPrivateInstance(data);
 		setAutoRenewState(!!data?.autoRenew);
 	};
@@ -114,7 +109,7 @@ const Instance = ({
 		setLoading(true);
 		setCurrentAction("purchase");
 		try {
-			await purchaseInstance(guildID, auth, instance.price, token);
+			await purchaseInstance(guildID, instance.price, token);
 			setSuccess("Instance is now being created");
 			await refreshPremiumData();
 			await updateInstanceState();
@@ -135,7 +130,7 @@ const Instance = ({
 		try {
 			setLoading(true);
 			setCurrentAction("extend");
-			await extendInstance(guildID, auth);
+			await extendInstance(guildID);
 			setSuccess(
 				`30 days have been added to the instance at a price of ${privateInstance.price} credits`,
 			);
@@ -153,7 +148,7 @@ const Instance = ({
 		try {
 			setLoading(true);
 			setCurrentAction("start");
-			await startInstance(guildID, auth);
+			await startInstance(guildID);
 			setSuccess("Instance is now starting");
 		} catch (e: any) {
 			setError(e.response.data.detail);
@@ -167,7 +162,7 @@ const Instance = ({
 		try {
 			setLoading(true);
 			setCurrentAction("reboot");
-			await rebootInstance(guildID, auth);
+			await rebootInstance(guildID);
 			setSuccess("Instance is now rebooting");
 		} catch (e: any) {
 			setError(e.response.data.detail);
@@ -181,7 +176,7 @@ const Instance = ({
 		try {
 			setLoading(true);
 			setCurrentAction("stop");
-			await stopInstance(guildID, auth);
+			await stopInstance(guildID);
 			setSuccess("Instance is now stopping");
 		} catch (e: any) {
 			setError(e.response.data.detail);
@@ -195,7 +190,7 @@ const Instance = ({
 		try {
 			setLoading(true);
 			setCurrentAction("terminate");
-			const refund = await deleteInstance(guildID, auth);
+			const refund = await deleteInstance(guildID);
 			setSuccess(
 				`Instance has been deleted, and you have been refunded ${refund.toFixed(
 					1,
@@ -213,7 +208,7 @@ const Instance = ({
 		try {
 			setLoading(true);
 			setCurrentAction("updateToken");
-			await updateToken(guildID, auth, botToken!);
+			await updateInstanceConfig(guildID, { token: botToken! });
 			setBotToken("");
 			setSuccess("Bot token has been updated");
 		} catch (e: any) {
@@ -229,7 +224,7 @@ const Instance = ({
 			setLoading(true);
 			setCurrentAction("toggleAutoRenew");
 			const newVal = !autoRenew;
-			await setAutoRenew(guildID, auth, newVal);
+			await updateInstanceConfig(guildID, { auto_renew: newVal });
 			setAutoRenewState(newVal);
 			setSuccess(`Auto-renew ${newVal ? "enabled" : "disabled"}`);
 		} catch (e: any) {

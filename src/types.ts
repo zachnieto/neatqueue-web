@@ -18,7 +18,7 @@ export type Guild = {
 	icon: string;
 	id: string;
 };
-export type Auth = { token_type: string; access_token: string } | undefined;
+export type Auth = { access_token: string } | undefined;
 export type Plan = {
 	price: number;
 	details: string;
@@ -73,6 +73,18 @@ export type Session = {
 	user: User;
 	guilds: Guild[] | undefined;
 	stats: BotStats;
+};
+
+export type LoginResponse = {
+	access_token: string;
+	user: Exclude<User, undefined>;
+	guilds: Guild[];
+};
+
+export type RefreshResponse = {
+	access_token: string;
+	user: Exclude<User, undefined>;
+	guilds: Guild[];
 };
 
 export type CommandSectonData = {

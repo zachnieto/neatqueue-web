@@ -1,7 +1,5 @@
-import { useHookstate } from "@hookstate/core";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { purchasePremium } from "../../services/neatqueue-service";
-import globalState from "../../state";
 import type { PremiumData, TimeLeft } from "../../types";
 import { calculateTimeLeft } from "../../util/utility";
 import Modal from "../Modal";
@@ -21,8 +19,6 @@ const PremiumStatus = ({
 	setError: (s: string) => void;
 	setSuccess: (s: string) => void;
 }) => {
-	const state = useHookstate(globalState);
-	const { auth } = state.get();
 	const [planModalOpen, setPlanModalOpen] = useState(false);
 	const [extendModalOpen, setExtendModalOpen] = useState(false);
 	const [timeLeft, setTimeLeft] = useState<TimeLeft>();
@@ -51,7 +47,7 @@ const PremiumStatus = ({
 		if (!guildID) return;
 
 		try {
-			const prem = await purchasePremium(guildID, auth, selectedPlan);
+			const prem = await purchasePremium(guildID, selectedPlan);
 			setSuccess(
 				`30 days have been added to your server's premium timer at the cost of ${
 					prem.plans[prem.premium.plan].price

@@ -1,14 +1,40 @@
 import axios from "axios";
 import globalState from "../state";
 import type {
-	Auth,
 	InstancePricing,
 	MatchHistory,
 	NodeStatus,
 	PrivateInstance,
 } from "../types";
+import { refreshToken } from "./server-service";
 
 const API_BASE = import.meta.env.VITE_NEATQUEUE_API;
+
+const api = axios.create({ baseURL: API_BASE });
+
+api.interceptors.request.use((config) => {
+	const { auth } = globalState.get();
+	if (auth?.access_token) {
+		config.headers.Authorization = `Bearer ${auth.access_token}`;
+	}
+	return config;
+});
+
+api.interceptors.response.use(
+	(response) => response,
+	async (error) => {
+		const original = error.config;
+		if (error.response?.status === 401 && !original._retry) {
+			original._retry = true;
+			const newToken = await refreshToken();
+			if (newToken) {
+				original.headers.Authorization = `Bearer ${newToken}`;
+				return api(original);
+			}
+		}
+		return Promise.reject(error);
+	},
+);
 
 export const getStats = async () => {
 	const resp = await axios.get(`${API_BASE}/stats`, { timeout: 2000 });
@@ -73,33 +99,13 @@ export const getPlayerStats = async (
 	return resp.data;
 };
 
-export const getPremium = async (guildID: string, oauth: Auth) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.get(`${API_BASE}/premium/${guildID}`, config);
+export const getPremium = async (guildID: string) => {
+	const resp = await api.get(`/premium/${guildID}`);
 	return resp.data;
 };
 
-export const purchasePremium = async (
-	guildID: string,
-	oauth: Auth,
-	plan: string,
-) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.post(
-		`${API_BASE}/premium/${guildID}/${plan}`,
-		{},
-		config,
-	);
+export const purchasePremium = async (guildID: string, plan: string) => {
+	const resp = await api.post(`/premium/${guildID}/${plan}`, {});
 	return resp.data;
 };
 
@@ -107,23 +113,12 @@ export const transferCredits = async (
 	fromGuildID: string,
 	toGuildID: string,
 	amount: number,
-	oauth: Auth,
 ) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	await axios.post(
-		`${API_BASE}/transfercredits`,
-		{
-			server_id: fromGuildID,
-			target_server_id: toGuildID,
-			amount: amount,
-		},
-		config,
-	);
+	await api.post("/transfercredits", {
+		server_id: fromGuildID,
+		target_server_id: toGuildID,
+		amount,
+	});
 };
 
 export async function getLongUrl(shortUrl: string) {
@@ -150,173 +145,57 @@ export async function getInstanceTypes() {
 	return data;
 }
 
-export async function getInstance(guildID: string, oauth: Auth) {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.get(`${API_BASE}/api/instance/${guildID}`, config);
+export async function getInstance(guildID: string) {
+	const resp = await api.get(`/api/instance/${guildID}`);
 	const data: PrivateInstance | undefined = resp.data;
 	return data;
 }
 
 export const purchaseInstance = async (
 	guildID: string,
-	oauth: Auth,
 	price: number,
 	botToken: string,
 ) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.post(
-		`${API_BASE}/api/instance/${guildID}`,
-		{
-			price,
-			bot_token: botToken,
-		},
-		config,
-	);
+	const resp = await api.post(`/api/instance/${guildID}`, {
+		price,
+		bot_token: botToken,
+	});
 	return resp.data;
 };
 
-export const extendInstance = async (guildID: string, oauth: Auth) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.get(
-		`${API_BASE}/api/instance/extend/${guildID}`,
-		config,
-	);
+export const extendInstance = async (guildID: string) => {
+	const resp = await api.get(`/api/instance/extend/${guildID}`);
 	return resp.data;
 };
 
-export const startInstance = async (guildID: string, oauth: Auth) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.get(
-		`${API_BASE}/api/instance/start/${guildID}`,
-		config,
-	);
+export const startInstance = async (guildID: string) => {
+	const resp = await api.get(`/api/instance/start/${guildID}`);
 	return resp.data;
 };
 
-export const rebootInstance = async (guildID: string, oauth: Auth) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.get(
-		`${API_BASE}/api/instance/reboot/${guildID}`,
-		config,
-	);
+export const rebootInstance = async (guildID: string) => {
+	const resp = await api.get(`/api/instance/reboot/${guildID}`);
 	return resp.data;
 };
 
-export const stopInstance = async (guildID: string, oauth: Auth) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.get(
-		`${API_BASE}/api/instance/stop/${guildID}`,
-		config,
-	);
+export const stopInstance = async (guildID: string) => {
+	const resp = await api.get(`/api/instance/stop/${guildID}`);
 	return resp.data;
 };
 
-export const deleteInstance = async (guildID: string, oauth: Auth) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.delete(
-		`${API_BASE}/api/instance/${guildID}`,
-		config,
-	);
+export const deleteInstance = async (guildID: string) => {
+	const resp = await api.delete(`/api/instance/${guildID}`);
 	return resp.data;
 };
 
-export const updateToken = async (
-	guildID: string,
-	oauth: Auth,
-	botToken: string,
-) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.patch(
-		`${API_BASE}/api/instance/${guildID}`,
-		{
-			token: botToken,
-		},
-		config,
-	);
-	return resp.data;
-};
-
-export const setAutoRenew = async (
-	guildID: string,
-	oauth: Auth,
-	enabled: boolean,
-) => {
-	const config = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.patch(
-		`${API_BASE}/api/instance/${guildID}`,
-		{
-			auto_renew: enabled,
-		},
-		config,
-	);
-	return resp.data;
-};
-
-// Unified function to update instance configuration (token and/or auto_renew)
 export const updateInstanceConfig = async (
 	guildID: string,
-	oauth: Auth,
 	config: {
 		token?: string;
 		auto_renew?: boolean;
 	},
 ) => {
-	const axiosConfig = {
-		headers: {
-			authorization: `${oauth?.token_type} ${oauth?.access_token}`,
-		},
-	};
-
-	const resp = await axios.patch(
-		`${API_BASE}/api/instance/${guildID}`,
-		config,
-		axiosConfig,
-	);
+	const resp = await api.patch(`/api/instance/${guildID}`, config);
 	return resp.data;
 };
 

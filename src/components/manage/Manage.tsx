@@ -24,7 +24,7 @@ const Manage = () => {
 	}, [state.guilds, guildID]);
 
 	const refreshPremiumData = async () => {
-		if (guildID) getPremium(guildID, state.auth.get()).then(setPremiumData);
+		if (guildID) getPremium(guildID).then(setPremiumData);
 	};
 
 	if (!guild) {

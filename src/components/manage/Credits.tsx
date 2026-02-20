@@ -23,7 +23,7 @@ const Credits = ({
 	setSuccess: (s: string) => void;
 }) => {
 	const state = useHookstate(globalState);
-	const { user, auth } = state.get();
+	const { user } = state.get();
 
 	const [purchaseAmountDollars, setPurchaseAmountDollars] = useState<number>(1);
 	const [transferAmountCredits, setTransferAmountCredits] = useState<number>(0);
@@ -52,12 +52,7 @@ const Credits = ({
 	const handleTransferCredits = async () => {
 		if (!user || !guildID) return;
 		try {
-			await transferCredits(
-				guildID,
-				transferGuildId,
-				transferAmountCredits,
-				auth,
-			);
+			await transferCredits(guildID, transferGuildId, transferAmountCredits);
 			setSuccess(`Successfully transferred ${transferAmountCredits} credits`);
 			await refreshPremiumData();
 		} catch (e: any) {
