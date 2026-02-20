@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { purchasePremium } from "../../services/neatqueue-service";
 import type { PremiumData, TimeLeft } from "../../types";
 import { calculateTimeLeft } from "../../util/utility";
@@ -8,13 +8,13 @@ import Extend from "./Extend";
 
 const PremiumStatus = ({
 	premiumData,
-	setPremiumData,
+	refreshPremiumData,
 	guildID,
 	setError,
 	setSuccess,
 }: {
 	premiumData: PremiumData;
-	setPremiumData: Dispatch<SetStateAction<PremiumData | undefined>>;
+	refreshPremiumData: () => Promise<void>;
 	guildID: string;
 	setError: (s: string) => void;
 	setSuccess: (s: string) => void;
@@ -53,7 +53,7 @@ const PremiumStatus = ({
 					prem.plans[prem.premium.plan].price
 				} credits`,
 			);
-			setPremiumData(prem);
+			await refreshPremiumData();
 		} catch (e: any) {
 			setError(e.response.data.detail);
 			return;

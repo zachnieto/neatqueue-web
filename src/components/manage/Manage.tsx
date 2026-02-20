@@ -63,7 +63,7 @@ const Manage = () => {
 					<>
 						<PremiumStatus
 							premiumData={premiumData}
-							setPremiumData={setPremiumData}
+							refreshPremiumData={refreshPremiumData}
 							guildID={guildID}
 							setError={showError}
 							setSuccess={showSuccess}
