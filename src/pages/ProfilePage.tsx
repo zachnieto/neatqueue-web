@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import Loading from "../components/Loading";
 import { useToast } from "../hooks/useToast";
 import {
 	getProfile,
@@ -59,33 +60,12 @@ export default function ProfilePage() {
 	};
 
 	if (isLoading || !profile) {
-		return (
-			<div className="min-h-screen">
-				<div className="text-center mb-5">
-					<h1 className="text-5xl">Profile</h1>
-					<p className="text-xl text-gray-400">Loading profile...</p>
-				</div>
-			</div>
-		);
+		return <Loading />;
 	}
 
 	return (
-		<div className="min-h-screen">
-			<div className="text-center mb-5">
-				<h1 className="text-5xl">Profile</h1>
-			</div>
-
-			<div className="flex justify-end lg:mx-32 mb-4">
-				<button
-					type="button"
-					onClick={handleLogout}
-					className="rounded-md bg-stone-700 px-4 py-2 text-lg font-medium text-white hover:bg-stone-600 transition-colors"
-				>
-					Logout
-				</button>
-			</div>
-
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:mx-32 gap-8">
+		<div className="min-h-screen lg:p-32">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 				{/* Discord + Account (combined) */}
 				<section className="col-span-1 bg-stone-900 rounded shadow-md p-5">
 					<h2 className="text-3xl mb-4">Discord</h2>
@@ -154,7 +134,7 @@ export default function ProfilePage() {
 								type="button"
 								onClick={handleUnlinkSteam}
 								disabled={unlinkLoading}
-								className="rounded-md bg-red-600/90 px-3 py-2 text-xl font-medium text-white hover:bg-red-600 hover:translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+								className="btn-primary"
 							>
 								{unlinkLoading ? "Unlinking..." : "Unlink"}
 							</button>
@@ -175,6 +155,12 @@ export default function ProfilePage() {
 						</div>
 					)}
 				</section>
+			</div>
+
+			<div className="flex justify-center mt-10">
+				<button type="button" onClick={handleLogout} className="btn-primary">
+					Logout
+				</button>
 			</div>
 		</div>
 	);

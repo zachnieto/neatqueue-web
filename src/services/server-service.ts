@@ -11,6 +11,7 @@ const authApi = axios.create({
 });
 
 let loginInProgress = false;
+let refreshPromise: Promise<string | null> | null = null;
 
 export const getSession = async () => {
 	// Always refresh on page load — gets fresh guilds, user info, and a new
@@ -32,7 +33,7 @@ export const discordAuth = async (code: string) => {
 	}
 };
 
-export const refreshToken = async (): Promise<string | null> => {
+const doRefresh = async (): Promise<string | null> => {
 	try {
 		const resp = await authApi.post(`/auth/refresh`);
 		const data: RefreshResponse = resp.data;
@@ -49,6 +50,16 @@ export const refreshToken = async (): Promise<string | null> => {
 			globalState.guilds.set(undefined);
 		}
 		return null;
+	}
+};
+
+export const refreshToken = async (): Promise<string | null> => {
+	if (refreshPromise) return refreshPromise;
+	refreshPromise = doRefresh();
+	try {
+		return await refreshPromise;
+	} finally {
+		refreshPromise = null;
 	}
 };
 

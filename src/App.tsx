@@ -34,40 +34,38 @@ function App() {
 		<QueryClientProvider client={queryClient}>
 			<ToastProvider>
 				<div className="container-fluid px-5 relative">
-					<>
-						<CustomParticles color={""} clickable={false} />
+					<CustomParticles color={""} clickable={false} />
 
-						<Nav />
-						<Routes>
-							<Route path="/" element={<Home />} />
-							<Route
-								path="/leaderboard/:guildID/:channelID"
-								element={<Leaderboard />}
-							/>
-							<Route path="/lb/:shortUrl" element={<ShortURL />} />
-							<Route
-								path="/transcript/:guildID/:gameNum"
-								element={<Transcript />}
-							/>
-							<Route path="/status" element={<Status />} />
-							<Route path="/privacy" element={<Privacy />} />
+					<Nav />
+					<Routes>
+						<Route path="/" element={<Home />} />
+						<Route
+							path="/leaderboard/:guildID/:channelID"
+							element={<Leaderboard />}
+						/>
+						<Route path="/lb/:shortUrl" element={<ShortURL />} />
+						<Route
+							path="/transcript/:guildID/:gameNum"
+							element={<Transcript />}
+						/>
+						<Route path="/status" element={<Status />} />
+						<Route path="/privacy" element={<Privacy />} />
 
-							<Route element={<LoggedInRoutes />}>
-								<Route path="/dashboard" element={<Dashboard />} />
-								<Route path="/manage/:guildID" element={<Manage />} />
-								<Route path="/profile" element={<ProfilePage />} />
-							</Route>
+						<Route element={<LoggedInRoutes />}>
+							<Route path="/dashboard" element={<Dashboard />} />
+							<Route path="/manage/:guildID" element={<Manage />} />
+							<Route path="/profile" element={<ProfilePage />} />
+						</Route>
 
-							<Route element={<AdminRoutes />}>
-								<Route path="/admin" element={<Admin />} />
-							</Route>
+						<Route element={<AdminRoutes />}>
+							<Route path="/admin" element={<Admin />} />
+						</Route>
 
-							<Route path="/link-account/steam" element={<LinkAccountPage />} />
-							<Route path="/history/:serverId" element={<HistoryPage />} />
-						</Routes>
+						<Route path="/link-account/steam" element={<LinkAccountPage />} />
+						<Route path="/history/:serverId" element={<HistoryPage />} />
+					</Routes>
 
-						<Footer />
-					</>
+					<Footer />
 					<ToastContainer />
 				</div>
 			</ToastProvider>
