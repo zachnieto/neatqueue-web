@@ -5,6 +5,7 @@ import type {
 	MatchHistory,
 	NodeStatus,
 	PrivateInstance,
+	UserProfile,
 } from "../types";
 import { refreshToken } from "./server-service";
 
@@ -102,6 +103,24 @@ export const getPlayerStats = async (
 export const getPremium = async (guildID: string) => {
 	const resp = await api.get(`/premium/${guildID}`);
 	return resp.data;
+};
+
+export const getProfile = async (): Promise<UserProfile> => {
+	const resp = await api.get("/auth/profile");
+	return resp.data;
+};
+
+export const unlinkSteam = async () => {
+	await api.post("/auth/steam/unlink");
+};
+
+export const getSteamLinkUrl = async (
+	redirectUrl: string,
+): Promise<string | null> => {
+	const resp = await api.get<{ steam_url: string }>("/auth/steam/link", {
+		params: { redirect_url: redirectUrl },
+	});
+	return resp.data?.steam_url ?? null;
 };
 
 export const purchasePremium = async (guildID: string, plan: string) => {

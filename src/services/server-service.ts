@@ -1,5 +1,5 @@
 import axios from "axios";
-import globalState from "../state";
+import globalState, { sessionReadyState } from "../state";
 import type { LoginResponse, RefreshResponse } from "../types";
 
 const API_BASE = import.meta.env.VITE_NEATQUEUE_API;
@@ -10,18 +10,26 @@ const authApi = axios.create({
 	baseURL: API_BASE,
 });
 
+let loginInProgress = false;
+
 export const getSession = async () => {
 	// Always refresh on page load — gets fresh guilds, user info, and a new
 	// access token. Falls back to clearing state if the refresh cookie is expired.
 	await refreshToken();
+	sessionReadyState.set(true);
 };
 
 export const discordAuth = async (code: string) => {
-	const resp = await authApi.post(`/auth/login`, { code });
-	const data: LoginResponse = resp.data;
-	globalState.auth.set({ access_token: data.access_token });
-	globalState.user.set(data.user);
-	globalState.guilds.set(data.guilds);
+	loginInProgress = true;
+	try {
+		const resp = await authApi.post(`/auth/login`, { code });
+		const data: LoginResponse = resp.data;
+		globalState.auth.set({ access_token: data.access_token });
+		globalState.user.set(data.user);
+		globalState.guilds.set(data.guilds);
+	} finally {
+		loginInProgress = false;
+	}
 };
 
 export const refreshToken = async (): Promise<string | null> => {
@@ -35,9 +43,11 @@ export const refreshToken = async (): Promise<string | null> => {
 		}
 		return data.access_token;
 	} catch {
-		globalState.auth.set(undefined);
-		globalState.user.set(undefined);
-		globalState.guilds.set(undefined);
+		if (!loginInProgress) {
+			globalState.auth.set(undefined);
+			globalState.user.set(undefined);
+			globalState.guilds.set(undefined);
+		}
 		return null;
 	}
 };

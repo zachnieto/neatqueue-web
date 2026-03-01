@@ -19,6 +19,8 @@ import ToastContainer from "./components/ToastContainer";
 import Transcript from "./components/Transcript";
 import { ToastProvider } from "./hooks/useToast";
 import HistoryPage from "./pages/HistoryPage";
+import LinkAccountPage from "./pages/LinkAccountPage";
+import ProfilePage from "./pages/ProfilePage";
 import { getSession } from "./services/server-service";
 
 const queryClient = new QueryClient();
@@ -53,12 +55,14 @@ function App() {
 							<Route element={<LoggedInRoutes />}>
 								<Route path="/dashboard" element={<Dashboard />} />
 								<Route path="/manage/:guildID" element={<Manage />} />
+								<Route path="/profile" element={<ProfilePage />} />
 							</Route>
 
 							<Route element={<AdminRoutes />}>
 								<Route path="/admin" element={<Admin />} />
 							</Route>
 
+							<Route path="/link-account/steam" element={<LinkAccountPage />} />
 							<Route path="/history/:serverId" element={<HistoryPage />} />
 						</Routes>
 

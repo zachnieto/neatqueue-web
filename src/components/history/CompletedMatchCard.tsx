@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { classNames } from "../../util/tailwind";
 import type { MatchHistory } from "../../types";
+import { classNames } from "../../util/tailwind";
 
 interface CompletedMatchCardProps {
 	match: MatchHistory;
