@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect } from "react";
 import { classNames } from "../util/tailwind";
 import { delay } from "../util/utility";
 
@@ -12,10 +12,11 @@ const Alert = ({
 	setValue: Dispatch<SetStateAction<string | null>>;
 }) => {
 	useEffect(() => {
+		if (!value) return;
 		delay(10000).then(() => setValue(null));
-	}, [value]);
+	}, [value, setValue]);
 
-	if (!value) return <></>;
+	if (!value) return null;
 
 	return (
 		<div>

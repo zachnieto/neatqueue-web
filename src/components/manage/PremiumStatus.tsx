@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { purchasePremium } from "../../services/neatqueue-service";
 import type { PremiumData, TimeLeft } from "../../types";
 import { calculateTimeLeft } from "../../util/utility";
@@ -26,6 +26,11 @@ const PremiumStatus = ({
 		premiumData.premium?.plan || "",
 	);
 
+	const recalculateTimeLeft = useCallback(() => {
+		if (!premiumData.premium?.until) return;
+		return calculateTimeLeft(premiumData.premium?.until);
+	}, [premiumData.premium?.until]);
+
 	useEffect(() => {
 		setTimeLeft(recalculateTimeLeft());
 		const interval = setInterval(
@@ -36,12 +41,7 @@ const PremiumStatus = ({
 		return () => {
 			clearInterval(interval);
 		};
-	}, [premiumData]);
-
-	const recalculateTimeLeft = () => {
-		if (!premiumData.premium?.until) return;
-		return calculateTimeLeft(premiumData.premium?.until);
-	};
+	}, [recalculateTimeLeft]);
 
 	const handlePurchase = async () => {
 		if (!guildID) return;
@@ -54,8 +54,9 @@ const PremiumStatus = ({
 				} credits`,
 			);
 			await refreshPremiumData();
-		} catch (e: any) {
-			setError(e.response.data.detail);
+		} catch (e: unknown) {
+			const err = e as { response?: { data?: { detail?: string } } };
+			setError(err.response?.data?.detail ?? "Purchase failed");
 			return;
 		}
 
@@ -82,12 +83,14 @@ const PremiumStatus = ({
 						</h3>
 						<div className="flex place-content-center gap-3">
 							<button
+								type="button"
 								onClick={() => setPlanModalOpen(true)}
 								className="btn-primary max-w-1/2"
 							>
 								Change Plan
 							</button>
 							<button
+								type="button"
 								onClick={() => setExtendModalOpen(true)}
 								className="btn-primary"
 							>
@@ -101,6 +104,7 @@ const PremiumStatus = ({
 						<h1 className="text-2xl">❌</h1>
 						<div className="flex gap-3">
 							<button
+								type="button"
 								onClick={() => setPlanModalOpen(true)}
 								className="btn-primary"
 							>

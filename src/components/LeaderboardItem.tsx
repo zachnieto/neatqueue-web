@@ -6,7 +6,7 @@ const LeaderboardItem = ({
 	rank,
 	sortKey,
 }: {
-	player: any;
+	player: { name: string; data: Record<string, unknown> };
 	rank: number;
 	sortKey: string;
 }) => {
@@ -53,7 +53,7 @@ const LeaderboardItem = ({
 				<>
 					<div className="basis-1/4">
 						<h1 className="md:text-3xl sm:text-lg">
-							{parseInt(player.data[sortKey])}
+							{parseInt(String(player.data[sortKey]), 10)}
 						</h1>
 					</div>
 					<div className="basis-1/4">
@@ -66,7 +66,7 @@ const LeaderboardItem = ({
 				<div className="basis-1/4">
 					<h1 className="md:text-3xl sm:text-lg">
 						{sortKey !== "winrate"
-							? parseInt(player.data[sortKey])
+							? parseInt(String(player.data[sortKey]), 10)
 							: displayPercent(player.data[sortKey])}
 					</h1>
 				</div>

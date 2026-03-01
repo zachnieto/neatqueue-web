@@ -67,8 +67,7 @@ const Toast = ({
 			if (enterTimerRef.current) clearTimeout(enterTimerRef.current);
 			if (timerRef.current) clearTimeout(timerRef.current);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []); // Empty deps - only run once on mount
+	}, [duration, handleDismiss]);
 
 	return (
 		<div
@@ -98,6 +97,7 @@ const Toast = ({
 
 			{/* Dismiss Button */}
 			<button
+				type="button"
 				onClick={handleDismiss}
 				className="flex-shrink-0 text-gray-300 hover:text-white transition-colors"
 				aria-label="Dismiss"
@@ -107,7 +107,9 @@ const Toast = ({
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
+					aria-hidden
 				>
+					<title>Dismiss</title>
 					<path
 						strokeLinecap="round"
 						strokeLinejoin="round"

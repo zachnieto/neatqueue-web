@@ -107,7 +107,7 @@ export type UserProfile = {
 
 export type CommandSectonData = {
 	title: string;
-	paragraph: any;
+	paragraph: unknown;
 	link: string;
 };
 

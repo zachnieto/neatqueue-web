@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { getTranscript } from "../services/neatqueue-service";
 import Loading from "./Loading";
@@ -14,13 +14,14 @@ const Transcript = () => {
 			setHtml(html);
 			setLoading(false);
 		});
-	}, []);
+	}, [guildID, gameNum]);
 
 	if (loading) return <Loading />;
 
 	return (
 		<div className="h-100vh">
 			<iframe
+				title="Game transcript"
 				srcDoc={html}
 				style={{ width: "1px", minWidth: "100%", height: "90vh" }}
 			/>

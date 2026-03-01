@@ -87,6 +87,7 @@ const Admin = () => {
 
 			<div className="flex justify-center gap-4 my-10">
 				<button
+					type="button"
 					className="btn-primary"
 					disabled={loading}
 					onClick={() => restartApps.mutate(nodes.map((n) => n.uuid))}
@@ -97,6 +98,7 @@ const Admin = () => {
 
 			<div className="flex justify-center gap-4 my-10">
 				<button
+					type="button"
 					className="btn-primary"
 					disabled={disableActions}
 					onClick={() => startApps.mutate(selectedApplications)}
@@ -104,6 +106,7 @@ const Admin = () => {
 					Start Selected
 				</button>
 				<button
+					type="button"
 					className="btn-primary"
 					disabled={disableActions}
 					onClick={() => restartApps.mutate(selectedApplications)}
@@ -111,6 +114,7 @@ const Admin = () => {
 					Restart Selected
 				</button>
 				<button
+					type="button"
 					className="btn-primary"
 					disabled={disableActions}
 					onClick={() => stopApps.mutate(selectedApplications)}

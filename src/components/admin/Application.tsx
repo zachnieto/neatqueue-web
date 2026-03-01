@@ -11,7 +11,8 @@ const Application = ({
 	onClick: (id: string) => void;
 }) => {
 	return (
-		<div
+		<button
+			type="button"
 			className={classNames(
 				"col-span-1 bg-green-600 rounded shadow-md p-5 grid place-items-center cursor-pointer",
 				selected ? "border-4 border-white" : "",
@@ -22,7 +23,7 @@ const Application = ({
 			<h2>{data.name}</h2>
 			<h2>{data.status}</h2>
 			{/*{JSON.stringify(application)}*/}
-		</div>
+		</button>
 	);
 };
 

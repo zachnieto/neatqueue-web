@@ -3,14 +3,13 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getLeaderboardV2 } from "../services/neatqueue-service";
-import type { LeaderboardPlayer, LeaderboardV2Response } from "../types";
+import type {
+	LeaderboardPlayer,
+	LeaderboardV2Response,
+	MonthData,
+} from "../types";
 import { classNames } from "../util/tailwind";
-import {
-	delay,
-	displayPercent,
-	getWinRateColor,
-	handleKeyDown,
-} from "../util/utility";
+import { displayPercent, getWinRateColor } from "../util/utility";
 import ExpandedStats from "./ExpandedStats";
 
 type PlayerData = LeaderboardPlayer["stats"];
@@ -155,8 +154,9 @@ const Leaderboard = ({
 	const currentMonthData = useMemo(() => {
 		if (!leaderboardData) return null;
 		return (
-			leaderboardData.months.find((m: any) => m.month === selectedMonth) ||
-			leaderboardData.months[0]
+			leaderboardData.months.find(
+				(m: MonthData) => m.month === selectedMonth,
+			) || leaderboardData.months[0]
 		);
 	}, [leaderboardData, selectedMonth]);
 
@@ -214,7 +214,7 @@ const Leaderboard = ({
 
 		try {
 			const [year, monthNum] = month.split("-");
-			const date = new Date(parseInt(year), parseInt(monthNum) - 1, 15);
+			const date = new Date(parseInt(year, 10), parseInt(monthNum, 10) - 1, 15);
 			return date.toLocaleDateString("en-US", {
 				year: "numeric",
 				month: "short",
@@ -290,7 +290,7 @@ const Leaderboard = ({
 
 				// Use actualMonth (from currentMonthData) instead of selectedMonth
 				const monthData =
-					data.months.find((m: any) => m.month === actualMonth) ||
+					data.months.find((m: MonthData) => m.month === actualMonth) ||
 					data.months[0]; // Fallback to first month if not found
 				totalPages = monthData.pagination.total_pages;
 				if (monthData?.data) {
@@ -522,7 +522,12 @@ const Leaderboard = ({
 									{isDownloadingCSV ? (
 										<>
 											<div className="relative w-4 h-4">
-												<svg className="w-4 h-4 -rotate-90" viewBox="0 0 36 36">
+												<svg
+													className="w-4 h-4 -rotate-90"
+													viewBox="0 0 36 36"
+													aria-hidden
+												>
+													<title>Download progress</title>
 													<circle
 														cx="18"
 														cy="18"
@@ -562,7 +567,9 @@ const Leaderboard = ({
 												fill="none"
 												stroke="currentColor"
 												viewBox="0 0 24 24"
+												aria-hidden
 											>
+												<title>Download</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"
@@ -629,7 +636,12 @@ const Leaderboard = ({
 									{isDownloadingCSV ? (
 										<>
 											<div className="relative w-4 h-4">
-												<svg className="w-4 h-4 -rotate-90" viewBox="0 0 36 36">
+												<svg
+													className="w-4 h-4 -rotate-90"
+													viewBox="0 0 36 36"
+													aria-hidden
+												>
+													<title>Download progress</title>
 													<circle
 														cx="18"
 														cy="18"
@@ -669,7 +681,9 @@ const Leaderboard = ({
 												fill="none"
 												stroke="currentColor"
 												viewBox="0 0 24 24"
+												aria-hidden
 											>
+												<title>Download</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"
@@ -740,21 +754,15 @@ const Leaderboard = ({
 													rankInfo.bg,
 												)}
 											>
-												<div
+												<button
+													type="button"
 													className={classNames(
-														"px-6 py-4 cursor-pointer hover:bg-black/20",
+														"w-full text-left px-6 py-4 cursor-pointer hover:bg-black/20",
 														"transition-colors duration-200",
 													)}
 													onClick={() =>
 														setExpandedPlayerId(isExpanded ? null : player.id)
 													}
-													onKeyDown={(e) => {
-														handleKeyDown(e, () =>
-															setExpandedPlayerId(
-																isExpanded ? null : player.id,
-															),
-														);
-													}}
 												>
 													<div className="flex items-center gap-4">
 														{/* Rank */}
@@ -835,7 +843,7 @@ const Leaderboard = ({
 															);
 														})}
 													</div>
-												</div>
+												</button>
 
 												{/* Expanded Stats View */}
 												<div
@@ -956,18 +964,12 @@ const Leaderboard = ({
 												)}
 											>
 												{/* Compact Row Layout - Clickable */}
-												<div
-													className="flex items-center gap-2 p-3 cursor-pointer hover:bg-black/20 transition-colors duration-200"
+												<button
+													type="button"
+													className="w-full text-left flex items-center gap-2 p-3 cursor-pointer hover:bg-black/20 transition-colors duration-200"
 													onClick={() =>
 														setExpandedPlayerId(isExpanded ? null : player.id)
 													}
-													onKeyDown={(e) => {
-														handleKeyDown(e, () =>
-															setExpandedPlayerId(
-																isExpanded ? null : player.id,
-															),
-														);
-													}}
 												>
 													{/* Rank */}
 													<div className="flex flex-col items-center justify-center w-10">
@@ -1069,7 +1071,7 @@ const Leaderboard = ({
 															})}
 														</div>
 													</div>
-												</div>
+												</button>
 
 												{/* Expanded Stats View */}
 												<div

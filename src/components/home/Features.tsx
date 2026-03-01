@@ -14,9 +14,9 @@ const Features = () => {
 			</h1>
 			<div>
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-					{features.map((feature, index) => (
+					{features.map((feature) => (
 						<div
-							key={index}
+							key={feature.title}
 							className="max-w-sm rounded overflow-hidden shadow-lg bg-black/25 text-white text-center p-4"
 						>
 							<h2 className="font-bold text-xl mb-2">{feature.title}</h2>

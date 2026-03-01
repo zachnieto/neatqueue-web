@@ -4,8 +4,6 @@ import { getStats } from "../../services/neatqueue-service";
 import globalState from "../../state";
 import { classNames } from "../../util/tailwind";
 import { LoadingBar } from "../Loading";
-import CustomParticles from "../Particles";
-import Sus from "../Sus";
 
 const Stats = () => {
 	const global = useHookstate(globalState);

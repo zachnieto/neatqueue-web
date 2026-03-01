@@ -8,12 +8,12 @@ const AdminRoutes = () => {
 	const { user } = state.get();
 
 	if (!ready.get()) {
-		return <></>;
+		return null;
 	}
 
 	if (!user?.id) {
 		window.open(import.meta.env.VITE_DISCORD_AUTH, "_self");
-		return <></>;
+		return null;
 	}
 
 	return user?.admin ? <Outlet /> : <Navigate to="/" />;

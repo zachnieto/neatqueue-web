@@ -91,10 +91,10 @@ const InstanceCreationWizard = ({
 						Choose the instance size that best fits your server's needs:
 					</p>
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-						{instanceTypes.map((instance: InstancePricing, i: number) => (
+						{instanceTypes.map((instance: InstancePricing) => (
 							<button
 								type="button"
-								key={i}
+								key={instance.name}
 								onClick={() => setSelectedInstance(instance)}
 								className={classNames(
 									"p-6 rounded-lg border-2 transition-all text-left",
@@ -119,7 +119,9 @@ const InstanceCreationWizard = ({
 												fill="none"
 												stroke="currentColor"
 												viewBox="0 0 24 24"
+												aria-hidden
 											>
+												<title>Selected</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"
@@ -197,7 +199,9 @@ const InstanceCreationWizard = ({
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
+								aria-hidden
 							>
+								<title>Help</title>
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"
@@ -299,18 +303,16 @@ const InstanceCreationWizard = ({
 	];
 
 	return (
-		<>
-			<Wizard
-				visible={visible}
-				setVisibility={setVisibility}
-				steps={steps}
-				title="Create Private Instance"
-				completeBtnText="Create Instance"
-				onComplete={handleComplete}
-				onCancel={handleCancel}
-				allowStepNavigation={true}
-			/>
-		</>
+		<Wizard
+			visible={visible}
+			setVisibility={setVisibility}
+			steps={steps}
+			title="Create Private Instance"
+			completeBtnText="Create Instance"
+			onComplete={handleComplete}
+			onCancel={handleCancel}
+			allowStepNavigation={true}
+		/>
 	);
 };
 

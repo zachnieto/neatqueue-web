@@ -8,14 +8,14 @@ export default function Modal({
 	component,
 	submitText,
 }: {
-	onSubmit?: (...args: any[]) => Promise<void>;
+	onSubmit?: (...args: unknown[]) => Promise<void>;
 	setVisibility: (visibility: boolean) => void;
 	title: string;
 	submitText: string;
 	component?: ReactElement;
 	visible: boolean;
 }) {
-	if (!visible) return <></>;
+	if (!visible) return null;
 
 	return (
 		<>

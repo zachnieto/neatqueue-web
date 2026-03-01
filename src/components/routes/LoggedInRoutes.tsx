@@ -10,7 +10,7 @@ const LoggedInRoutes = () => {
 	// Redirect only after session is ready and we know there's no user
 	if (ready.get() && !user?.id) {
 		window.open(import.meta.env.VITE_DISCORD_AUTH, "_self");
-		return <></>;
+		return null;
 	}
 
 	return <Outlet />;

@@ -25,7 +25,7 @@ const PurchaseCredits = ({
 					min={1}
 					allowNegativeValue={false}
 					// @ts-expect-error
-					onValueChange={(val: number, name: string) => {
+					onValueChange={(val: number, _name: string) => {
 						const valWithDefault = val || 0;
 						setPurchaseAmountDollars(
 							floatToPrice(valWithDefault ** (1 / CREDIT_MULTIPLIER)),
@@ -44,7 +44,7 @@ const PurchaseCredits = ({
 					allowNegativeValue={false}
 					prefix="$"
 					// @ts-expect-error
-					onValueChange={(val: number, name: string) => {
+					onValueChange={(val: number, _name: string) => {
 						const valWithDefault = val || 0;
 						setPurchaseAmountDollars(valWithDefault);
 						setPurchaseAmountCredits(
@@ -56,7 +56,7 @@ const PurchaseCredits = ({
 
 			<input
 				onChange={(e) => {
-					const val = parseInt(e.target.value);
+					const val = parseInt(e.target.value, 10);
 					setPurchaseAmountDollars(val);
 					setPurchaseAmountCredits(floatToNDecimals(val ** CREDIT_MULTIPLIER));
 				}}

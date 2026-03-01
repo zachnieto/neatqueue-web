@@ -1,7 +1,7 @@
 import HighchartsReact from "@highcharts/react/Highcharts";
 import { useQuery } from "@tanstack/react-query";
 import Highcharts from "highcharts";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { getPlayerStats } from "../services/neatqueue-service";
 import type { LeaderboardPlayer, QueueGame, QueueGameData } from "../types";
 import { classNames } from "../util/tailwind";
@@ -241,13 +241,15 @@ const buildParsedStatEntries = (player: LeaderboardPlayer): GroupedStat[] => {
 			});
 		}
 
-		const group = groupedMap.get(baseName)!;
-		group.values.push({
-			kind: statType,
-			label: labelMap[statType],
-			value: formatNumericValue(value, key),
-			rawKey: key,
-		});
+		const group = groupedMap.get(baseName);
+		if (group) {
+			group.values.push({
+				kind: statType,
+				label: labelMap[statType],
+				value: formatNumericValue(value, key),
+				rawKey: key,
+			});
+		}
 	});
 
 	return Array.from(groupedMap.values())

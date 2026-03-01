@@ -33,7 +33,7 @@ function formatQueueName(queueName: string): string {
 			"December",
 		];
 
-		const formattedDate = `${monthNames[parseInt(month) - 1]} ${year}`;
+		const formattedDate = `${monthNames[parseInt(month, 10) - 1]} ${year}`;
 		const queueDisplayName = queueParts.join(" ").toUpperCase();
 
 		return `${formattedDate} - ${queueDisplayName}`;

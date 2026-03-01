@@ -1,6 +1,10 @@
 export const Loading = () => {
 	return (
-		<div role="status" className="h-screen flex justify-center items-center">
+		<div
+			className="h-screen flex justify-center items-center"
+			aria-live="polite"
+			aria-busy="true"
+		>
 			<svg
 				aria-hidden="true"
 				className="inline loading-spinner mr-2 text-gray-200 animate-spin dark:text-gray-600  fill-purple-500"
