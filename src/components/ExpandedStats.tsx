@@ -1,6 +1,8 @@
-import HighchartsReact from "@highcharts/react/Highcharts";
+import HighchartsReact, {
+	type HighchartsOptionsType,
+} from "@highcharts/react/Highcharts";
 import { useQuery } from "@tanstack/react-query";
-import Highcharts from "highcharts";
+import type Highcharts from "highcharts";
 import { useMemo, useState } from "react";
 import { getPlayerStats } from "../services/neatqueue-service";
 import type { LeaderboardPlayer, QueueGame, QueueGameData } from "../types";
@@ -736,7 +738,9 @@ const ExpandedStats = ({
 								Loading player history...
 							</div>
 						) : seriesData.length > 0 ? (
-							<HighchartsReact highcharts={Highcharts} options={chartOptions} />
+							<HighchartsReact
+								options={chartOptions as HighchartsOptionsType}
+							/>
 						) : (
 							<div className="flex h-full items-center justify-center text-sm text-gray-400">
 								No data found.

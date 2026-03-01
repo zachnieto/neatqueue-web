@@ -84,9 +84,8 @@ const Instance = ({
 	useEffect(() => {
 		if (!privateInstance) return;
 
-		let intervalId: NodeJS.Timer;
+		const intervalId = setInterval(updateInstanceState, 5000);
 		updateInstanceState();
-		intervalId = setInterval(updateInstanceState, 5000);
 
 		return () => {
 			clearInterval(intervalId);
@@ -228,7 +227,6 @@ const Instance = ({
 		} catch (e: unknown) {
 			const err = e as { response?: { data?: { detail?: string } } };
 			setError(err.response?.data?.detail ?? "Failed");
-			setError(e.response.data.detail);
 		} finally {
 			setLoading(false);
 			setCurrentAction(null);
