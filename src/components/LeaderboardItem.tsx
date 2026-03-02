@@ -6,17 +6,18 @@ const LeaderboardItem = ({
 	rank,
 	sortKey,
 }: {
-	player: any;
+	player: { name: string; data: Record<string, unknown> };
 	rank: number;
 	sortKey: string;
 }) => {
+	const rankVal = Number(player.data.rank);
 	let arrowClass = "";
-	if (sortKey === "mmr" && player.data.rank !== rank) {
+	if (sortKey === "mmr" && rankVal !== rank) {
 		arrowClass =
 			"w-2 h-2 border-t-2 border-l-2 md:w-4 md:h-4 md:border-t-4 md:border-l-4 border-solid ";
 
 		arrowClass +=
-			player.data.rank > rank
+			rankVal > rank
 				? `rotate-45 border-t-green-400 border-l-green-400 translate-y-0.5`
 				: `-rotate-[135deg] border-t-red-700 border-l-red-700 -translate-y-1`;
 	}
@@ -53,12 +54,12 @@ const LeaderboardItem = ({
 				<>
 					<div className="basis-1/4">
 						<h1 className="md:text-3xl sm:text-lg">
-							{parseInt(player.data[sortKey])}
+							{parseInt(String(player.data[sortKey]), 10)}
 						</h1>
 					</div>
 					<div className="basis-1/4">
 						<h1 className="md:text-3xl sm:text-lg">
-							({player.data.wins} - {player.data.losses})
+							({String(player.data.wins)} - {String(player.data.losses)})
 						</h1>
 					</div>
 				</>
@@ -66,8 +67,8 @@ const LeaderboardItem = ({
 				<div className="basis-1/4">
 					<h1 className="md:text-3xl sm:text-lg">
 						{sortKey !== "winrate"
-							? parseInt(player.data[sortKey])
-							: displayPercent(player.data[sortKey])}
+							? parseInt(String(player.data[sortKey]), 10)
+							: displayPercent(Number(player.data[sortKey]))}
 					</h1>
 				</div>
 			)}

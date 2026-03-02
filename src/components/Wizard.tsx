@@ -33,7 +33,7 @@ const Wizard = ({
 	onComplete,
 	onCancel,
 	completeBtnText = "Complete",
-	allowStepNavigation = true,
+	allowStepNavigation: _allowStepNavigation = true,
 	showProgress = true,
 	width = "4xl",
 }: WizardProps) => {
@@ -176,6 +176,7 @@ const Wizard = ({
 						<div className="flex items-center justify-between p-6 border-b border-neutral-700">
 							<h3 className="text-3xl text-white">{title}</h3>
 							<button
+								type="button"
 								className="text-gray-400 hover:text-white transition-colors disabled:opacity-50"
 								onClick={handleClose}
 								disabled={isProcessing}
@@ -185,7 +186,9 @@ const Wizard = ({
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
+									aria-hidden
 								>
+									<title>Close</title>
 									<path
 										strokeLinecap="round"
 										strokeLinejoin="round"
@@ -235,7 +238,8 @@ const Wizard = ({
 
 									return (
 										<button
-											key={index}
+											type="button"
+											key={step.title}
 											onClick={() => {
 												if (index < currentStep || index === currentStep + 1) {
 													handleStepChange(index);
@@ -270,7 +274,9 @@ const Wizard = ({
 														fill="none"
 														stroke="currentColor"
 														viewBox="0 0 24 24"
+														aria-hidden
 													>
+														<title>Complete</title>
 														<path
 															strokeLinecap="round"
 															strokeLinejoin="round"
@@ -304,6 +310,7 @@ const Wizard = ({
 						{/* Footer */}
 						<div className="flex items-center justify-between p-6 border-t border-neutral-700">
 							<button
+								type="button"
 								className={classNames(
 									"px-6 py-2 rounded-md font-medium transition-all",
 									currentStep === 0
@@ -318,6 +325,7 @@ const Wizard = ({
 
 							<div className="flex gap-3">
 								<button
+									type="button"
 									className="text-gray-400 hover:text-white px-6 py-2 rounded-md font-medium transition-all disabled:opacity-50"
 									onClick={handleClose}
 									disabled={isProcessing}
@@ -327,6 +335,7 @@ const Wizard = ({
 
 								{currentStep < displayedSteps.length - 1 ? (
 									<button
+										type="button"
 										className="bg-neutral-700 hover:bg-neutral-600 text-white px-6 py-2 rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
 										onClick={handleNext}
 										disabled={isProcessing}
@@ -335,6 +344,7 @@ const Wizard = ({
 									</button>
 								) : (
 									<button
+										type="button"
 										className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 										onClick={handleComplete}
 										disabled={isProcessing}

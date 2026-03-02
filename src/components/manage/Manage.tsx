@@ -1,5 +1,5 @@
 import { useHookstate } from "@hookstate/core";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useToast } from "../../hooks/useToast";
 import { getPremium } from "../../services/neatqueue-service";
@@ -16,19 +16,19 @@ const Manage = () => {
 	const [guild, setGuild] = useState<Guild>();
 	const [premiumData, setPremiumData] = useState<PremiumData>();
 
+	const refreshPremiumData = useCallback(async () => {
+		if (guildID) getPremium(guildID).then(setPremiumData);
+	}, [guildID]);
+
 	useEffect(() => {
 		if (guildID) {
-			setGuild(state.guilds.get()?.find((g) => g.id == guildID));
+			setGuild(state.guilds.get()?.find((g) => g.id === guildID));
 			refreshPremiumData();
 		}
-	}, [state.guilds, guildID]);
-
-	const refreshPremiumData = async () => {
-		if (guildID) getPremium(guildID).then(setPremiumData);
-	};
+	}, [state.guilds, guildID, refreshPremiumData]);
 
 	if (!guild) {
-		return <></>;
+		return null;
 	}
 
 	const showError = (message: string) => {

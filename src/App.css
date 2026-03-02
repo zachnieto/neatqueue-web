@@ -6,6 +6,7 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	background-color: rgb(29, 29, 29);
 	color: white;
+	min-height: 100vh;
 }
 
 /* Remove number input arrows */

@@ -55,8 +55,9 @@ const Credits = ({
 			await transferCredits(guildID, transferGuildId, transferAmountCredits);
 			setSuccess(`Successfully transferred ${transferAmountCredits} credits`);
 			await refreshPremiumData();
-		} catch (e: any) {
-			setError(e.response.data.detail);
+		} catch (e: unknown) {
+			const err = e as { response?: { data?: { detail?: string } } };
+			setError(err.response?.data?.detail ?? "Transfer failed");
 		}
 	};
 
@@ -68,12 +69,14 @@ const Credits = ({
 				</h1>
 				<div className="flex gap-3">
 					<button
+						type="button"
 						onClick={() => setCreditModalOpen(true)}
 						className="btn-primary"
 					>
 						Buy
 					</button>
 					<button
+						type="button"
 						onClick={() => setTransferModalOpen(true)}
 						className="btn-primary"
 					>

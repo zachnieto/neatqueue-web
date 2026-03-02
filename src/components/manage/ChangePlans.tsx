@@ -1,5 +1,5 @@
-import { type Dispatch, type SetStateAction, useState } from "react";
-import { type Plans, PremiumData } from "../../types";
+import type { Dispatch, SetStateAction } from "react";
+import type { Plans } from "../../types";
 import { classNames } from "../../util/tailwind";
 
 const ChangePlans = ({
@@ -13,9 +13,9 @@ const ChangePlans = ({
 }) => {
 	return (
 		<div className="flex flex-col md:flex-row ">
-			{Object.keys(plans).map((plan: string, i: number) => (
+			{Object.keys(plans).map((plan: string) => (
 				<div
-					key={i}
+					key={plan}
 					className="m-1 max-w-sm rounded shadow-lg bg-black/25 text-white text-center basis-full"
 				>
 					<div className="px-6 py-4 h-full">
@@ -25,6 +25,7 @@ const ChangePlans = ({
 						</div>
 						<div className="text-md mb-2">{plans[plan].details}</div>
 						<button
+							type="button"
 							onClick={() => setSelectedPlan(plan)}
 							className={classNames(
 								"btn-primary mt-auto",

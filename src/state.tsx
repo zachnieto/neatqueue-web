@@ -19,4 +19,6 @@ const globalState = hookstate(
 	localstored({ key: "session", engine: sessionStorage }),
 );
 
+export const sessionReadyState = hookstate(false);
+
 export default globalState;

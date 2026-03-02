@@ -87,9 +87,27 @@ export type RefreshResponse = {
 	guilds: Guild[];
 };
 
+export type SteamAccount = {
+	id: string;
+	id3: string;
+	id_legacy: string;
+	username: string;
+	avatar: string;
+};
+
+export type UserProfile = {
+	id: string;
+	username: string;
+	avatar: string | null;
+	discriminator: string;
+	admin: boolean;
+	premium: boolean;
+	steam: SteamAccount | null;
+};
+
 export type CommandSectonData = {
 	title: string;
-	paragraph: any;
+	paragraph: unknown;
 	link: string;
 };
 

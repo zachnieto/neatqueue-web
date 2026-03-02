@@ -11,13 +11,11 @@ import {
 	stopInstance,
 	updateInstanceConfig,
 } from "../../../services/neatqueue-service";
-import {
-	type InstancePricing,
-	type PrivateInstance,
-	PrivateInstanceState,
-	type TimeLeft,
+import type {
+	InstancePricing,
+	PrivateInstance,
+	TimeLeft,
 } from "../../../types";
-import { classNames } from "../../../util/tailwind";
 import { calculateTimeLeft } from "../../../util/utility";
 import Modal from "../../Modal";
 import BotTokenWizard from "./BotTokenWizard";
@@ -70,6 +68,7 @@ const Instance = ({
 		offline: "text-red-600",
 	};
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: recalculateTimeLeft depends on privateInstance; intentional mount + privateInstance sync
 	useEffect(() => {
 		setTimeLeft(recalculateTimeLeft());
 		const interval = setInterval(
@@ -81,12 +80,12 @@ const Instance = ({
 		};
 	}, [privateInstance, privateInstance?.until]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: updateInstanceState is stable; intentional polling when instance exists
 	useEffect(() => {
 		if (!privateInstance) return;
 
-		let intervalId: NodeJS.Timer;
+		const intervalId = setInterval(updateInstanceState, 5000);
 		updateInstanceState();
-		intervalId = setInterval(updateInstanceState, 5000);
 
 		return () => {
 			clearInterval(intervalId);
@@ -94,6 +93,7 @@ const Instance = ({
 		};
 	}, [privateInstance?.instance]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: run once on mount only
 	useEffect(() => {
 		getInstanceTypes().then(setInstanceTypes);
 		updateInstanceState().finally(() => setInitialLoading(false));
@@ -114,9 +114,15 @@ const Instance = ({
 			await refreshPremiumData();
 			await updateInstanceState();
 			setInstanceModalOpen(false);
-		} catch (e: any) {
+		} catch (e: unknown) {
+			const err = e as {
+				response?: { data?: { detail?: string } };
+				message?: string;
+			};
 			setError(
-				e.response?.data?.detail || e.message || "Failed to create instance",
+				err.response?.data?.detail ??
+					err.message ??
+					"Failed to create instance",
 			);
 		} finally {
 			setLoading(false);
@@ -136,8 +142,9 @@ const Instance = ({
 			);
 			await refreshPremiumData();
 			await updateInstanceState();
-		} catch (e: any) {
-			setError(e.response.data.detail);
+		} catch (e: unknown) {
+			const err = e as { response?: { data?: { detail?: string } } };
+			setError(err.response?.data?.detail ?? "Failed");
 		} finally {
 			setLoading(false);
 			setCurrentAction(null);
@@ -150,8 +157,9 @@ const Instance = ({
 			setCurrentAction("start");
 			await startInstance(guildID);
 			setSuccess("Instance is now starting");
-		} catch (e: any) {
-			setError(e.response.data.detail);
+		} catch (e: unknown) {
+			const err = e as { response?: { data?: { detail?: string } } };
+			setError(err.response?.data?.detail ?? "Failed");
 		} finally {
 			setLoading(false);
 			setCurrentAction(null);
@@ -164,8 +172,9 @@ const Instance = ({
 			setCurrentAction("reboot");
 			await rebootInstance(guildID);
 			setSuccess("Instance is now rebooting");
-		} catch (e: any) {
-			setError(e.response.data.detail);
+		} catch (e: unknown) {
+			const err = e as { response?: { data?: { detail?: string } } };
+			setError(err.response?.data?.detail ?? "Failed");
 		} finally {
 			setLoading(false);
 			setCurrentAction(null);
@@ -178,8 +187,9 @@ const Instance = ({
 			setCurrentAction("stop");
 			await stopInstance(guildID);
 			setSuccess("Instance is now stopping");
-		} catch (e: any) {
-			setError(e.response.data.detail);
+		} catch (e: unknown) {
+			const err = e as { response?: { data?: { detail?: string } } };
+			setError(err.response?.data?.detail ?? "Failed");
 		} finally {
 			setLoading(false);
 			setCurrentAction(null);
@@ -196,8 +206,9 @@ const Instance = ({
 					1,
 				)} credits`,
 			);
-		} catch (e: any) {
-			setError(e.response.data.detail);
+		} catch (e: unknown) {
+			const err = e as { response?: { data?: { detail?: string } } };
+			setError(err.response?.data?.detail ?? "Failed");
 		} finally {
 			setLoading(false);
 			setCurrentAction(null);
@@ -208,11 +219,14 @@ const Instance = ({
 		try {
 			setLoading(true);
 			setCurrentAction("updateToken");
-			await updateInstanceConfig(guildID, { token: botToken! });
+			if (botToken) {
+				await updateInstanceConfig(guildID, { token: botToken });
+			}
 			setBotToken("");
 			setSuccess("Bot token has been updated");
-		} catch (e: any) {
-			setError(e.response.data.detail);
+		} catch (e: unknown) {
+			const err = e as { response?: { data?: { detail?: string } } };
+			setError(err.response?.data?.detail ?? "Failed");
 		} finally {
 			setLoading(false);
 			setCurrentAction(null);
@@ -227,8 +241,9 @@ const Instance = ({
 			await updateInstanceConfig(guildID, { auto_renew: newVal });
 			setAutoRenewState(newVal);
 			setSuccess(`Auto-renew ${newVal ? "enabled" : "disabled"}`);
-		} catch (e: any) {
-			setError(e.response.data.detail);
+		} catch (e: unknown) {
+			const err = e as { response?: { data?: { detail?: string } } };
+			setError(err.response?.data?.detail ?? "Failed");
 		} finally {
 			setLoading(false);
 			setCurrentAction(null);
@@ -249,6 +264,7 @@ const Instance = ({
 				{!initialLoading &&
 					(!privateInstance || !timeLeft ? (
 						<button
+							type="button"
 							className="btn-primary"
 							disabled={loading}
 							onClick={() => setInstanceModalOpen(true)}
@@ -268,6 +284,7 @@ const Instance = ({
 								{/*</button>*/}
 
 								<button
+									type="button"
 									onClick={() => setExtendModalOpen(true)}
 									disabled={loading}
 									className="btn-primary"
@@ -300,6 +317,7 @@ const Instance = ({
 									<label htmlFor="autoRenew">Auto-renew</label>
 								</div>
 								<button
+									type="button"
 									onClick={start}
 									disabled={privateInstance.instance !== "stopped" || loading}
 									className="btn-primary"
@@ -308,6 +326,7 @@ const Instance = ({
 								</button>
 
 								<button
+									type="button"
 									onClick={reboot}
 									disabled={privateInstance.instance !== "running" || loading}
 									className="btn-primary"
@@ -316,6 +335,7 @@ const Instance = ({
 								</button>
 
 								<button
+									type="button"
 									onClick={stop}
 									disabled={privateInstance.instance !== "running" || loading}
 									className="btn-primary"
@@ -324,6 +344,7 @@ const Instance = ({
 								</button>
 
 								<button
+									type="button"
 									disabled={loading}
 									onClick={() => setTerminateModalOpen(true)}
 									className="btn-primary"
@@ -341,6 +362,7 @@ const Instance = ({
 										className="text-center rounded w-80 text-black px-2"
 									/>
 									<button
+										type="button"
 										disabled={loading || !botToken}
 										onClick={updateBotToken}
 										className="btn-primary"
@@ -349,6 +371,7 @@ const Instance = ({
 									</button>
 								</div>
 								<button
+									type="button"
 									onClick={() => setBotTokenWizardOpen(true)}
 									className="text-blue-400 hover:text-blue-300 text-sm underline transition-colors"
 								>

@@ -32,7 +32,7 @@
 		"socket.io-client": "^4.6.1"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.2.4",
+		"@biomejs/biome": "2.4.4",
 		"@types/lodash": "^4.14.192",
 		"@types/node": "^18.15.3",
 		"@types/react": "^18.0.28",
