@@ -8,6 +8,8 @@ import {
 	LiveMatchCard,
 	MatchPagination,
 } from "../components/history";
+import PageLayout from "../components/ui/PageLayout";
+import SectionHeader from "../components/ui/SectionHeader";
 import { getHistory } from "../services/neatqueue-service";
 
 function formatQueueName(queueName: string): string {
@@ -128,11 +130,20 @@ export default function HistoryPage() {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
 				<div className="text-center">
-					<div className="relative w-20 h-20 mx-auto mb-6">
-						<div className="absolute inset-0 border-4 border-neutral-700 rounded-full"></div>
-						<div className="absolute inset-0 border-4 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+					<div className="relative w-16 h-16 mx-auto mb-6">
+						<div
+							className="absolute inset-0 rounded-full"
+							style={{ border: "3px solid rgba(255,255,255,0.06)" }}
+						/>
+						<div
+							className="absolute inset-0 rounded-full animate-spin"
+							style={{
+								border: "3px solid transparent",
+								borderTopColor: "#00b4ff",
+							}}
+						/>
 					</div>
-					<p className="text-xl text-gray-300 font-medium">
+					<p className="section-subtitle" style={{ marginTop: 0 }}>
 						Loading match history...
 					</p>
 				</div>
@@ -143,12 +154,45 @@ export default function HistoryPage() {
 	if (error) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
-				<div className="text-center max-w-md mx-auto p-8 bg-red-900/20 border border-red-500/30 rounded-xl">
-					<div className="text-5xl mb-4">⚠️</div>
-					<h2 className="text-2xl font-bold text-red-400 mb-2">
-						Error Loading Match History
+				<div
+					className="card-glass"
+					style={{
+						maxWidth: 420,
+						padding: 32,
+						border: "1px solid rgba(255,71,87,0.2)",
+						borderRadius: 2,
+						textAlign: "center",
+					}}
+				>
+					<div
+						style={{
+							width: 48,
+							height: 48,
+							borderRadius: "50%",
+							background: "rgba(255,71,87,0.1)",
+							border: "1px solid rgba(255,71,87,0.25)",
+							display: "inline-flex",
+							alignItems: "center",
+							justifyContent: "center",
+							marginBottom: 16,
+							fontSize: 20,
+						}}
+					>
+						⚠
+					</div>
+					<h2
+						className="font-rajdhani"
+						style={{
+							fontSize: 20,
+							fontWeight: 700,
+							color: "#ff4757",
+							letterSpacing: "0.04em",
+							marginBottom: 8,
+						}}
+					>
+						ERROR LOADING MATCH HISTORY
 					</h2>
-					<p className="text-gray-400">
+					<p className="section-subtitle" style={{ marginTop: 0 }}>
 						{(error as Error).message || "Unknown error"}
 					</p>
 				</div>
@@ -157,96 +201,152 @@ export default function HistoryPage() {
 	}
 
 	return (
-		<div className="min-h-screen py-8 px-4">
-			<div className="max-w-7xl mx-auto">
-				{/* Header */}
-				<div className="mb-6 text-center">
-					<h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-						Match History
-					</h1>
-				</div>
+		<PageLayout>
+			<SectionHeader
+				title="Match History"
+				subtitle="View completed and live matches from the last 30 days."
+			/>
 
-				{/* Queue Selector */}
-				<div className="mb-6">
-					<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-4 shadow-2xl max-w-xs mx-auto">
-						<label
-							htmlFor={queueSelectorId}
-							className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wide block"
-						>
-							Queue Filter
-						</label>
-						<select
-							id={queueSelectorId}
-							className="w-full bg-neutral-900 text-white border border-neutral-700 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-neutral-600 cursor-pointer hover:bg-neutral-800 transition-colors"
-							value={selectedQueue}
-							onChange={(e) => {
-								setSelectedQueue(e.target.value);
-								setCurrentPage(1);
+			{/* Queue Selector */}
+			<div style={{ marginBottom: 32 }}>
+				<div
+					className="card-glass"
+					style={{
+						maxWidth: 280,
+						padding: "16px 20px",
+						border: "1px solid rgba(255,255,255,0.07)",
+						borderRadius: 2,
+					}}
+				>
+					<label
+						htmlFor={queueSelectorId}
+						className="font-rajdhani"
+						style={{
+							display: "block",
+							fontSize: 11,
+							fontWeight: 700,
+							color: "#5a6078",
+							letterSpacing: "0.08em",
+							textTransform: "uppercase",
+							marginBottom: 8,
+						}}
+					>
+						Queue Filter
+					</label>
+					<select
+						id={queueSelectorId}
+						className="input-field"
+						style={{ cursor: "pointer" }}
+						value={selectedQueue}
+						onChange={(e) => {
+							setSelectedQueue(e.target.value);
+							setCurrentPage(1);
+						}}
+					>
+						<option value="all">ALL QUEUES</option>
+						{availableQueues.map((queue) => (
+							<option key={queue} value={queue}>
+								{formatQueueName(queue)}
+							</option>
+						))}
+					</select>
+				</div>
+			</div>
+
+			{/* Live Matches Section - Only show on page 1 */}
+			{currentPage === 1 && liveMatches.length > 0 && (
+				<div style={{ marginBottom: 32 }}>
+					<div className="flex items-center gap-3" style={{ marginBottom: 16 }}>
+						<h2
+							className="font-rajdhani"
+							style={{
+								fontSize: 22,
+								fontWeight: 700,
+								color: "#e8eaf0",
+								letterSpacing: "0.04em",
+								textTransform: "uppercase",
 							}}
 						>
-							<option value="all">ALL QUEUES</option>
-							{availableQueues.map((queue) => (
-								<option key={queue} value={queue}>
-									{formatQueueName(queue)}
-								</option>
-							))}
-						</select>
+							Live Matches
+						</h2>
+						<span
+							className="badge-live"
+							style={{
+								display: "inline-flex",
+								alignItems: "center",
+								gap: 4,
+								padding: "3px 8px",
+								borderRadius: 2,
+								background: "rgba(255,71,87,0.12)",
+								border: "1px solid rgba(255,71,87,0.3)",
+								fontFamily: "'JetBrains Mono', monospace",
+								fontSize: 10,
+								fontWeight: 700,
+								color: "#ff4757",
+								letterSpacing: "0.08em",
+							}}
+						>
+							<span
+								style={{
+									width: 6,
+									height: 6,
+									borderRadius: "50%",
+									background: "#ff4757",
+								}}
+							/>
+							LIVE
+						</span>
+					</div>
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+						{liveMatches.map((match) => (
+							<LiveMatchCard
+								key={`${match.game}_${match.game_num}`}
+								match={match}
+								formatQueueName={formatQueueName}
+								serverId={serverId || ""}
+							/>
+						))}
 					</div>
 				</div>
+			)}
 
-				{/* Live Matches Section - Only show on page 1 */}
-				{currentPage === 1 && liveMatches.length > 0 && (
-					<div className="mb-6">
-						<h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center justify-center gap-2">
-							Live Matches
-							<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30">
-								<span className="w-2 h-2 rounded-full bg-red-400 mr-1 animate-pulse" />
-								LIVE
-							</span>
-						</h2>
-						<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-							{liveMatches.map((match) => (
-								<LiveMatchCard
-									key={`${match.game}_${match.game_num}`}
-									match={match}
-									formatQueueName={formatQueueName}
-									serverId={serverId || ""}
-								/>
-							))}
+			{/* Completed Matches Section */}
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+				{paginatedMatches.map((match) => (
+					<CompletedMatchCard
+						key={`${match.game}_${match.game_num}`}
+						match={match}
+						formatQueueName={formatQueueName}
+						serverId={serverId || ""}
+					/>
+				))}
+
+				{/* Empty State */}
+				{liveMatches.length === 0 && completedMatches.length === 0 && (
+					<div className="col-span-full">
+						<div
+							className="card-glass"
+							style={{
+								padding: "48px 24px",
+								border: "1px solid rgba(255,255,255,0.06)",
+								borderRadius: 2,
+								textAlign: "center",
+							}}
+						>
+							<p className="section-subtitle" style={{ marginTop: 0 }}>
+								No matches found in the last 30 days
+							</p>
 						</div>
 					</div>
 				)}
-
-				{/* Completed Matches Section */}
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-					{paginatedMatches.map((match) => (
-						<CompletedMatchCard
-							key={`${match.game}_${match.game_num}`}
-							match={match}
-							formatQueueName={formatQueueName}
-							serverId={serverId || ""}
-						/>
-					))}
-
-					{/* Empty State */}
-					{liveMatches.length === 0 && completedMatches.length === 0 && (
-						<div className="col-span-full">
-							<div className="bg-neutral-800 rounded-xl border border-neutral-700 p-12 text-center">
-								<p className="text-gray-400 text-lg">
-									No matches found in the last 30 days
-								</p>
-							</div>
-						</div>
-					)}
-				</div>
-
-				{/* Pagination */}
-				<MatchPagination
-					currentPage={currentPage}
-					totalPages={totalPages}
-					onPageChange={handlePageChange}
-				/>
 			</div>
-		</div>
+
+			{/* Pagination */}
+			<MatchPagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				onPageChange={handlePageChange}
+			/>
+		</PageLayout>
 	);
 }

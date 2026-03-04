@@ -134,7 +134,7 @@ export default function Nav() {
 												)}
 												aria-current={item.current ? "page" : undefined}
 											>
-												{item.name}
+												<h1>{item.name}</h1>
 											</a>
 										))}
 									</div>

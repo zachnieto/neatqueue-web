@@ -140,6 +140,7 @@ const PremiumStatus = ({
 				setVisibility={setPlanModalOpen}
 				title="Change Plans"
 				submitText="Confirm"
+				className="max-w-3xl"
 				component={
 					<ChangePlans
 						selectedPlan={selectedPlan}

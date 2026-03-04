@@ -8,6 +8,7 @@ import {
 import { useReadyUp, useDeclineMatch } from "../../hooks/useQueueActions";
 import type { ActiveMatch } from "../../types";
 import ChannelMention from "../ChannelMention";
+import NumberFlow from "@number-flow/react";
 
 type MatchFoundOverlayProps = {
 	match: ActiveMatch;
@@ -75,9 +76,10 @@ export default function MatchFoundOverlay({
 			const newTimeLeft = calculateTimeLeft();
 			setTimeLeft(newTimeLeft);
 
-			// Play tick sound every second
+			// Play tick sound every second (mute when user has readied up)
 			if (
 				!isMuted &&
+				!isReady &&
 				newTimeLeft > 0 &&
 				Math.floor(newTimeLeft / 1000) !== Math.floor(timeLeft / 1000)
 			) {
@@ -99,7 +101,7 @@ export default function MatchFoundOverlay({
 		}, 100);
 
 		return () => clearInterval(interval);
-	}, [timerEnd, timeLeft, isMuted]);
+	}, [timerEnd, timeLeft, isMuted, isReady]);
 
 	const handleReadyUp = () => {
 		readyUp.mutate({ serverId, gameNum: match.game_num });
@@ -173,7 +175,7 @@ export default function MatchFoundOverlay({
 							transition: "color 0.3s ease",
 						}}
 					>
-						{Math.ceil(timeLeft / 1000)}s
+						{<NumberFlow value={Math.ceil(timeLeft / 1000)} />}s
 					</div>
 					<div className="text-[#5a6078] text-xs font-bold tracking-widest uppercase">
 						Remaining Time
@@ -207,7 +209,7 @@ export default function MatchFoundOverlay({
 									color: readyCount >= totalPlayers ? "#39d98a" : "#00b4ff",
 								}}
 							>
-								{readyCount}
+								{<NumberFlow value={readyCount} />}
 							</span>
 							<span style={{ color: "#3d4258" }}> / {totalPlayers}</span>
 						</div>
@@ -232,7 +234,20 @@ export default function MatchFoundOverlay({
 				</div>
 
 				<div className="mt-auto">
-					{readyUpMode === 0 ? (
+					{isReady ? (
+						<div className="flex flex-col items-center justify-center py-4 bg-[#39d98a]/10 border border-[#39d98a]/30 rounded text-[#39d98a]">
+							<CheckCircleIcon className="w-8 h-8 mb-2" />
+							<span
+								className="font-bold tracking-wider"
+								style={{ fontFamily: "'Rajdhani', sans-serif" }}
+							>
+								YOU ARE READY
+							</span>
+							<span className="text-xs opacity-70 mt-1">
+								Waiting for other players...
+							</span>
+						</div>
+					) : readyUpMode === 0 ? (
 						isReady ? (
 							<div className="flex flex-col items-center justify-center py-4 bg-[#39d98a]/10 border border-[#39d98a]/30 rounded text-[#39d98a]">
 								<CheckCircleIcon className="w-8 h-8 mb-2" />
@@ -271,19 +286,17 @@ export default function MatchFoundOverlay({
 							<p className="text-[#e8eaf0] mb-3 leading-relaxed">
 								Please join the lobby voice channel to ready up:
 							</p>
-							<div className="inline-block px-4 py-2 bg-black/40 rounded border border-white/5">
-								{match.voice_channels && match.voice_channels.length > 0 ? (
-									<ChannelMention
-										jumpUrl={`https://discord.com/channels/${serverId}/${match.voice_channels[0].id}`}
-										name={match.voice_channels[0].name || "Lobby"}
-										type="voice"
-									/>
-								) : (
-									<span className="text-gray-400 font-mono">
-										Channel unavailable
-									</span>
-								)}
-							</div>
+							{match.voice_channels && match.voice_channels.length > 0 ? (
+								<ChannelMention
+									jumpUrl={`https://discord.com/channels/${serverId}/${match.voice_channels[0].id}`}
+									name={match.voice_channels[0].name || "Lobby"}
+									type="voice"
+								/>
+							) : (
+								<span className="text-gray-400 font-mono">
+									Channel unavailable
+								</span>
+							)}
 						</div>
 					)}
 

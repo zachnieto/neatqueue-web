@@ -7,6 +7,7 @@ export default function Modal({
 	title,
 	component,
 	submitText,
+	className,
 }: {
 	onSubmit?: (...args: unknown[]) => Promise<void>;
 	setVisibility: (visibility: boolean) => void;
@@ -14,19 +15,25 @@ export default function Modal({
 	submitText: string;
 	component?: ReactElement;
 	visible: boolean;
+	className?: string;
 }) {
 	if (!visible) return null;
 
 	return (
 		<>
 			<div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
-				<div className="relative w-full max-w-lg my-6 mx-auto px-4 modal-enter">
+				<div
+					className={`relative w-full ${className || "max-w-lg"} my-6 mx-auto px-4 modal-enter`}
+				>
 					<div
 						className="card-glass panel"
 						style={{
 							padding: 0,
 							borderRadius: "6px",
 							background: "rgba(24,24,28,0.95)",
+							maxHeight: "90vh",
+							display: "flex",
+							flexDirection: "column",
 						}}
 					>
 						<div className="panel-accent" />
@@ -39,6 +46,7 @@ export default function Modal({
 								justifyContent: "space-between",
 								padding: "20px 24px 16px",
 								borderBottom: "1px solid rgba(255,255,255,0.06)",
+								flexShrink: 0,
 							}}
 						>
 							<h3 className="panel-title" style={{ margin: 0 }}>
@@ -78,7 +86,14 @@ export default function Modal({
 						</div>
 
 						{/* Body */}
-						<div style={{ padding: "20px 24px", overflow: "auto" }}>
+						<div
+							style={{
+								padding: "20px 24px",
+								overflowY: "auto",
+								flex: 1,
+								minHeight: 0,
+							}}
+						>
 							{component}
 						</div>
 

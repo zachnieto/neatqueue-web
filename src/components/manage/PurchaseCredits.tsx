@@ -16,7 +16,7 @@ const PurchaseCredits = ({
 
 	return (
 		<div className="grid place-items-center">
-			<div className="flex">
+			<div className="flex mb-6">
 				<CurrencyInput
 					className="input-field"
 					style={{ textAlign: "center", width: 80 }}
@@ -66,7 +66,7 @@ const PurchaseCredits = ({
 				min={1}
 				type="range"
 				value={purchaseAmountDollars}
-				className="w-full h-1 mb-6 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
+				className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
 			/>
 		</div>
 	);

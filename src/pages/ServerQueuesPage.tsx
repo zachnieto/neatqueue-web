@@ -12,6 +12,7 @@ import WsStatusIndicator from "../components/queue/WsStatusIndicator";
 import MatchFoundOverlay from "../components/queue/MatchFoundOverlay";
 import Input from "../components/ui/Input";
 import type { ActiveMatch, QueueInfo } from "../types";
+import NumberFlow from "@number-flow/react";
 
 export default function ServerQueuesPage() {
 	const { serverId } = useParams();
@@ -331,7 +332,7 @@ export default function ServerQueuesPage() {
 										lineHeight: 1.1,
 									}}
 								>
-									{value}
+									{<NumberFlow value={value} />}
 								</div>
 							)}
 							<div

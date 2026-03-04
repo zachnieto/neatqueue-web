@@ -10,6 +10,7 @@ import type { QueueInfo } from "../../types";
 import { useJoinQueue, useLeaveQueue } from "../../hooks/useQueueActions";
 import { useElapsedTime } from "../../hooks/useElapsedTime";
 import PlayerList from "./PlayerList";
+import NumberFlow from "@number-flow/react";
 
 type QueueStatus = "Live" | "Active" | "Test Mode" | "Locked" | "Offline";
 
@@ -295,7 +296,7 @@ export default function QueueCard({ queue, serverId }: QueueCardProps) {
 							}}
 						>
 							<span style={{ color: isFull ? "#39d98a" : "#00b4ff" }}>
-								{currentSize}
+								{<NumberFlow value={currentSize} />}
 							</span>
 							<span style={{ color: "#3d4258" }}> / {queueSize}</span>
 						</div>

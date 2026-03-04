@@ -1,5 +1,4 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
-import { classNames } from "../../util/tailwind";
 
 interface MatchPaginationProps {
 	currentPage: number;
@@ -17,42 +16,53 @@ export const MatchPagination = ({
 	}
 
 	return (
-		<div className="mt-6">
-			<div className="bg-neutral-800 rounded-xl border border-neutral-700 px-6 py-4 shadow-2xl">
+		<div style={{ marginTop: 24 }}>
+			<div
+				className="card-glass"
+				style={{
+					padding: "16px 24px",
+					border: "1px solid rgba(255,255,255,0.07)",
+					borderRadius: 2,
+				}}
+			>
 				<div className="flex items-center justify-between flex-wrap gap-4">
-					<div className="text-sm text-gray-400">
-						Page <span className="text-white font-semibold">{currentPage}</span>{" "}
-						of <span className="text-white font-semibold">{totalPages}</span>
+					<div className="section-subtitle" style={{ marginTop: 0 }}>
+						Page{" "}
+						<span
+							className="font-mono-gaming"
+							style={{ color: "#e8eaf0", fontWeight: 600 }}
+						>
+							{currentPage}
+						</span>{" "}
+						of{" "}
+						<span
+							className="font-mono-gaming"
+							style={{ color: "#e8eaf0", fontWeight: 600 }}
+						>
+							{totalPages}
+						</span>
 					</div>
 
-					<div className="flex items-center space-x-2">
+					<div className="flex items-center gap-2">
 						<button
 							type="button"
 							onClick={() => onPageChange(currentPage - 1)}
 							disabled={currentPage === 1}
-							className={classNames(
-								"px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-1",
-								currentPage === 1
-									? "bg-neutral-800 text-gray-500 cursor-not-allowed"
-									: "bg-neutral-700 hover:bg-neutral-600 text-white shadow-lg",
-							)}
+							className="btn-action"
+							style={{ padding: "6px 14px" }}
 						>
 							<ChevronLeftIcon className="h-4 w-4" />
-							Previous
+							PREVIOUS
 						</button>
 
 						<button
 							type="button"
 							onClick={() => onPageChange(currentPage + 1)}
 							disabled={currentPage === totalPages}
-							className={classNames(
-								"px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-1",
-								currentPage === totalPages
-									? "bg-neutral-800 text-gray-500 cursor-not-allowed"
-									: "bg-neutral-700 hover:bg-neutral-600 text-white shadow-lg",
-							)}
+							className="btn-action"
+							style={{ padding: "6px 14px" }}
 						>
-							Next
+							NEXT
 							<ChevronRightIcon className="h-4 w-4" />
 						</button>
 					</div>
