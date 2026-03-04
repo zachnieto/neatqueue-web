@@ -3,6 +3,7 @@ import { purchasePremium } from "../../services/neatqueue-service";
 import type { PremiumData, TimeLeft } from "../../types";
 import { calculateTimeLeft } from "../../util/utility";
 import Modal from "../Modal";
+import Panel from "../ui/Panel";
 import ChangePlans from "./ChangePlans";
 import Extend from "./Extend";
 
@@ -70,50 +71,68 @@ const PremiumStatus = ({
 
 	return (
 		<>
-			<div className="col-span-1 bg-stone-900 rounded shadow-md p-5">
+			<Panel className="col-span-1">
 				{premiumData.premium && timeLeft ? (
-					<div className="grid place-items-center">
-						<h1 className="text-3xl">Premium</h1>
-						<h1 className="text-2xl text-green-500 mt-5">
+					<div className="flex flex-col h-full items-center justify-center">
+						<h1 className="panel-title">Premium</h1>
+						<h1
+							className="font-rajdhani"
+							style={{
+								fontSize: "28px",
+								fontWeight: 700,
+								color: "#39d98a",
+								letterSpacing: "0.04em",
+								marginTop: "12px",
+							}}
+						>
 							{premiumData.premium.plan}
 						</h1>
-						<h3>
+						<h3
+							className="font-inter"
+							style={{
+								fontSize: "14px",
+								color: "#9aa0b4",
+								marginTop: "8px",
+								marginBottom: "24px",
+								textAlign: "center",
+							}}
+						>
 							For Another {timeLeft.days} Days, {timeLeft.hours} Hours, and{" "}
 							{timeLeft.minutes} Minutes
 						</h3>
-						<div className="flex place-content-center gap-3">
+						<div className="flex place-content-center gap-3 w-full max-w-[300px]">
 							<button
 								type="button"
 								onClick={() => setPlanModalOpen(true)}
-								className="btn-primary max-w-1/2"
+								className="btn-action btn-join w-full"
 							>
-								Change Plan
+								CHANGE PLAN
 							</button>
 							<button
 								type="button"
 								onClick={() => setExtendModalOpen(true)}
-								className="btn-primary"
+								className="btn-action btn-action-green btn-join w-full"
 							>
-								Extend
+								EXTEND
 							</button>
 						</div>
 					</div>
 				) : (
-					<div className="grid place-items-center">
-						<h1 className="text-3xl">Premium</h1>
-						<h1 className="text-2xl">❌</h1>
-						<div className="flex gap-3">
+					<div className="flex flex-col h-full items-center justify-center">
+						<h1 className="panel-title">Premium</h1>
+						<h1 className="text-2xl mt-3 mb-6">❌</h1>
+						<div className="flex gap-3 w-full max-w-[200px]">
 							<button
 								type="button"
 								onClick={() => setPlanModalOpen(true)}
-								className="btn-primary"
+								className="btn-action btn-join w-full"
 							>
-								Change Plan
+								SUBSCRIBE
 							</button>
 						</div>
 					</div>
 				)}
-			</div>
+			</Panel>
 
 			<Modal
 				onSubmit={handleChangePlans}

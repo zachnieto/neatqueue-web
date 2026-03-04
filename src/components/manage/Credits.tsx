@@ -6,6 +6,7 @@ import globalState from "../../state";
 import type { PremiumData } from "../../types";
 import { floatToNDecimals, floatToNDecimalsString } from "../../util/utility";
 import Modal from "../Modal";
+import Panel from "../ui/Panel";
 import PurchaseCredits from "./PurchaseCredits";
 import TransferCredits from "./TransferCredits";
 
@@ -63,27 +64,41 @@ const Credits = ({
 
 	return (
 		<>
-			<div className="col-span-1 bg-stone-900 rounded shadow-md p-5 grid place-items-center">
-				<h1 className="text-3xl">
-					Credits: {floatToNDecimalsString(premiumData.credits)}
-				</h1>
-				<div className="flex gap-3">
-					<button
-						type="button"
-						onClick={() => setCreditModalOpen(true)}
-						className="btn-primary"
+			<Panel className="col-span-1" accentColor="rgba(255,165,2,0.5)">
+				<div className="flex flex-col h-full items-center justify-center">
+					<h1 className="panel-title">Credits</h1>
+					<h1
+						className="font-rajdhani"
+						style={{
+							fontSize: "28px",
+							fontWeight: 700,
+							color: "#ffa502",
+							letterSpacing: "0.04em",
+							marginTop: "8px",
+							marginBottom: "24px",
+						}}
 					>
-						Buy
-					</button>
-					<button
-						type="button"
-						onClick={() => setTransferModalOpen(true)}
-						className="btn-primary"
-					>
-						Transfer
-					</button>
+						{floatToNDecimalsString(premiumData.credits)}
+					</h1>
+
+					<div className="flex gap-3 w-full max-w-[300px]">
+						<button
+							type="button"
+							onClick={() => setCreditModalOpen(true)}
+							className="btn-action btn-join w-full"
+						>
+							BUY
+						</button>
+						<button
+							type="button"
+							onClick={() => setTransferModalOpen(true)}
+							className="btn-action btn-action-purple btn-join w-full"
+						>
+							TRANSFER
+						</button>
+					</div>
 				</div>
-			</div>
+			</Panel>
 
 			<Modal
 				onSubmit={handlePurchaseCredits}

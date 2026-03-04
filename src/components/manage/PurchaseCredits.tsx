@@ -18,7 +18,8 @@ const PurchaseCredits = ({
 		<div className="grid place-items-center">
 			<div className="flex">
 				<CurrencyInput
-					className="text-center rounded w-20 text-black px-2 mb-5"
+					className="input-field"
+					style={{ textAlign: "center", width: 80 }}
 					name="input-name"
 					value={purchaseAmountCredits}
 					decimalsLimit={2}
@@ -36,7 +37,8 @@ const PurchaseCredits = ({
 				<h1 className="mx-2">Credits = </h1>
 
 				<CurrencyInput
-					className="text-center rounded w-20 text-black px-2 mb-5"
+					className="input-field"
+					style={{ textAlign: "center", width: 80 }}
 					name="input-name"
 					value={purchaseAmountDollars}
 					decimalsLimit={2}

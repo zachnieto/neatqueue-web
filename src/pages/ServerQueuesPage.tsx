@@ -10,6 +10,7 @@ import QueueCard from "../components/queue/QueueCard";
 import ActiveMatchCard from "../components/queue/ActiveMatchCard";
 import WsStatusIndicator from "../components/queue/WsStatusIndicator";
 import MatchFoundOverlay from "../components/queue/MatchFoundOverlay";
+import Input from "../components/ui/Input";
 import type { ActiveMatch, QueueInfo } from "../types";
 
 export default function ServerQueuesPage() {
@@ -222,22 +223,8 @@ export default function ServerQueuesPage() {
 		);
 	}
 
-	if (isLoading || !data) {
-		return (
-			<div className="min-h-screen p-6">
-				<div className="animate-pulse space-y-4">
-					<div className="h-8 bg-gray-700 rounded w-1/3" />
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-						{[1, 2, 3].map((i) => (
-							<div key={i} className="h-48 bg-gray-700 rounded" />
-						))}
-					</div>
-				</div>
-			</div>
-		);
-	}
-
-	const info = data.info;
+	const isDataLoading = isLoading || !data;
+	const info = data?.info;
 
 	return (
 		<div
@@ -278,7 +265,9 @@ export default function ServerQueuesPage() {
 
 				{/* Server header */}
 				<div className="flex items-center gap-4 mb-8">
-					{info.icon_url ? (
+					{isDataLoading ? (
+						<div className="w-16 h-16 rounded-full flex-shrink-0 bg-white/10 animate-pulse" />
+					) : info?.icon_url ? (
 						<img
 							src={info.icon_url}
 							alt=""
@@ -291,8 +280,14 @@ export default function ServerQueuesPage() {
 						/>
 					)}
 					<div>
-						<h1>{info.name}</h1>
-						{info.member_count != null && (
+						{isDataLoading ? (
+							<div className="h-8 bg-white/10 rounded w-48 mb-2 animate-pulse" />
+						) : (
+							<h1>{info?.name}</h1>
+						)}
+						{isDataLoading ? (
+							<div className="h-4 bg-white/10 rounded w-24 animate-pulse" />
+						) : info?.member_count != null ? (
 							<p
 								style={{
 									fontFamily: "'Inter', sans-serif",
@@ -303,7 +298,7 @@ export default function ServerQueuesPage() {
 							>
 								{info.member_count} members
 							</p>
-						)}
+						) : null}
 					</div>
 				</div>
 
@@ -323,18 +318,22 @@ export default function ServerQueuesPage() {
 								borderRight: "1px solid rgba(255,255,255,0.04)",
 							}}
 						>
-							<div
-								style={{
-									fontFamily: "'JetBrains Mono', monospace",
-									fontSize: "22px",
-									fontWeight: 700,
-									color,
-									letterSpacing: "-0.02em",
-									lineHeight: 1.1,
-								}}
-							>
-								{value}
-							</div>
+							{isDataLoading ? (
+								<div className="h-[24px] bg-white/10 rounded w-12 mb-1 animate-pulse" />
+							) : (
+								<div
+									style={{
+										fontFamily: "'JetBrains Mono', monospace",
+										fontSize: "22px",
+										fontWeight: 700,
+										color,
+										letterSpacing: "-0.02em",
+										lineHeight: 1.1,
+									}}
+								>
+									{value}
+								</div>
+							)}
 							<div
 								style={{
 									fontSize: "10px",
@@ -380,21 +379,25 @@ export default function ServerQueuesPage() {
 							>
 								QUEUES
 							</h2>
-							<span
-								style={{
-									padding: "3px 8px",
-									borderRadius: 2,
-									background: "rgba(0,180,255,0.1)",
-									border: "1px solid rgba(0,180,255,0.25)",
-									fontFamily: "'JetBrains Mono', monospace",
-									fontSize: "11px",
-									fontWeight: 700,
-									color: "#00b4ff",
-									letterSpacing: "0.08em",
-								}}
-							>
-								{filteredQueues.length} AVAILABLE
-							</span>
+							{isDataLoading ? (
+								<div className="h-5 bg-white/10 rounded w-20 animate-pulse" />
+							) : (
+								<span
+									style={{
+										padding: "3px 8px",
+										borderRadius: 2,
+										background: "rgba(0,180,255,0.1)",
+										border: "1px solid rgba(0,180,255,0.25)",
+										fontFamily: "'JetBrains Mono', monospace",
+										fontSize: "11px",
+										fontWeight: 700,
+										color: "#00b4ff",
+										letterSpacing: "0.08em",
+									}}
+								>
+									{filteredQueues.length} AVAILABLE
+								</span>
+							)}
 						</div>
 						<p
 							style={{
@@ -413,35 +416,34 @@ export default function ServerQueuesPage() {
 							className="w-[13px] h-[13px] absolute left-[11px] top-1/2 -translate-y-1/2"
 							style={{ color: "#5a6078" }}
 						/>
-						<input
+						<Input
 							type="text"
 							placeholder="Search queues..."
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							style={{
-								width: "100%",
-								padding: "8px 12px 8px 32px",
-								background: "rgba(255,255,255,0.03)",
-								border: "1px solid rgba(255,255,255,0.08)",
-								borderRadius: 2,
-								fontFamily: "'JetBrains Mono', monospace",
-								fontSize: "11px",
-								color: "#9aa0b4",
-								outline: "none",
-							}}
-							onFocus={(e) => {
-								e.currentTarget.style.borderColor = "rgba(0,180,255,0.3)";
-							}}
-							onBlur={(e) => {
-								e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
-							}}
+							style={{ paddingLeft: 32 }}
 						/>
 					</div>
 				</div>
 
 				{/* Queue grid */}
 				<section className="mb-8">
-					{filteredQueues.length > 0 ? (
+					{isDataLoading ? (
+						<div
+							className="grid gap-4"
+							style={{
+								gridTemplateColumns:
+									"repeat(auto-fill, minmax(min(100%, 380px), 1fr))",
+							}}
+						>
+							{[1, 2, 3, 4, 5, 6].map((i) => (
+								<div
+									key={i}
+									className="h-[340px] bg-white/5 border border-white/10 rounded-sm animate-pulse"
+								/>
+							))}
+						</div>
+					) : filteredQueues.length > 0 ? (
 						<div
 							className="grid gap-4"
 							style={{

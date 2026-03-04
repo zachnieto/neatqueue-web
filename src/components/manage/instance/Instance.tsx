@@ -18,6 +18,8 @@ import type {
 } from "../../../types";
 import { calculateTimeLeft } from "../../../util/utility";
 import Modal from "../../Modal";
+import Panel from "../../ui/Panel";
+import Input from "../../ui/Input";
 import BotTokenWizard from "./BotTokenWizard";
 import ExtendModal from "./ExtendModal";
 import InstanceCreationWizard from "./InstanceCreationWizard";
@@ -257,130 +259,190 @@ const Instance = ({
 
 	return (
 		<>
-			<div className="col-span-1 md:col-span-2 bg-stone-900 rounded shadow-md p-5 grid place-items-center">
-				<h1 className="text-3xl">BETA</h1>
-				<h1 className="text-3xl">Private Instance</h1>
-
-				{!initialLoading &&
-					(!privateInstance || !timeLeft ? (
-						<button
-							type="button"
-							className="btn-primary"
-							disabled={loading}
-							onClick={() => setInstanceModalOpen(true)}
+			<Panel
+				className="col-span-1 md:col-span-2"
+				accentColor="rgba(165,94,234,0.5)"
+			>
+				<div className="flex flex-col h-full items-center justify-center w-full">
+					<div className="flex items-center gap-3">
+						<h1 className="panel-title">Private Instance</h1>
+						<span
+							className="font-mono-gaming"
+							style={{
+								padding: "3px 10px",
+								borderRadius: 2,
+								background: "rgba(165,94,234,0.12)",
+								border: "1px solid rgba(165,94,234,0.35)",
+								fontSize: "10px",
+								fontWeight: 700,
+								color: "#a55eea",
+								letterSpacing: "0.08em",
+							}}
 						>
-							Buy
-						</button>
-					) : (
-						<div>
-							<h3 className="text-center">
-								For Another {timeLeft.days} Days, {timeLeft.hours} Hours, and{" "}
-								{timeLeft.minutes} Minutes
-							</h3>
+							BETA
+						</span>
+					</div>
 
-							<div className="flex gap-3 mt-3 justify-center">
-								{/*<button onClick={updateInstanceState} className="btn-primary">*/}
-								{/*  Refresh Status*/}
-								{/*</button>*/}
-
+					{!initialLoading &&
+						(!privateInstance || !timeLeft ? (
+							<div className="mt-6 w-full max-w-[200px]">
 								<button
 									type="button"
-									onClick={() => setExtendModalOpen(true)}
+									className="btn-action btn-join w-full"
 									disabled={loading}
-									className="btn-primary"
+									onClick={() => setInstanceModalOpen(true)}
 								>
-									Extend
+									BUY INSTANCE
 								</button>
 							</div>
-
-							<h1 className="text-2xl text-center mt-5">
-								Instance Status:{" "}
-								<span
-									className={
-										statusColor[
-											privateInstance.instance as keyof typeof statusColor
-										] || "text-yellow-400"
-									}
+						) : (
+							<div className="flex flex-col items-center w-full mt-4">
+								<h3
+									className="font-inter"
+									style={{
+										fontSize: "14px",
+										color: "#9aa0b4",
+										marginBottom: "16px",
+										textAlign: "center",
+									}}
 								>
-									{_.capitalize(privateInstance.instance)}
-								</span>
-							</h1>
+									For Another {timeLeft.days} Days, {timeLeft.hours} Hours, and{" "}
+									{timeLeft.minutes} Minutes
+								</h3>
 
-							<div className="flex gap-3 justify-center">
-								<div className="flex items-center gap-2 mr-4">
-									<input
-										id="autoRenew"
-										type="checkbox"
-										checked={autoRenew}
-										onChange={toggleAutoRenew}
-									/>
-									<label htmlFor="autoRenew">Auto-renew</label>
-								</div>
-								<button
-									type="button"
-									onClick={start}
-									disabled={privateInstance.instance !== "stopped" || loading}
-									className="btn-primary"
-								>
-									{currentAction === "start" ? "Starting…" : "Start"}
-								</button>
-
-								<button
-									type="button"
-									onClick={reboot}
-									disabled={privateInstance.instance !== "running" || loading}
-									className="btn-primary"
-								>
-									{currentAction === "reboot" ? "Rebooting…" : "Reboot"}
-								</button>
-
-								<button
-									type="button"
-									onClick={stop}
-									disabled={privateInstance.instance !== "running" || loading}
-									className="btn-primary"
-								>
-									{currentAction === "stop" ? "Stopping…" : "Stop"}
-								</button>
-
-								<button
-									type="button"
-									disabled={loading}
-									onClick={() => setTerminateModalOpen(true)}
-									className="btn-primary"
-								>
-									Delete
-								</button>
-							</div>
-							<div className="flex flex-col items-center mt-7 gap-2">
-								<div className="flex items-center gap-1">
-									<h1 className="text-xl">Bot Token: </h1>
-									<input
-										onChange={(e) => setBotToken(e.target.value)}
-										value={botToken}
-										placeholder="Enter new bot token"
-										className="text-center rounded w-80 text-black px-2"
-									/>
+								<div className="flex gap-3 mt-2 justify-center w-full max-w-[200px]">
 									<button
 										type="button"
-										disabled={loading || !botToken}
-										onClick={updateBotToken}
-										className="btn-primary"
+										onClick={() => setExtendModalOpen(true)}
+										disabled={loading}
+										className="btn-action btn-action-green btn-join w-full"
 									>
-										{currentAction === "updateToken" ? "Setting…" : "Set"}
+										EXTEND
 									</button>
 								</div>
-								<button
-									type="button"
-									onClick={() => setBotTokenWizardOpen(true)}
-									className="text-blue-400 hover:text-blue-300 text-sm underline transition-colors"
+
+								<h1
+									className="font-rajdhani"
+									style={{
+										fontSize: "20px",
+										fontWeight: 700,
+										color: "#e8eaf0",
+										letterSpacing: "0.04em",
+										marginTop: "24px",
+										marginBottom: "16px",
+										textAlign: "center",
+									}}
 								>
-									Need help getting a bot token?
-								</button>
+									Status:{" "}
+									<span
+										className={
+											statusColor[
+												privateInstance.instance as keyof typeof statusColor
+											] || "text-yellow-400"
+										}
+										style={{ textShadow: "0 0 10px rgba(0,0,0,0.5)" }}
+									>
+										{_.capitalize(privateInstance.instance)}
+									</span>
+								</h1>
+
+								<div className="flex flex-wrap gap-3 justify-center mb-6">
+									<div className="flex items-center gap-2 mr-4 text-[#9aa0b4] text-sm font-inter">
+										<input
+											id="autoRenew"
+											type="checkbox"
+											checked={autoRenew}
+											onChange={toggleAutoRenew}
+											className="accent-[#00b4ff]"
+										/>
+										<label htmlFor="autoRenew">Auto-renew</label>
+									</div>
+									<button
+										type="button"
+										onClick={start}
+										disabled={privateInstance.instance !== "stopped" || loading}
+										className="btn-action btn-join px-6"
+									>
+										{currentAction === "start" ? "STARTING…" : "START"}
+									</button>
+
+									<button
+										type="button"
+										onClick={reboot}
+										disabled={privateInstance.instance !== "running" || loading}
+										className="btn-action btn-action-orange btn-join px-6"
+									>
+										{currentAction === "reboot" ? "REBOOTING…" : "REBOOT"}
+									</button>
+
+									<button
+										type="button"
+										onClick={stop}
+										disabled={privateInstance.instance !== "running" || loading}
+										className="btn-action btn-action-red btn-join px-6"
+									>
+										{currentAction === "stop" ? "STOPPING…" : "STOP"}
+									</button>
+
+									<button
+										type="button"
+										disabled={loading}
+										onClick={() => setTerminateModalOpen(true)}
+										className="btn-action btn-action-danger btn-join px-6"
+									>
+										DELETE
+									</button>
+								</div>
+
+								<div className="divider" style={{ margin: "16px 0" }} />
+
+								<div className="flex flex-col items-center gap-3 w-full max-w-[500px]">
+									<div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+										<h1
+											className="font-rajdhani"
+											style={{
+												fontSize: "16px",
+												fontWeight: 700,
+												color: "#e8eaf0",
+												letterSpacing: "0.04em",
+												whiteSpace: "nowrap",
+											}}
+										>
+											BOT TOKEN:
+										</h1>
+										<Input
+											onChange={(e) => setBotToken(e.target.value)}
+											value={botToken}
+											placeholder="Enter new bot token"
+										/>
+										<button
+											type="button"
+											disabled={loading || !botToken}
+											onClick={updateBotToken}
+											className="btn-action btn-join px-6"
+										>
+											{currentAction === "updateToken" ? "SETTING…" : "SET"}
+										</button>
+									</div>
+									<button
+										type="button"
+										onClick={() => setBotTokenWizardOpen(true)}
+										className="font-inter hover:opacity-100 transition-opacity"
+										style={{
+											fontSize: "12px",
+											color: "#00b4ff",
+											textDecoration: "underline",
+											textUnderlineOffset: "2px",
+											opacity: 0.8,
+										}}
+									>
+										Need help getting a bot token?
+									</button>
+								</div>
 							</div>
-						</div>
-					))}
-			</div>
+						))}
+				</div>
+			</Panel>
 
 			{instanceTypes.length > 0 && (
 				<InstanceCreationWizard

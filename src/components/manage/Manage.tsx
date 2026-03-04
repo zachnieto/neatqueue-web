@@ -5,6 +5,8 @@ import { useToast } from "../../hooks/useToast";
 import { getPremium } from "../../services/neatqueue-service";
 import globalState from "../../state";
 import type { Guild, PremiumData } from "../../types";
+import PageLayout from "../ui/PageLayout";
+import SectionHeader from "../ui/SectionHeader";
 import Credits from "./Credits";
 import Instance from "./instance/Instance";
 import PremiumStatus from "./PremiumStatus";
@@ -41,24 +43,23 @@ const Manage = () => {
 
 	if (!premiumData?.occupied) {
 		return (
-			<div className="min-h-screen">
-				<div className="text-center mb-5">
-					<h1>{guild.name}</h1>
-					<p className="text-xl text-gray-400">
-						Please invite the bot to your server to get started.
-					</p>
-				</div>
-			</div>
+			<PageLayout>
+				<SectionHeader title={guild.name} />
+				<p className="section-subtitle">
+					Please invite the bot to your server to get started.
+				</p>
+			</PageLayout>
 		);
 	}
 
 	return (
-		<div className="min-h-screen">
-			<div className="text-center mb-5">
-				<h1>{guild.name}</h1>
-			</div>
+		<PageLayout>
+			<SectionHeader
+				title={`${guild.name} Settings`}
+				subtitle="Manage premium, credits, and instance configuration."
+			/>
 
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:mx-32 gap-8">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 				{premiumData && guildID && (
 					<>
 						<PremiumStatus
@@ -84,7 +85,7 @@ const Manage = () => {
 					</>
 				)}
 			</div>
-		</div>
+		</PageLayout>
 	);
 };
 
