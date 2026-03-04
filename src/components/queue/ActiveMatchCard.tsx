@@ -1,5 +1,6 @@
 import type { ActiveMatch, ChannelRef } from "../../types";
 import ChannelMention from "../ChannelMention";
+import MatchCardHeader from "../ui/MatchCardHeader";
 import PlayerList from "./PlayerList";
 
 const DISCORD_CHANNEL_URL = "https://discord.com/channels";
@@ -28,25 +29,36 @@ function ChannelLink({
 	);
 }
 
+const formatStage = (stage: string | undefined) => {
+	return stage?.replace("_", " ");
+};
+
 type ActiveMatchCardProps = {
 	match: ActiveMatch;
 	serverId: string;
 	gameNumKey?: string;
+	queueName?: string;
 };
 
 export default function ActiveMatchCard({
 	match,
 	serverId,
 	gameNumKey = "game_num",
+	queueName,
 }: ActiveMatchCardProps) {
 	const gameNum =
 		match.game_num ?? (match as Record<string, unknown>)[gameNumKey];
 	const teams = match.teams ?? [];
 	const hasTeams = teams.some((team) => team.length > 0);
-	const stage = match.stage ?? "In progress";
+	const stage = formatStage(match.stage);
 	const channel = match.channel;
 	const queue_channel = match.queue_channel;
 	const voiceChannels = match.voice_channels ?? [];
+
+	const queueChannelId = queue_channel?.id ? String(queue_channel.id) : "";
+	const displayName = queueName
+		? `${queueName} — Match #${gameNum}`
+		: `Match #${gameNum}`;
 
 	return (
 		<div
@@ -58,6 +70,7 @@ export default function ActiveMatchCard({
 				display: "flex",
 				flexDirection: "column",
 				transition: "border-color 0.25s ease, box-shadow 0.25s ease",
+				overflow: "hidden",
 			}}
 		>
 			{/* Top accent bar */}
@@ -65,53 +78,73 @@ export default function ActiveMatchCard({
 				style={{
 					height: "2px",
 					background:
-						"linear-gradient(90deg, rgba(165,94,234,0.6), transparent)",
+						"linear-gradient(90deg, rgba(255,71,87,0.5), transparent)",
 				}}
 			/>
 
+			{queueChannelId && (
+				<MatchCardHeader
+					title={displayName}
+					serverId={serverId}
+					channelId={queueChannelId}
+					status={stage}
+					variant="live"
+					showLeaderboardLink={false}
+				/>
+			)}
+
+			{!queueChannelId && (
+				<div
+					style={{
+						padding: "12px 16px",
+						background: "rgba(165,94,234,0.04)",
+						borderBottom: "1px solid rgba(165,94,234,0.1)",
+					}}
+				>
+					<div className="flex justify-between items-center gap-3">
+						<span
+							style={{
+								fontFamily: "'Rajdhani', sans-serif",
+								fontSize: "14px",
+								fontWeight: 700,
+								color: "#e8eaf0",
+								letterSpacing: "0.04em",
+							}}
+						>
+							{displayName}
+						</span>
+						{stage && (
+							<span
+								style={{
+									padding: "4px 10px",
+									borderRadius: 2,
+									background: "rgba(57,217,138,0.12)",
+									border: "1px solid rgba(57,217,138,0.35)",
+									fontFamily: "'JetBrains Mono', monospace",
+									fontSize: "9px",
+									fontWeight: 700,
+									color: "#39d98a",
+									letterSpacing: "0.1em",
+								}}
+							>
+								{stage.toUpperCase()}
+							</span>
+						)}
+					</div>
+				</div>
+			)}
+
 			<div
 				style={{
-					padding: "20px 22px 22px",
+					padding: "16px 22px 22px",
 					flex: 1,
 					display: "flex",
 					flexDirection: "column",
 					gap: 12,
 				}}
 			>
-				<div className="flex justify-between items-center gap-3">
-					<span
-						style={{
-							fontFamily: "'Rajdhani', sans-serif",
-							fontSize: "18px",
-							fontWeight: 700,
-							color: "#e8eaf0",
-							letterSpacing: "0.04em",
-						}}
-					>
-						Game #{gameNum}
-					</span>
-					<span
-						style={{
-							padding: "4px 10px",
-							borderRadius: 2,
-							background: "rgba(57,217,138,0.12)",
-							border: "1px solid rgba(57,217,138,0.35)",
-							fontFamily: "'JetBrains Mono', monospace",
-							fontSize: "9px",
-							fontWeight: 700,
-							color: "#39d98a",
-							letterSpacing: "0.1em",
-						}}
-					>
-						{stage.toUpperCase()}
-					</span>
-				</div>
-
 				{(hasTeams || (match.players?.length ?? 0) > 0) && (
 					<>
-						<div
-							style={{ height: "1px", background: "rgba(255,255,255,0.05)" }}
-						/>
 						{hasTeams ? (
 							<div className="grid grid-cols-2 gap-3">
 								{teams

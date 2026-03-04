@@ -219,6 +219,7 @@ export type QueuePlayer = {
 	name: string;
 	mmr: number;
 	role: string | null;
+	color?: string | null;
 	avatar_url?: string;
 	/** ISO timestamp when the player joined the queue */
 	timestamp?: string;

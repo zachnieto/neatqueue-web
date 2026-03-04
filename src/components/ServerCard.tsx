@@ -1,12 +1,16 @@
 import { useState } from "react";
 
+type ServerCardAction = {
+	text: string;
+	onClick: () => void;
+};
+
 type ServerCardProps = {
 	id: string;
 	name: string;
 	icon?: string | null;
 	memberCount?: number | null;
-	actionText: string;
-	onClick: () => void;
+	actions: ServerCardAction[];
 };
 
 export default function ServerCard({
@@ -14,8 +18,7 @@ export default function ServerCard({
 	name,
 	icon,
 	memberCount,
-	actionText,
-	onClick,
+	actions,
 }: ServerCardProps) {
 	const [hovered, setHovered] = useState(false);
 
@@ -86,14 +89,24 @@ export default function ServerCard({
 					</div>
 				</div>
 
-				<div style={{ marginTop: "auto" }}>
-					<button
-						type="button"
-						className="btn-action btn-join w-full"
-						onClick={onClick}
-					>
-						{actionText}
-					</button>
+				<div
+					style={{
+						marginTop: "auto",
+						display: "flex",
+						flexDirection: "column",
+						gap: 8,
+					}}
+				>
+					{actions.map((action) => (
+						<button
+							key={action.text}
+							type="button"
+							className="btn-action btn-join w-full"
+							onClick={action.onClick}
+						>
+							{action.text}
+						</button>
+					))}
 				</div>
 			</div>
 		</div>

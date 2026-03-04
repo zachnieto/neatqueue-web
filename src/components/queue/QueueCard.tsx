@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
 	ClockIcon,
 	UserGroupIcon,
@@ -283,7 +284,7 @@ export default function QueueCard({ queue, serverId }: QueueCardProps) {
 							}}
 						>
 							<UserGroupIcon
-								className="w-[11px] h-[11px]"
+								className="w-[16px] h-[16px] mb-0.5"
 								style={{ color: "#5a6078" }}
 							/>
 							Players
@@ -330,7 +331,7 @@ export default function QueueCard({ queue, serverId }: QueueCardProps) {
 				</div>
 
 				{/* Stats row */}
-				<div className="flex items-center gap-4">
+				<div className="flex items-center justify-between gap-4">
 					{isInQueue && (
 						<div className="flex items-center gap-1.5">
 							<ClockIcon className="w-3 h-3" style={{ color: "#5a6078" }} />
@@ -348,6 +349,32 @@ export default function QueueCard({ queue, serverId }: QueueCardProps) {
 							</span>
 						</div>
 					)}
+					<div className="flex gap-2 items-end" style={{ marginLeft: "auto" }}>
+						<Link
+							to={`/leaderboard/${serverId}/${channelId}`}
+							className="btn-action"
+							style={{
+								padding: "4px 12px",
+								fontSize: 11,
+								whiteSpace: "nowrap",
+								marginLeft: "auto",
+							}}
+						>
+							LEADERBOARD
+						</Link>
+						<Link
+							to={`/history/${serverId}?queue=${encodeURIComponent(queue.name)}`}
+							className="btn-action"
+							style={{
+								padding: "4px 12px",
+								fontSize: 11,
+								whiteSpace: "nowrap",
+								marginLeft: "auto",
+							}}
+						>
+							HISTORY
+						</Link>
+					</div>
 				</div>
 
 				{/* Action buttons */}

@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import type { MatchHistory } from "../../types";
+import MatchCardHeader from "../ui/MatchCardHeader";
 
 interface LiveMatchCardProps {
 	match: MatchHistory;
@@ -31,75 +31,14 @@ export const LiveMatchCard = ({
 				}}
 			/>
 
-			{/* Header */}
-			<div
-				className="flex items-center justify-between gap-2"
-				style={{
-					padding: "12px 16px",
-					background: "rgba(255,71,87,0.04)",
-					borderBottom: "1px solid rgba(255,71,87,0.1)",
-				}}
-			>
-				<div style={{ flex: 1, minWidth: 0 }}>
-					<div
-						className="font-rajdhani"
-						style={{
-							fontSize: 14,
-							fontWeight: 700,
-							color: "#e8eaf0",
-							letterSpacing: "0.04em",
-						}}
-					>
-						{formatQueueName(match.game)} — Match #{match.game_num}
-					</div>
-					<div
-						className="section-subtitle"
-						style={{ marginTop: 2, fontSize: 11 }}
-					>
-						{new Date(match.time).toLocaleString()}
-					</div>
-				</div>
-				<div className="flex-shrink-0 flex items-center gap-2">
-					<Link
-						to={`/leaderboard/${serverId}/${match.queue_channel}`}
-						className="btn-action"
-						style={{
-							padding: "4px 12px",
-							fontSize: 11,
-							whiteSpace: "nowrap",
-						}}
-					>
-						LEADERBOARD
-					</Link>
-					<span
-						className="badge-live"
-						style={{
-							display: "inline-flex",
-							alignItems: "center",
-							gap: 4,
-							padding: "3px 8px",
-							borderRadius: 2,
-							background: "rgba(255,71,87,0.12)",
-							border: "1px solid rgba(255,71,87,0.3)",
-							fontFamily: "'JetBrains Mono', monospace",
-							fontSize: 10,
-							fontWeight: 700,
-							color: "#ff4757",
-							letterSpacing: "0.08em",
-						}}
-					>
-						<span
-							style={{
-								width: 6,
-								height: 6,
-								borderRadius: "50%",
-								background: "#ff4757",
-							}}
-						/>
-						LIVE
-					</span>
-				</div>
-			</div>
+			<MatchCardHeader
+				title={`${formatQueueName(match.game)} — Match #${match.game_num}`}
+				subtitle={new Date(match.time).toLocaleString()}
+				serverId={serverId}
+				channelId={match.queue_channel}
+				status="LIVE"
+				variant="live"
+			/>
 
 			{/* Content */}
 			<div style={{ padding: 16 }}>

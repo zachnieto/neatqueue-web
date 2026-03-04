@@ -259,10 +259,7 @@ const Instance = ({
 
 	return (
 		<>
-			<Panel
-				className="col-span-1 md:col-span-2"
-				accentColor="rgba(165,94,234,0.5)"
-			>
+			<Panel className="col-span-1" accentColor="rgba(165,94,234,0.5)">
 				<div className="flex flex-col h-full items-center justify-center w-full">
 					<div className="flex items-center gap-3">
 						<h1 className="panel-title">Private Instance</h1>

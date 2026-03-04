@@ -172,7 +172,7 @@ export default function ServerQueuesPage() {
 		);
 		return [
 			{
-				label: "Players Online",
+				label: "Players In Queue",
 				value:
 					stats?.players_in_queues != null
 						? stats.players_in_queues.toLocaleString()
@@ -186,6 +186,11 @@ export default function ServerQueuesPage() {
 						? String(stats.active_queues)
 						: String(queues.length),
 				color: "#39d98a",
+			},
+			{
+				label: "Active Matches",
+				value: matches.length,
+				color: "#ffae00ff",
 			},
 			{
 				label: "Matches Today",
@@ -305,7 +310,7 @@ export default function ServerQueuesPage() {
 
 				{/* Stats strip */}
 				<div
-					className="grid grid-cols-3 gap-3 mb-10 rounded-sm overflow-hidden"
+					className="grid grid-cols-4 gap-3 mb-10 rounded-sm overflow-hidden"
 					style={{
 						background: "rgba(255,255,255,0.02)",
 						border: "1px solid rgba(255,255,255,0.06)",
@@ -523,56 +528,25 @@ export default function ServerQueuesPage() {
 								marginBottom: 16,
 							}}
 						>
-							My matches
+							MY MATCHES
 						</h2>
-						<div
-							className="grid gap-4"
-							style={{
-								gridTemplateColumns:
-									"repeat(auto-fill, minmax(min(100%, 380px), 1fr))",
-							}}
-						>
-							{myMatches.map((match) => (
-								<ActiveMatchCard
-									key={match.game_num}
-									match={match as ActiveMatch}
-									serverId={serverId}
-									gameNumKey="game_num"
-								/>
-							))}
-						</div>
-					</section>
-				)}
-
-				{otherMatches.length > 0 && (
-					<section>
-						<h2
-							style={{
-								fontFamily: "'Rajdhani', sans-serif",
-								fontSize: "22px",
-								fontWeight: 700,
-								color: "#e8eaf0",
-								letterSpacing: "0.04em",
-								marginBottom: 16,
-							}}
-						>
-							Active matches
-						</h2>
-						<div
-							className="grid gap-4"
-							style={{
-								gridTemplateColumns:
-									"repeat(auto-fill, minmax(min(100%, 380px), 1fr))",
-							}}
-						>
-							{otherMatches.map((match) => (
-								<ActiveMatchCard
-									key={match.game_num}
-									match={match as ActiveMatch}
-									serverId={serverId}
-									gameNumKey="game_num"
-								/>
-							))}
+						<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+							{myMatches.map((match) => {
+								const m = match as ActiveMatch;
+								const name =
+									queues.find(
+										(q) => String(q.channel_id) === String(m.queue_channel?.id),
+									)?.name ?? m.queue_channel?.name;
+								return (
+									<ActiveMatchCard
+										key={match.game_num}
+										match={m}
+										serverId={serverId}
+										gameNumKey="game_num"
+										queueName={name ?? undefined}
+									/>
+								);
+							})}
 						</div>
 					</section>
 				)}

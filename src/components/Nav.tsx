@@ -9,6 +9,7 @@ import {
 } from "../pages/LinkAccountPage";
 import { discordAuth } from "../services/server-service";
 import globalState from "../state";
+import { featureFlags } from "../util/featureFlags";
 import { classNames } from "../util/tailwind";
 
 const navigation = [
@@ -18,6 +19,7 @@ const navigation = [
 		href: "/servers",
 		current: false,
 		requiresLogin: false,
+		featureFlag: "web-queue",
 	},
 	{
 		name: "Invite",
@@ -101,6 +103,10 @@ export default function Nav() {
 	if (!user?.admin) {
 		navBarItems = navBarItems.filter((item) => !item.requiresAdmin);
 	}
+
+	navBarItems = navBarItems.filter(
+		(item) => !item.featureFlag || featureFlags.isEnabled(item.featureFlag),
+	);
 
 	return (
 		<Disclosure as="nav" className="">

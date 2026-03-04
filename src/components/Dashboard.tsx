@@ -1,12 +1,14 @@
 import { useHookstate } from "@hookstate/core";
+import { useNavigate } from "react-router-dom";
 import globalState, { sessionReadyState } from "../state";
-import GuildCard from "./GuildCard";
+import ServerCard from "./ServerCard";
 import PageLayout from "./ui/PageLayout";
 import SectionHeader from "./ui/SectionHeader";
 
 const Dashboard = () => {
 	const state = useHookstate(globalState);
 	const ready = useHookstate(sessionReadyState);
+	const navigate = useNavigate();
 	const { guilds } = state.get();
 	const loading = !ready.get() || guilds === undefined;
 
@@ -25,9 +27,22 @@ const Dashboard = () => {
 			>
 				{loading
 					? Array.from({ length: 20 }, (_, i) => `skeleton-${i}`).map((id) => (
-							<GuildCard.Skeleton key={id} />
+							<ServerCard.Skeleton key={id} />
 						))
-					: guilds.map((guild) => <GuildCard key={guild.id} guild={guild} />)}
+					: guilds.map((guild) => (
+							<ServerCard
+								key={guild.id}
+								id={guild.id}
+								name={guild.name}
+								icon={guild.icon}
+								actions={[
+									{
+										text: "Manage",
+										onClick: () => navigate(`/manage/${guild.id}`),
+									},
+								]}
+							/>
+						))}
 			</div>
 		</PageLayout>
 	);

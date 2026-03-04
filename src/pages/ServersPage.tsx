@@ -52,8 +52,12 @@ export default function ServersPage() {
 								name={server.name}
 								icon={server.icon}
 								memberCount={server.member_count}
-								actionText="View Queues"
-								onClick={() => navigate(`/servers/${server.id}`)}
+								actions={[
+									{
+										text: "View Queues",
+										onClick: () => navigate(`/servers/${server.id}`),
+									},
+								]}
 							/>
 						))}
 			</div>

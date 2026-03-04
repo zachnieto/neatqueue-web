@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
 import type { MatchHistory } from "../../types";
 import { classNames } from "../../util/tailwind";
+import MatchCardHeader from "../ui/MatchCardHeader";
 
 interface CompletedMatchCardProps {
 	match: MatchHistory;
@@ -23,42 +23,12 @@ export const CompletedMatchCard = ({
 				transition: "border-color 0.2s",
 			}}
 		>
-			{/* Header */}
-			<div
-				className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
-				style={{
-					padding: "12px 16px",
-					background: "rgba(255,255,255,0.02)",
-					borderBottom: "1px solid rgba(255,255,255,0.06)",
-				}}
-			>
-				<div style={{ flex: 1, minWidth: 0 }}>
-					<div
-						className="font-rajdhani"
-						style={{
-							fontSize: 14,
-							fontWeight: 700,
-							color: "#e8eaf0",
-							letterSpacing: "0.04em",
-						}}
-					>
-						{formatQueueName(match.game)} — Match #{match.game_num}
-					</div>
-					<div
-						className="section-subtitle"
-						style={{ marginTop: 2, fontSize: 11 }}
-					>
-						{new Date(match.time).toLocaleString()}
-					</div>
-				</div>
-				<Link
-					to={`/leaderboard/${serverId}/${match.queue_channel}`}
-					className="btn-action"
-					style={{ padding: "4px 12px", fontSize: 11, whiteSpace: "nowrap" }}
-				>
-					LEADERBOARD
-				</Link>
-			</div>
+			<MatchCardHeader
+				title={`${formatQueueName(match.game)} — Match #${match.game_num}`}
+				subtitle={new Date(match.time).toLocaleString()}
+				serverId={serverId}
+				channelId={match.queue_channel}
+			/>
 
 			{/* Content */}
 			<div style={{ padding: 16 }}>
