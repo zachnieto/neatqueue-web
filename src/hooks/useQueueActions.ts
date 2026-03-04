@@ -15,41 +15,52 @@ type LeaveQueueParams = {
 	channelId: string;
 };
 
+type ActionResult = {
+	action: string;
+	success: boolean;
+	message?: string;
+	variant?: "success" | "error" | "info";
+	channel_id?: string;
+	server_id?: string;
+	game_num?: number;
+};
+
 export function useJoinQueue() {
 	const queryClient = useQueryClient();
 	const toast = useToast();
 	const resolveRef = useRef<((value: boolean) => void) | null>(null);
+	const pendingParamsRef = useRef<{
+		serverId: string;
+		channelId: string;
+	} | null>(null);
 
 	useEffect(() => {
 		const socket = getWsSocket();
-		const unsubResult = socket.on(
-			"join_queue_result",
+		const unsub = socket.on(
+			"action_result",
 			(data: Record<string, unknown>) => {
-				const success = data.success === true;
-				if (resolveRef.current) {
-					resolveRef.current(success);
-					resolveRef.current = null;
+				const result = data as ActionResult;
+				if (result.action !== "join_queue") return;
+				const pending = pendingParamsRef.current;
+				if (
+					pending &&
+					String(result.server_id) === pending.serverId &&
+					String(result.channel_id) === pending.channelId
+				) {
+					pendingParamsRef.current = null;
+					if (resolveRef.current) {
+						resolveRef.current(result.success === true);
+						resolveRef.current = null;
+					}
+					if (result.message) {
+						toast.showToast(result.message, {
+							variant: result.variant ?? "success",
+						});
+					}
 				}
-				if (success) toast.showToast("Joined queue!", { variant: "success" });
-				else if (data.message)
-					toast.showToast(String(data.message), { variant: "error" });
 			},
 		);
-		const unsubError = socket.on("error", (data: Record<string, unknown>) => {
-			if (data.ref !== "join_queue") return;
-			if (resolveRef.current) {
-				resolveRef.current(false);
-				resolveRef.current = null;
-			}
-			toast.showToast(
-				data.message ? String(data.message) : "Failed to join queue",
-				{ variant: "error" },
-			);
-		});
-		return () => {
-			unsubResult();
-			unsubError();
-		};
+		return () => unsub();
 	}, [toast]);
 
 	const mutation = useMutation({
@@ -57,6 +68,10 @@ export function useJoinQueue() {
 			getWsSocket().ensureConnected();
 			return new Promise<boolean>((resolve, reject) => {
 				resolveRef.current = resolve;
+				pendingParamsRef.current = {
+					serverId: params.serverId,
+					channelId: params.channelId,
+				};
 				getWsSocket().joinQueue(
 					params.serverId,
 					params.channelId,
@@ -67,6 +82,7 @@ export function useJoinQueue() {
 				setTimeout(() => {
 					if (resolveRef.current) {
 						resolveRef.current = null;
+						pendingParamsRef.current = null;
 						reject(new Error("Join queue timed out"));
 					}
 				}, 15000);
@@ -93,37 +109,38 @@ export function useLeaveQueue() {
 	const queryClient = useQueryClient();
 	const toast = useToast();
 	const resolveRef = useRef<((value: boolean) => void) | null>(null);
+	const pendingParamsRef = useRef<{
+		serverId: string;
+		channelId: string;
+	} | null>(null);
 
 	useEffect(() => {
 		const socket = getWsSocket();
-		const unsubResult = socket.on(
-			"leave_queue_result",
+		const unsub = socket.on(
+			"action_result",
 			(data: Record<string, unknown>) => {
-				const success = data.success === true;
-				if (resolveRef.current) {
-					resolveRef.current(success);
-					resolveRef.current = null;
+				const result = data as ActionResult;
+				if (result.action !== "leave_queue") return;
+				const pending = pendingParamsRef.current;
+				if (
+					pending &&
+					String(result.server_id) === pending.serverId &&
+					String(result.channel_id) === pending.channelId
+				) {
+					pendingParamsRef.current = null;
+					if (resolveRef.current) {
+						resolveRef.current(result.success === true);
+						resolveRef.current = null;
+					}
+					if (result.message) {
+						toast.showToast(result.message, {
+							variant: result.variant ?? "success",
+						});
+					}
 				}
-				if (success) toast.showToast("Left queue", { variant: "success" });
-				else if (data.message)
-					toast.showToast(String(data.message), { variant: "error" });
 			},
 		);
-		const unsubError = socket.on("error", (data: Record<string, unknown>) => {
-			if (data.ref !== "leave_queue") return;
-			if (resolveRef.current) {
-				resolveRef.current(false);
-				resolveRef.current = null;
-			}
-			toast.showToast(
-				data.message ? String(data.message) : "Failed to leave queue",
-				{ variant: "error" },
-			);
-		});
-		return () => {
-			unsubResult();
-			unsubError();
-		};
+		return () => unsub();
 	}, [toast]);
 
 	const mutation = useMutation({
@@ -131,10 +148,15 @@ export function useLeaveQueue() {
 			getWsSocket().ensureConnected();
 			return new Promise<boolean>((resolve, reject) => {
 				resolveRef.current = resolve;
+				pendingParamsRef.current = {
+					serverId: params.serverId,
+					channelId: params.channelId,
+				};
 				getWsSocket().leaveQueue(params.serverId, params.channelId);
 				setTimeout(() => {
 					if (resolveRef.current) {
 						resolveRef.current = null;
+						pendingParamsRef.current = null;
 						reject(new Error("Leave queue timed out"));
 					}
 				}, 15000);
@@ -181,31 +203,26 @@ export function useReadyUp() {
 				}, 5000);
 
 				const handleResult = (data: Record<string, unknown>) => {
-					if (data.server_id === serverId && data.game_num === gameNum) {
-						if (data.success) {
-							cleanup();
+					const result = data as ActionResult;
+					if (
+						result.action === "web_ready_up" &&
+						String(result.server_id) === serverId &&
+						result.game_num === gameNum
+					) {
+						cleanup();
+						if (result.success) {
 							resolve();
 						} else {
-							cleanup();
-							reject(new Error(String(data.error || "Failed to ready up")));
+							reject(new Error(String(result.message || "Failed to ready up")));
 						}
 					}
 				};
 
-				const handleError = (data: Record<string, unknown>) => {
-					if (data.ref === "web_ready_up") {
-						cleanup();
-						reject(new Error(String(data.message || "Ready up error")));
-					}
-				};
-
-				const cleanup1 = socket.on("ready_up_result", handleResult);
-				const cleanup2 = socket.on("error", handleError);
+				const cleanup1 = socket.on("action_result", handleResult);
 
 				const cleanup = () => {
 					clearTimeout(timeoutId);
 					cleanup1();
-					cleanup2();
 				};
 
 				socket.readyUpMatch(serverId, gameNum);
@@ -244,33 +261,28 @@ export function useDeclineMatch() {
 				}, 5000);
 
 				const handleResult = (data: Record<string, unknown>) => {
-					if (data.server_id === serverId && data.game_num === gameNum) {
-						if (data.success) {
-							cleanup();
+					const result = data as ActionResult;
+					if (
+						result.action === "web_decline_match" &&
+						String(result.server_id) === serverId &&
+						result.game_num === gameNum
+					) {
+						cleanup();
+						if (result.success) {
 							resolve();
 						} else {
-							cleanup();
 							reject(
-								new Error(String(data.error || "Failed to decline match")),
+								new Error(String(result.message || "Failed to decline match")),
 							);
 						}
 					}
 				};
 
-				const handleError = (data: Record<string, unknown>) => {
-					if (data.ref === "web_decline_match") {
-						cleanup();
-						reject(new Error(String(data.message || "Decline match error")));
-					}
-				};
-
-				const cleanup1 = socket.on("decline_match_result", handleResult);
-				const cleanup2 = socket.on("error", handleError);
+				const cleanup1 = socket.on("action_result", handleResult);
 
 				const cleanup = () => {
 					clearTimeout(timeoutId);
 					cleanup1();
-					cleanup2();
 				};
 
 				socket.declineMatch(serverId, gameNum);

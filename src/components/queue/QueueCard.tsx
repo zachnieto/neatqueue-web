@@ -11,7 +11,7 @@ import { useJoinQueue, useLeaveQueue } from "../../hooks/useQueueActions";
 import { useElapsedTime } from "../../hooks/useElapsedTime";
 import PlayerList from "./PlayerList";
 
-type QueueStatus = "Live" | "Filling" | "Test Mode" | "Locked" | "Offline";
+type QueueStatus = "Live" | "Active" | "Test Mode" | "Locked" | "Offline";
 
 const STATUS_CONFIG: Record<
 	QueueStatus,
@@ -24,12 +24,12 @@ const STATUS_CONFIG: Record<
 		dot: "#ff4757",
 		badgeClass: "badge-live",
 	},
-	Filling: {
-		label: "FILLING",
+	Active: {
+		label: "ACTIVE",
 		bg: "rgba(57,217,138,0.12)",
 		text: "#39d98a",
 		dot: "#39d98a",
-		badgeClass: "badge-filling",
+		badgeClass: "badge-active",
 	},
 	"Test Mode": {
 		label: "TEST MODE",
@@ -62,7 +62,7 @@ function deriveStatus(queue: QueueInfo): QueueStatus {
 	const size = queue.current_size ?? queue.players?.length ?? 0;
 	const max = queue.queue_size ?? 10;
 	if (size >= max) return "Live";
-	return "Filling";
+	return "Active";
 }
 
 export default function QueueCard({ queue, serverId }: QueueCardProps) {
