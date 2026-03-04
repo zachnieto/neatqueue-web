@@ -3,7 +3,7 @@ import Particles from "react-tsparticles";
 const CustomParticles = ({
 	color = "#1c0037",
 	clickable = true,
-	opacity = 0.05,
+	opacity = 0.02,
 }: {
 	color?: string;
 	clickable?: boolean;

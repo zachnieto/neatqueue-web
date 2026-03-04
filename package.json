@@ -28,8 +28,7 @@
 		"react-currency-input-field": "^3.6.10",
 		"react-dom": "^18.2.0",
 		"react-router-dom": "^6.9.0",
-		"react-tsparticles": "^1.43.1",
-		"socket.io-client": "^4.6.1"
+		"react-tsparticles": "^1.43.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.4",

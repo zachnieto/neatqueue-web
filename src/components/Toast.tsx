@@ -72,7 +72,8 @@ const Toast = ({
 	return (
 		<div
 			className={classNames(
-				"flex items-start gap-3 p-4 rounded-lg border-l-4 shadow-xl backdrop-blur-sm transition-all duration-300 ease-out min-w-[320px] max-w-md",
+				"flex gap-3 p-4 rounded-lg border-l-4 shadow-xl backdrop-blur-sm transition-all duration-300 ease-out min-w-[320px] max-w-md",
+				message ? "items-start" : "items-center",
 				styles.container,
 				isVisible && !isLeaving
 					? "translate-x-0 opacity-100"
@@ -91,7 +92,14 @@ const Toast = ({
 
 			{/* Content */}
 			<div className="flex-1 min-w-0">
-				<h3 className="text-white font-semibold text-sm mb-1">{title}</h3>
+				<h3
+					className={classNames(
+						"text-white font-semibold text-sm",
+						message ? "mb-1" : "",
+					)}
+				>
+					{title}
+				</h3>
 				{message && <p className="text-gray-200 text-sm">{message}</p>}
 			</div>
 

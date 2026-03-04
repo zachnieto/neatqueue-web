@@ -14,6 +14,12 @@ import { classNames } from "../util/tailwind";
 const navigation = [
 	{ name: "Home", href: "/", current: true },
 	{
+		name: "Queues",
+		href: "/servers",
+		current: false,
+		requiresLogin: false,
+	},
+	{
 		name: "Invite",
 		href: import.meta.env.VITE_DISCORD_INVITE,
 		current: false,
@@ -35,12 +41,6 @@ const navigation = [
 	{
 		name: "Dashboard",
 		href: "/dashboard",
-		current: false,
-		requiresLogin: true,
-	},
-	{
-		name: "Profile",
-		href: "/profile",
 		current: false,
 		requiresLogin: true,
 	},
@@ -79,9 +79,11 @@ export default function Nav() {
 	useEffect(() => {
 		if (code) {
 			setSearchParams({});
-			discordAuth(code).catch(() => {});
+			discordAuth(code)
+				.then(() => navigate("/servers", { replace: true }))
+				.catch(() => {});
 		}
-	}, [code, setSearchParams]);
+	}, [code, setSearchParams, navigate]);
 
 	useEffect(() => {
 		if (user && getPendingSteamLink()) {

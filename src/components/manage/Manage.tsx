@@ -43,7 +43,7 @@ const Manage = () => {
 		return (
 			<div className="min-h-screen">
 				<div className="text-center mb-5">
-					<h1 className="text-5xl">{guild.name}</h1>
+					<h1>{guild.name}</h1>
 					<p className="text-xl text-gray-400">
 						Please invite the bot to your server to get started.
 					</p>
@@ -55,7 +55,7 @@ const Manage = () => {
 	return (
 		<div className="min-h-screen">
 			<div className="text-center mb-5">
-				<h1 className="text-5xl">{guild.name}</h1>
+				<h1>{guild.name}</h1>
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:mx-32 gap-8">

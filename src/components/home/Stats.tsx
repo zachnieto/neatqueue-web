@@ -17,7 +17,9 @@ const Stats = () => {
 	return (
 		<div className="h-screen flex justify-center items-center text-gray-200">
 			<div className="">
-				<h1 className="md:text-9xl sm:text-8xl text-7xl">NeatQueue</h1>
+				<h1 className="heading-display md:text-9xl sm:text-8xl text-7xl">
+					NeatQueue
+				</h1>
 				<div className="grid grid-cols-4">
 					<div className="col-span-1">
 						<h1 className="md:text-4xl sm:text-3xl">Servers:</h1>
