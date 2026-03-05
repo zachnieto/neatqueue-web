@@ -7,7 +7,6 @@ import type {
 	PrivateInstance,
 	ServerQueuesData,
 	UserProfile,
-	UserServer,
 } from "../types";
 import { refreshToken } from "./server-service";
 
@@ -233,11 +232,6 @@ export const getHistory = async (
 		data: MatchHistory[];
 		total?: number;
 	};
-};
-
-export const getUserServers = async (): Promise<UserServer[]> => {
-	const resp = await api.get("/api/v1/user/servers");
-	return resp.data;
 };
 
 export const getServerInfo = async (

@@ -8,9 +8,8 @@ import {
 	LiveMatchCard,
 	MatchPagination,
 } from "../components/history";
-import PageLayout from "../components/ui/PageLayout";
-import SectionHeader from "../components/ui/SectionHeader";
-import { getHistory } from "../services/neatqueue-service";
+import ServerPageLayout from "../components/ui/ServerPageLayout";
+import { getHistory, getServerInfo } from "../services/neatqueue-service";
 
 function formatQueueName(queueName: string): string {
 	// Check if the queue name has a date prefix (YYYY-MM_)
@@ -71,17 +70,26 @@ export default function HistoryPage() {
 		};
 	}, []);
 
+	// Server info for header
+	const { data: serverData, isLoading: serverLoading } = useQuery({
+		queryKey: ["server", serverId],
+		queryFn: () => getServerInfo(serverId ?? ""),
+		enabled: !!serverId,
+	});
+
 	// React Query for data fetching
 	const {
 		data: historyData,
-		isLoading,
+		isLoading: historyLoading,
 		error,
 	} = useQuery({
 		queryKey: ["history", serverId, startDate, endDate],
-		queryFn: () => getHistory(serverId || "", LIMIT_SIZE, startDate, endDate),
+		queryFn: () => getHistory(serverId ?? "", LIMIT_SIZE, startDate, endDate),
 		enabled: !!serverId,
 		staleTime: 30000, // 30 seconds
 	});
+
+	const isLoading = historyLoading || !historyData;
 
 	// Compute available queues
 	const availableQueues = useMemo(() => {
@@ -126,34 +134,63 @@ export default function HistoryPage() {
 		setCurrentPage(newPage);
 	};
 
+	if (!serverId) {
+		return (
+			<ServerPageLayout
+				sectionTitle="Match History"
+				sectionSubtitle="View completed and live matches from the last 30 days."
+			>
+				<p className="section-subtitle" style={{ marginTop: 0 }}>
+					No server selected.
+				</p>
+			</ServerPageLayout>
+		);
+	}
+
 	if (isLoading || !historyData) {
 		return (
-			<div className="flex items-center justify-center min-h-screen">
-				<div className="text-center">
-					<div className="relative w-16 h-16 mx-auto mb-6">
-						<div
-							className="absolute inset-0 rounded-full"
-							style={{ border: "3px solid rgba(255,255,255,0.06)" }}
-						/>
-						<div
-							className="absolute inset-0 rounded-full animate-spin"
-							style={{
-								border: "3px solid transparent",
-								borderTopColor: "#00b4ff",
-							}}
-						/>
+			<ServerPageLayout
+				serverName={serverData?.info?.name}
+				serverIconUrl={serverData?.info?.icon_url}
+				memberCount={serverData?.info?.member_count}
+				serverHeaderLoading={serverLoading || !serverData}
+				sectionTitle="Match History"
+				sectionSubtitle="View completed and live matches from the last 30 days."
+			>
+				<div className="flex items-center justify-center py-24">
+					<div className="text-center">
+						<div className="relative w-16 h-16 mx-auto mb-6">
+							<div
+								className="absolute inset-0 rounded-full"
+								style={{ border: "3px solid rgba(255,255,255,0.06)" }}
+							/>
+							<div
+								className="absolute inset-0 rounded-full animate-spin"
+								style={{
+									border: "3px solid transparent",
+									borderTopColor: "#00b4ff",
+								}}
+							/>
+						</div>
+						<p className="section-subtitle" style={{ marginTop: 0 }}>
+							Loading match history...
+						</p>
 					</div>
-					<p className="section-subtitle" style={{ marginTop: 0 }}>
-						Loading match history...
-					</p>
 				</div>
-			</div>
+			</ServerPageLayout>
 		);
 	}
 
 	if (error) {
 		return (
-			<div className="flex items-center justify-center min-h-screen">
+			<ServerPageLayout
+				serverName={serverData?.info?.name}
+				serverIconUrl={serverData?.info?.icon_url}
+				memberCount={serverData?.info?.member_count}
+				serverHeaderLoading={serverLoading || !serverData}
+				sectionTitle="Match History"
+				sectionSubtitle="View completed and live matches from the last 30 days."
+			>
 				<div
 					className="card-glass"
 					style={{
@@ -162,6 +199,7 @@ export default function HistoryPage() {
 						border: "1px solid rgba(255,71,87,0.2)",
 						borderRadius: 2,
 						textAlign: "center",
+						margin: "0 auto",
 					}}
 				>
 					<div
@@ -196,17 +234,19 @@ export default function HistoryPage() {
 						{(error as Error).message || "Unknown error"}
 					</p>
 				</div>
-			</div>
+			</ServerPageLayout>
 		);
 	}
 
 	return (
-		<PageLayout>
-			<SectionHeader
-				title="Match History"
-				subtitle="View completed and live matches from the last 30 days."
-			/>
-
+		<ServerPageLayout
+			serverName={serverData?.info?.name}
+			serverIconUrl={serverData?.info?.icon_url}
+			memberCount={serverData?.info?.member_count}
+			serverHeaderLoading={serverLoading || !serverData}
+			sectionTitle="Match History"
+			sectionSubtitle="View completed and live matches from the last 30 days."
+		>
 			{/* Queue Selector */}
 			<div style={{ marginBottom: 32 }}>
 				<div
@@ -347,6 +387,6 @@ export default function HistoryPage() {
 				totalPages={totalPages}
 				onPageChange={handlePageChange}
 			/>
-		</PageLayout>
+		</ServerPageLayout>
 	);
 }
