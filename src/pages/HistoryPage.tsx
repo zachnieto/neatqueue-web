@@ -157,24 +157,36 @@ export default function HistoryPage() {
 				sectionTitle="Match History"
 				sectionSubtitle="View completed and live matches from the last 30 days."
 			>
-				<div className="flex items-center justify-center py-24">
-					<div className="text-center">
-						<div className="relative w-16 h-16 mx-auto mb-6">
-							<div
-								className="absolute inset-0 rounded-full"
-								style={{ border: "3px solid rgba(255,255,255,0.06)" }}
-							/>
-							<div
-								className="absolute inset-0 rounded-full animate-spin"
-								style={{
-									border: "3px solid transparent",
-									borderTopColor: "#00b4ff",
-								}}
-							/>
+				{/* Loading Skeleton */}
+				<div>
+					<div style={{ marginBottom: 32 }}>
+						<div
+							className="card-glass animate-pulse"
+							style={{
+								maxWidth: 280,
+								height: 82,
+								border: "1px solid rgba(255,255,255,0.07)",
+								borderRadius: 2,
+							}}
+						/>
+					</div>
+
+					<div style={{ marginBottom: 32 }}>
+						<div
+							className="h-7 bg-white/10 rounded w-48 mb-6 animate-pulse"
+							style={{ letterSpacing: "0.04em" }}
+						/>
+						<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+							{Array.from({ length: 2 }).map((_, i) => (
+								<LiveMatchCard.Skeleton key={`live-skeleton-${i}`} />
+							))}
 						</div>
-						<p className="section-subtitle" style={{ marginTop: 0 }}>
-							Loading match history...
-						</p>
+					</div>
+
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+						{Array.from({ length: 6 }).map((_, i) => (
+							<CompletedMatchCard.Skeleton key={`history-skeleton-${i}`} />
+						))}
 					</div>
 				</div>
 			</ServerPageLayout>

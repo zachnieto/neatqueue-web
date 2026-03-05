@@ -148,8 +148,22 @@ ServerCard.Skeleton = function ServerCardSkeleton() {
 						<div className="h-3 bg-white/5 rounded w-1/2 animate-pulse" />
 					</div>
 				</div>
-				<div style={{ marginTop: "auto" }}>
-					<div className="w-full h-[38px] rounded bg-white/5 animate-pulse" />
+				<div
+					style={{
+						marginTop: "auto",
+						display: "flex",
+						flexDirection: "column",
+						gap: 8,
+					}}
+				>
+					{Array.from({ length: Math.floor(Math.random() * 3) + 1 }).map(
+						(_, index) => (
+							<div
+								key={index}
+								className="w-full h-[38px] rounded bg-white/5 animate-pulse"
+							/>
+						),
+					)}
 				</div>
 			</div>
 		</div>

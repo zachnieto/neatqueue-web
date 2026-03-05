@@ -167,3 +167,53 @@ export const CompletedMatchCard = ({
 		</div>
 	);
 };
+
+CompletedMatchCard.Skeleton = () => {
+	return (
+		<div
+			className="card-glass rounded-sm animate-pulse"
+			style={{
+				overflow: "hidden",
+				border: "1px solid rgba(255,255,255,0.07)",
+				height: 180,
+			}}
+		>
+			<div
+				style={{
+					height: 56,
+					padding: "16px 20px",
+					borderBottom: "1px solid rgba(255,255,255,0.05)",
+					display: "flex",
+					flexDirection: "column",
+					gap: 6,
+				}}
+			>
+				<div className="h-4 bg-white/10 rounded w-2/3" />
+				<div className="h-3 bg-white/5 rounded w-1/3" />
+			</div>
+
+			<div style={{ padding: 16 }}>
+				<div className="grid grid-cols-2 gap-3">
+					{[0, 1].map((team) => (
+						<div
+							key={team}
+							style={{
+								background: "rgba(255,255,255,0.02)",
+								border: "1px solid rgba(255,255,255,0.05)",
+								borderRadius: 2,
+								padding: 12,
+								height: 90,
+							}}
+						>
+							<div className="h-3 bg-white/10 rounded w-1/3 mb-4" />
+							<div className="space-y-2">
+								<div className="h-3 bg-white/5 rounded w-full" />
+								<div className="h-3 bg-white/5 rounded w-4/5" />
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+	);
+};

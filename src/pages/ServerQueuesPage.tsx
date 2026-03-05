@@ -388,7 +388,7 @@ export default function ServerQueuesPage() {
 							className="grid gap-4"
 							style={{
 								gridTemplateColumns:
-									"repeat(auto-fill, minmax(min(100%, 380px), 1fr))",
+									"repeat(auto-fill, minmax(min(100%, 335px), 1fr))",
 							}}
 						>
 							{[1, 2, 3, 4, 5, 6].map((i) => (
@@ -403,7 +403,7 @@ export default function ServerQueuesPage() {
 							className="grid gap-4"
 							style={{
 								gridTemplateColumns:
-									"repeat(auto-fill, minmax(min(100%, 380px), 1fr))",
+									"repeat(auto-fill, minmax(min(100%, 335px), 1fr))",
 							}}
 						>
 							{filteredQueues.map((queue) => (
