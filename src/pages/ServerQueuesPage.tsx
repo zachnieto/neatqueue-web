@@ -98,16 +98,7 @@ export default function ServerQueuesPage() {
 		: [];
 
 	const matchNeedingReadyUp = myMatches.find(
-		(m) =>
-			m.stage === "VALIDATING_PLAYERS" &&
-			// We only want to block the screen if they haven't readied up yet AND the mode is button.
-			// If mode is voice channel, show it so they see the channel to join until the state changes.
-			// Actually, let's show it in either case if the state is VALIDATING_PLAYERS,
-			// but let the MatchFoundOverlay handle the "Waiting" appearance if they clicked ready.
-			// But in order not to trap them forever, let's at least ensure we only render it
-			// when it's actively validating and perhaps they aren't fully ready yet, or the MatchFoundOverlay
-			// already has logic to show "YOU ARE READY"
-			true,
+		(m) => m.stage === "VALIDATING_PLAYERS" && m.ready_up_mode !== 2,
 	);
 
 	const myMatchGameNums = new Set(myMatches.map((m) => m.game_num));

@@ -13,7 +13,7 @@ import { useElapsedTime } from "../../hooks/useElapsedTime";
 import PlayerList from "./PlayerList";
 import NumberFlow from "@number-flow/react";
 
-type QueueStatus = "Live" | "Active" | "Test Mode" | "Locked" | "Offline";
+type QueueStatus = "Live" | "Active" | "Test Mode" | "Locked";
 
 const STATUS_CONFIG: Record<
 	QueueStatus,
@@ -44,12 +44,6 @@ const STATUS_CONFIG: Record<
 		bg: "rgba(255,165,2,0.12)",
 		text: "#ffa502",
 		dot: "#ffa502",
-	},
-	Offline: {
-		label: "OFFLINE",
-		bg: "rgba(122,128,153,0.12)",
-		text: "#7a8099",
-		dot: "#7a8099",
 	},
 };
 
@@ -181,6 +175,22 @@ export default function QueueCard({ queue, serverId }: QueueCardProps) {
 					<div
 						className={statusCfg.badgeClass ?? ""}
 						style={{
+							padding: "3px 10px",
+							borderRadius: 2,
+							background: "rgba(0,180,255,0.1)",
+							border: "1px solid rgba(0,180,255,0.25)",
+							fontFamily: "'JetBrains Mono', monospace",
+							fontSize: "10px",
+							fontWeight: 700,
+							color: "#00b4ff",
+							letterSpacing: "0.08em",
+						}}
+					>
+						{gameModeLabel}
+					</div>
+					<div
+						className={statusCfg.badgeClass ?? ""}
+						style={{
 							display: "flex",
 							alignItems: "center",
 							gap: 5,
@@ -212,59 +222,6 @@ export default function QueueCard({ queue, serverId }: QueueCardProps) {
 							{statusCfg.label}
 						</span>
 					</div>
-				</div>
-
-				{/* Mode badges */}
-				<div className="flex items-center gap-2 flex-wrap">
-					<span
-						style={{
-							padding: "3px 10px",
-							borderRadius: 2,
-							background: "rgba(0,180,255,0.1)",
-							border: "1px solid rgba(0,180,255,0.25)",
-							fontFamily: "'JetBrains Mono', monospace",
-							fontSize: "10px",
-							fontWeight: 700,
-							color: "#00b4ff",
-							letterSpacing: "0.08em",
-						}}
-					>
-						{gameModeLabel}
-					</span>
-					{locked && (
-						<span
-							style={{
-								padding: "3px 10px",
-								borderRadius: 2,
-								background: "rgba(255,165,2,0.12)",
-								border: "1px solid rgba(255,165,2,0.35)",
-								fontFamily: "'JetBrains Mono', monospace",
-								fontSize: "10px",
-								fontWeight: 700,
-								color: "#ffa502",
-								letterSpacing: "0.08em",
-							}}
-						>
-							LOCKED
-						</span>
-					)}
-					{testMode && (
-						<span
-							style={{
-								padding: "3px 10px",
-								borderRadius: 2,
-								background: "rgba(165,94,234,0.12)",
-								border: "1px solid rgba(165,94,234,0.35)",
-								fontFamily: "'JetBrains Mono', monospace",
-								fontSize: "10px",
-								fontWeight: 700,
-								color: "#a55eea",
-								letterSpacing: "0.08em",
-							}}
-						>
-							TEST
-						</span>
-					)}
 				</div>
 
 				{/* Divider */}
