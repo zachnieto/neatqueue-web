@@ -6,8 +6,7 @@ import { useToast } from "../../hooks/useToast";
 import { getPremium } from "../../services/neatqueue-service";
 import globalState from "../../state";
 import type { Guild } from "../../types";
-import PageLayout from "../ui/PageLayout";
-import SectionHeader from "../ui/SectionHeader";
+import ServerPageLayout from "../ui/ServerPageLayout";
 import Credits from "./Credits";
 import Instance from "./instance/Instance";
 import PremiumStatus from "./PremiumStatus";
@@ -88,6 +87,10 @@ const Manage = () => {
 		return null;
 	}
 
+	const guildIconUrl = guild.icon
+		? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+		: null;
+
 	const showError = (message: string) => {
 		showToast("Error", { message, variant: "error" });
 	};
@@ -98,57 +101,44 @@ const Manage = () => {
 
 	if (isLoading) {
 		return (
-			<PageLayout>
-				{/* Skeleton header */}
-				<div className="flex flex-col gap-2 mb-8">
-					<div
-						className="animate-pulse"
-						style={{
-							height: 28,
-							width: 260,
-							background: "rgba(255,255,255,0.08)",
-							borderRadius: 4,
-						}}
-					/>
-					<div
-						className="animate-pulse"
-						style={{
-							height: 14,
-							width: 340,
-							background: "rgba(255,255,255,0.05)",
-							borderRadius: 4,
-						}}
-					/>
-				</div>
-
-				{/* Skeleton cards */}
+			<ServerPageLayout
+				serverName={guild.name}
+				serverIconUrl={guildIconUrl}
+				memberCount={guild.approximate_member_count}
+				serverHeaderLoading
+				sectionTitle="Manage"
+			>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 					<SkeletonCard />
 					<SkeletonCard />
 					<SkeletonCard />
 				</div>
-			</PageLayout>
+			</ServerPageLayout>
 		);
 	}
 
 	if (!premiumData?.occupied) {
 		return (
-			<PageLayout>
-				<SectionHeader title={`${guild.name} Settings`} />
+			<ServerPageLayout
+				serverName={guild.name}
+				serverIconUrl={guildIconUrl}
+				memberCount={guild.approximate_member_count}
+				sectionTitle="Settings"
+			>
 				<p className="section-subtitle">
 					Please invite the bot to your server to get started.
 				</p>
-			</PageLayout>
+			</ServerPageLayout>
 		);
 	}
 
 	return (
-		<PageLayout>
-			<SectionHeader
-				title={`${guild.name} Settings`}
-				subtitle="Manage premium, credits, and instance configuration."
-			/>
-
+		<ServerPageLayout
+			serverName={guild.name}
+			serverIconUrl={guildIconUrl}
+			memberCount={guild.approximate_member_count}
+			sectionTitle="Manage"
+		>
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 				{premiumData && guildID && (
 					<>
@@ -175,7 +165,7 @@ const Manage = () => {
 					</>
 				)}
 			</div>
-		</PageLayout>
+		</ServerPageLayout>
 	);
 };
 

@@ -1,9 +1,8 @@
 import { useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Admin from "./components/admin/Admin";
-import Dashboard from "./components/Dashboard";
 import Footer from "./components/Footer";
 import Home from "./components/home/Home";
 import Leaderboard from "./components/Leaderboard";
@@ -68,7 +67,10 @@ function App() {
 						<Route element={<LoggedInRoutes />}>
 							<Route path="/servers" element={<ServersPage />} />
 							<Route path="/servers/:serverId" element={<ServerQueuesPage />} />
-							<Route path="/dashboard" element={<Dashboard />} />
+							<Route
+								path="/dashboard"
+								element={<Navigate to="/servers" replace />}
+							/>
 							<Route path="/manage/:guildID" element={<Manage />} />
 							<Route path="/profile" element={<ProfilePage />} />
 						</Route>

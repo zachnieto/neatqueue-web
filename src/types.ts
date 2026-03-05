@@ -17,6 +17,7 @@ export type Guild = {
 	name: string;
 	icon: string;
 	id: string;
+	approximate_member_count?: number;
 };
 export type Auth = { access_token: string } | undefined;
 export type Plan = {
@@ -275,13 +276,6 @@ export type ServerQueuesData = {
 	}>;
 	channels?: Array<{ id: number; name: string; type: string }>;
 	stats?: ServerQueuesStats;
-};
-
-export type UserServer = {
-	id: string;
-	name: string;
-	icon: string | null;
-	member_count: number | null;
 };
 
 export type ChannelRef = {

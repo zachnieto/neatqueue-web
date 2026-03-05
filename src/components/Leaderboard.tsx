@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getLeaderboardV2 } from "../services/neatqueue-service";
+import { getLeaderboardV2, getServerInfo } from "../services/neatqueue-service";
 import type {
 	LeaderboardPlayer,
 	LeaderboardV2Response,
@@ -11,8 +11,7 @@ import type {
 import { classNames } from "../util/tailwind";
 import { displayPercent, getWinRateColor } from "../util/utility";
 import ExpandedStats from "./ExpandedStats";
-import PageLayout from "./ui/PageLayout";
-import SectionHeader from "./ui/SectionHeader";
+import ServerPageLayout from "./ui/ServerPageLayout";
 
 type PlayerData = LeaderboardPlayer["stats"];
 type SortKey =
@@ -136,6 +135,12 @@ const Leaderboard = ({
 
 	const guildId = guildID || passedGuildId;
 	const channelId = channelID || passedChannelId;
+
+	const { data: serverData, isLoading: serverLoading } = useQuery({
+		queryKey: ["server", guildId],
+		queryFn: () => getServerInfo(guildId),
+		enabled: !!guildId,
+	});
 
 	const currentMonth = useMemo(() => {
 		return new Date().toISOString().slice(0, 7);
@@ -403,34 +408,67 @@ const Leaderboard = ({
 		}
 	};
 
+	if (!guildId || !channelId) {
+		return (
+			<ServerPageLayout
+				serverName={serverData?.info?.name}
+				serverIconUrl={serverData?.info?.icon_url}
+				memberCount={serverData?.info?.member_count}
+				serverHeaderLoading={serverLoading || !serverData}
+				sectionTitle="Leaderboard"
+				sectionSubtitle="Player rankings and statistics."
+			>
+				<p className="section-subtitle" style={{ marginTop: 0 }}>
+					No server or queue selected.
+				</p>
+			</ServerPageLayout>
+		);
+	}
+
 	if (isLoading || !leaderboardData) {
 		return (
-			<div className="flex items-center justify-center min-h-screen">
-				<div className="text-center">
-					<div className="relative w-16 h-16 mx-auto mb-6">
-						<div
-							className="absolute inset-0 rounded-full"
-							style={{ border: "3px solid rgba(255,255,255,0.06)" }}
-						/>
-						<div
-							className="absolute inset-0 rounded-full animate-spin"
-							style={{
-								border: "3px solid transparent",
-								borderTopColor: "#00b4ff",
-							}}
-						/>
+			<ServerPageLayout
+				serverName={serverData?.info?.name}
+				serverIconUrl={serverData?.info?.icon_url}
+				memberCount={serverData?.info?.member_count}
+				serverHeaderLoading={serverLoading || !serverData}
+				sectionTitle="Leaderboard"
+				sectionSubtitle="Player rankings and statistics."
+			>
+				<div className="flex items-center justify-center py-24">
+					<div className="text-center">
+						<div className="relative w-16 h-16 mx-auto mb-6">
+							<div
+								className="absolute inset-0 rounded-full"
+								style={{ border: "3px solid rgba(255,255,255,0.06)" }}
+							/>
+							<div
+								className="absolute inset-0 rounded-full animate-spin"
+								style={{
+									border: "3px solid transparent",
+									borderTopColor: "#00b4ff",
+								}}
+							/>
+						</div>
+						<p className="section-subtitle" style={{ marginTop: 0 }}>
+							Loading leaderboard...
+						</p>
 					</div>
-					<p className="section-subtitle" style={{ marginTop: 0 }}>
-						Loading leaderboard...
-					</p>
 				</div>
-			</div>
+			</ServerPageLayout>
 		);
 	}
 
 	if (error) {
 		return (
-			<div className="flex items-center justify-center min-h-screen">
+			<ServerPageLayout
+				serverName={serverData?.info?.name}
+				serverIconUrl={serverData?.info?.icon_url}
+				memberCount={serverData?.info?.member_count}
+				serverHeaderLoading={serverLoading || !serverData}
+				sectionTitle="Leaderboard"
+				sectionSubtitle="Player rankings and statistics."
+			>
 				<div
 					className="card-glass"
 					style={{
@@ -439,6 +477,7 @@ const Leaderboard = ({
 						border: "1px solid rgba(255,71,87,0.2)",
 						borderRadius: 2,
 						textAlign: "center",
+						margin: "0 auto",
 					}}
 				>
 					<div
@@ -473,17 +512,19 @@ const Leaderboard = ({
 						{(error as Error).message || "Unknown error"}
 					</p>
 				</div>
-			</div>
+			</ServerPageLayout>
 		);
 	}
 
 	return (
-		<PageLayout>
-			<SectionHeader
-				title={formatQueueName(leaderboardData.queue_name)}
-				subtitle="Player rankings and statistics."
-			/>
-
+		<ServerPageLayout
+			serverName={serverData?.info?.name}
+			serverIconUrl={serverData?.info?.icon_url}
+			memberCount={serverData?.info?.member_count}
+			serverHeaderLoading={serverLoading || !serverData}
+			sectionTitle={`${formatQueueName(leaderboardData.queue_name)} Leaderboard`}
+			sectionSubtitle="Player rankings and statistics."
+		>
 			<div className="space-y-4">
 				{/* Mobile Month Selector - Separate on mobile */}
 				{showMonthSelector && (
@@ -1207,7 +1248,7 @@ const Leaderboard = ({
 					</div>
 				</div>
 			</div>
-		</PageLayout>
+		</ServerPageLayout>
 	);
 };
 

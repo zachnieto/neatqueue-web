@@ -2,12 +2,13 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import NumberFlow from "@number-flow/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ActiveMatchCard from "../components/queue/ActiveMatchCard";
 import MatchFoundOverlay from "../components/queue/MatchFoundOverlay";
 import QueueCard from "../components/queue/QueueCard";
 import WsStatusIndicator from "../components/queue/WsStatusIndicator";
 import Input from "../components/ui/Input";
+import ServerPageLayout from "../components/ui/ServerPageLayout";
 import { useServerQueues } from "../hooks/useServerQueues";
 import {
 	getServerMatches,
@@ -19,7 +20,6 @@ import type { ActiveMatch, QueueInfo } from "../types";
 
 export default function ServerQueuesPage() {
 	const { serverId } = useParams();
-	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const userId = globalState.get().user?.id;
 	const [searchQuery, setSearchQuery] = useState("");
@@ -242,10 +242,7 @@ export default function ServerQueuesPage() {
 	const info = data?.info;
 
 	return (
-		<div
-			className="min-h-screen relative"
-			style={{ fontFamily: "'Inter', sans-serif" }}
-		>
+		<>
 			{matchNeedingReadyUp && (
 				<MatchFoundOverlay
 					match={matchNeedingReadyUp as ActiveMatch}
@@ -253,70 +250,13 @@ export default function ServerQueuesPage() {
 					currentUserId={userId ?? ""}
 				/>
 			)}
-
-			<main
-				className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 pb-16"
-				style={{ paddingTop: "40px" }}
+			<ServerPageLayout
+				serverName={info?.name}
+				serverIconUrl={info?.icon_url}
+				memberCount={info?.member_count}
+				serverHeaderLoading={isDataLoading}
+				topBarTrailing={<WsStatusIndicator />}
 			>
-				{/* Top bar: back + ws status */}
-				<div className="flex items-center justify-between mb-6">
-					<button
-						type="button"
-						onClick={() => navigate("/servers")}
-						style={{
-							fontFamily: "'Inter', sans-serif",
-							fontSize: "13px",
-							color: "#7a8099",
-							background: "none",
-							border: "none",
-							cursor: "pointer",
-						}}
-						className="hover:opacity-80"
-					>
-						← Back to servers
-					</button>
-					<WsStatusIndicator />
-				</div>
-
-				{/* Server header */}
-				<div className="flex items-center gap-4 mb-8">
-					{isDataLoading ? (
-						<div className="w-16 h-16 rounded-full flex-shrink-0 bg-white/10 animate-pulse" />
-					) : info?.icon_url ? (
-						<img
-							src={info.icon_url}
-							alt=""
-							className="w-16 h-16 rounded-full flex-shrink-0"
-						/>
-					) : (
-						<div
-							className="w-16 h-16 rounded-full flex-shrink-0"
-							style={{ background: "rgba(255,255,255,0.08)" }}
-						/>
-					)}
-					<div>
-						{isDataLoading ? (
-							<div className="h-8 bg-white/10 rounded w-48 mb-2 animate-pulse" />
-						) : (
-							<h1>{info?.name}</h1>
-						)}
-						{isDataLoading ? (
-							<div className="h-4 bg-white/10 rounded w-24 animate-pulse" />
-						) : info?.member_count != null ? (
-							<p
-								style={{
-									fontFamily: "'Inter', sans-serif",
-									fontSize: "13px",
-									color: "#5a6078",
-									marginTop: 4,
-								}}
-							>
-								{info.member_count} members
-							</p>
-						) : null}
-					</div>
-				</div>
-
 				{/* Stats strip */}
 				<div
 					className="grid grid-cols-4 gap-3 mb-10 rounded-sm overflow-hidden"
@@ -559,7 +499,7 @@ export default function ServerQueuesPage() {
 						</div>
 					</section>
 				)}
-			</main>
-		</div>
+			</ServerPageLayout>
+		</>
 	);
 }

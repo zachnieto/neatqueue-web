@@ -15,10 +15,10 @@ import { classNames } from "../util/tailwind";
 const navigation = [
 	{ name: "Home", href: "/", current: true },
 	{
-		name: "Queues",
+		name: "Servers",
 		href: "/servers",
 		current: false,
-		requiresLogin: false,
+		requiresLogin: true,
 		featureFlag: "web-queue",
 	},
 	{
@@ -38,13 +38,6 @@ const navigation = [
 		href: "https://docs.neatqueue.com/api",
 		current: false,
 		requiresLogin: false,
-	},
-
-	{
-		name: "Dashboard",
-		href: "/dashboard",
-		current: false,
-		requiresLogin: true,
 	},
 	{
 		name: "Status",
