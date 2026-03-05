@@ -12,7 +12,16 @@ import globalState from "../state";
 import { featureFlags } from "../util/featureFlags";
 import { classNames } from "../util/tailwind";
 
-const navigation = [
+type NavigationItem = {
+	name: string;
+	href: string;
+	current: boolean;
+	requiresLogin?: boolean;
+	requiresAdmin?: boolean;
+	featureFlag?: string;
+};
+
+const navigation: NavigationItem[] = [
 	{ name: "Home", href: "/", current: true },
 	{
 		name: "Servers",
