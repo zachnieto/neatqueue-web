@@ -19,7 +19,6 @@ const navigation = [
 		href: "/servers",
 		current: false,
 		requiresLogin: true,
-		featureFlag: "web-queue",
 	},
 	{
 		name: "Invite",
