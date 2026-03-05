@@ -1,14 +1,13 @@
-import { useEffect, useState, useRef } from "react";
 import {
 	CheckCircleIcon,
 	SpeakerWaveIcon,
 	SpeakerXMarkIcon,
-	UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import { useReadyUp, useDeclineMatch } from "../../hooks/useQueueActions";
+import NumberFlow from "@number-flow/react";
+import { useEffect, useRef, useState } from "react";
+import { useDeclineMatch, useReadyUp } from "../../hooks/useQueueActions";
 import type { ActiveMatch } from "../../types";
 import ChannelMention from "../ChannelMention";
-import NumberFlow from "@number-flow/react";
 
 type MatchFoundOverlayProps = {
 	match: ActiveMatch;

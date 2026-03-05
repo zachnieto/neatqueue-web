@@ -21,8 +21,8 @@ import { ToastProvider } from "./hooks/useToast";
 import HistoryPage from "./pages/HistoryPage";
 import LinkAccountPage from "./pages/LinkAccountPage";
 import ProfilePage from "./pages/ProfilePage";
-import ServersPage from "./pages/ServersPage";
 import ServerQueuesPage from "./pages/ServerQueuesPage";
+import ServersPage from "./pages/ServersPage";
 import { getSession } from "./services/server-service";
 
 const queryClient = new QueryClient();

@@ -1,18 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams, useNavigate } from "react-router-dom";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import globalState from "../state";
+import NumberFlow from "@number-flow/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import ActiveMatchCard from "../components/queue/ActiveMatchCard";
+import MatchFoundOverlay from "../components/queue/MatchFoundOverlay";
+import QueueCard from "../components/queue/QueueCard";
+import WsStatusIndicator from "../components/queue/WsStatusIndicator";
+import Input from "../components/ui/Input";
 import { useServerQueues } from "../hooks/useServerQueues";
 import { getServerMatches } from "../services/neatqueue-service";
 import { getWsSocket } from "../services/ws-service";
-import QueueCard from "../components/queue/QueueCard";
-import ActiveMatchCard from "../components/queue/ActiveMatchCard";
-import WsStatusIndicator from "../components/queue/WsStatusIndicator";
-import MatchFoundOverlay from "../components/queue/MatchFoundOverlay";
-import Input from "../components/ui/Input";
+import globalState from "../state";
 import type { ActiveMatch, QueueInfo } from "../types";
-import NumberFlow from "@number-flow/react";
 
 export default function ServerQueuesPage() {
 	const { serverId } = useParams();
@@ -102,7 +102,7 @@ export default function ServerQueuesPage() {
 	);
 
 	const myMatchGameNums = new Set(myMatches.map((m) => m.game_num));
-	const otherMatches = matches.filter((m) => !myMatchGameNums.has(m.game_num));
+	const _otherMatches = matches.filter((m) => !myMatchGameNums.has(m.game_num));
 
 	useEffect(() => {
 		if (!serverId) return;

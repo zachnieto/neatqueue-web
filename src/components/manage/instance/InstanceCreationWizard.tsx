@@ -177,9 +177,10 @@ const InstanceCreationWizard = ({
 					</p>
 
 					<div className="space-y-3">
-						<label className="block">
+						<label htmlFor="instance-wizard-bot-token" className="block">
 							<span className="text-lg mb-2 block">Bot Token:</span>
 							<Input
+								id="instance-wizard-bot-token"
 								type="password"
 								value={botToken}
 								onChange={(e) => {

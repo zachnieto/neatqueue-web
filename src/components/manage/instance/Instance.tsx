@@ -18,8 +18,8 @@ import type {
 } from "../../../types";
 import { calculateTimeLeft } from "../../../util/utility";
 import Modal from "../../Modal";
-import Panel from "../../ui/Panel";
 import Input from "../../ui/Input";
+import Panel from "../../ui/Panel";
 import BotTokenWizard from "./BotTokenWizard";
 import ExtendModal from "./ExtendModal";
 import InstanceCreationWizard from "./InstanceCreationWizard";

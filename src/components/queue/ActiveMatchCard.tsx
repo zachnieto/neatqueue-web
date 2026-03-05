@@ -143,56 +143,53 @@ export default function ActiveMatchCard({
 					gap: 12,
 				}}
 			>
-				{(hasTeams || (match.players?.length ?? 0) > 0) && (
-					<>
-						{hasTeams ? (
-							<div className="grid grid-cols-2 gap-3">
-								{teams
-									.filter((team) => team.length > 0)
-									.map((team, teamIdx) => (
-										<div
-											key={`game-${gameNum}-team-${team.map((p) => p.id).join("-")}`}
+				{(hasTeams || (match.players?.length ?? 0) > 0) &&
+					(hasTeams ? (
+						<div className="grid grid-cols-2 gap-3">
+							{teams
+								.filter((team) => team.length > 0)
+								.map((team, teamIdx) => (
+									<div
+										key={`game-${gameNum}-team-${team.map((p) => p.id).join("-")}`}
+										style={{
+											fontFamily: "'Inter', sans-serif",
+											fontSize: "11px",
+										}}
+									>
+										<p
 											style={{
-												fontFamily: "'Inter', sans-serif",
-												fontSize: "11px",
+												color: "#5a6078",
+												letterSpacing: "0.05em",
+												textTransform: "uppercase",
+												marginBottom: 6,
 											}}
 										>
-											<p
-												style={{
-													color: "#5a6078",
-													letterSpacing: "0.05em",
-													textTransform: "uppercase",
-													marginBottom: 6,
-												}}
-											>
-												Team {teamIdx + 1}
-											</p>
-											<PlayerList players={team} />
-										</div>
-									))}
-							</div>
-						) : (
-							<div
+											Team {teamIdx + 1}
+										</p>
+										<PlayerList players={team} />
+									</div>
+								))}
+						</div>
+					) : (
+						<div
+							style={{
+								fontFamily: "'Inter', sans-serif",
+								fontSize: "11px",
+							}}
+						>
+							<p
 								style={{
-									fontFamily: "'Inter', sans-serif",
-									fontSize: "11px",
+									color: "#5a6078",
+									letterSpacing: "0.05em",
+									textTransform: "uppercase",
+									marginBottom: 6,
 								}}
 							>
-								<p
-									style={{
-										color: "#5a6078",
-										letterSpacing: "0.05em",
-										textTransform: "uppercase",
-										marginBottom: 6,
-									}}
-								>
-									Players
-								</p>
-								<PlayerList players={match.players ?? []} />
-							</div>
-						)}
-					</>
-				)}
+								Players
+							</p>
+							<PlayerList players={match.players ?? []} />
+						</div>
+					))}
 
 				<div className="flex flex-wrap gap-2 items-center mt-1">
 					{channel && <ChannelLink serverId={serverId} channelRef={channel} />}

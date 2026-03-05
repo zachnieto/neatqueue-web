@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
 import {
+	ArrowLeftOnRectangleIcon,
+	ArrowRightOnRectangleIcon,
 	ClockIcon,
 	UserGroupIcon,
-	ArrowRightOnRectangleIcon,
-	ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/24/outline";
+import NumberFlow from "@number-flow/react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useElapsedTime } from "../../hooks/useElapsedTime";
+import { useJoinQueue, useLeaveQueue } from "../../hooks/useQueueActions";
 import globalState from "../../state";
 import type { QueueInfo } from "../../types";
-import { useJoinQueue, useLeaveQueue } from "../../hooks/useQueueActions";
-import { useElapsedTime } from "../../hooks/useElapsedTime";
 import PlayerList from "./PlayerList";
-import NumberFlow from "@number-flow/react";
 
 type QueueStatus = "Live" | "Active" | "Test Mode" | "Locked";
 

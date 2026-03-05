@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 interface MatchCardHeaderProps {
 	/** Main title line, e.g. "TEST — Match #173" */

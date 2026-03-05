@@ -4,7 +4,6 @@
  */
 
 import globalState from "../state";
-import { refreshToken } from "./server-service";
 
 const API_BASE = import.meta.env.VITE_NEATQUEUE_API;
 const WS_BASE = API_BASE?.replace(/^http/, "ws") ?? "ws://localhost:5173";

@@ -43,7 +43,6 @@ export default function PlayerList({
 								.join(" ");
 					return (
 						<div
-							// biome-ignore lint/suspicious/noArrayIndexKey: slots are positional; a player can appear multiple times
 							key={`slot-${i}`}
 							className="flex items-center gap-2"
 							style={{ minWidth: 0 }}
@@ -89,11 +88,7 @@ export default function PlayerList({
 					);
 				}
 				return (
-					<div
-						// biome-ignore lint/suspicious/noArrayIndexKey: slots are positional
-						key={`slot-${i}`}
-						className="flex items-center gap-2"
-					>
+					<div key={`slot-${i}`} className="flex items-center gap-2">
 						<span
 							style={{
 								width: 18,

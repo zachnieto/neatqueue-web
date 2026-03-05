@@ -72,4 +72,4 @@ export const featureFlags = {
 };
 
 // Expose globally so it's accessible from the browser console
-(window as any).ff = featureFlags;
+(window as Window & { ff: typeof featureFlags }).ff = featureFlags;

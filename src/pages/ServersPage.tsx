@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import ServerCard from "../components/ServerCard";
 import WsStatusIndicator from "../components/queue/WsStatusIndicator";
+import ServerCard from "../components/ServerCard";
 import PageLayout from "../components/ui/PageLayout";
 import SectionHeader from "../components/ui/SectionHeader";
 import { getUserServers } from "../services/neatqueue-service";

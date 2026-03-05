@@ -27,7 +27,8 @@ export default function ServerCard({
 		: "https://i.imgur.com/2X6ZRmm.png";
 
 	return (
-		<div
+		<section
+			aria-label={`Server: ${name}`}
 			className="card-glass rounded-sm"
 			style={{
 				border: "1px solid rgba(255,255,255,0.07)",
@@ -109,7 +110,7 @@ export default function ServerCard({
 					))}
 				</div>
 			</div>
-		</div>
+		</section>
 	);
 }
 
