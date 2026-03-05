@@ -9,7 +9,10 @@ import QueueCard from "../components/queue/QueueCard";
 import WsStatusIndicator from "../components/queue/WsStatusIndicator";
 import Input from "../components/ui/Input";
 import { useServerQueues } from "../hooks/useServerQueues";
-import { getServerMatches } from "../services/neatqueue-service";
+import {
+	getServerMatches,
+	type ServerMatchPayload,
+} from "../services/neatqueue-service";
 import { getWsSocket } from "../services/ws-service";
 import globalState from "../state";
 import type { ActiveMatch, QueueInfo } from "../types";
@@ -109,18 +112,33 @@ export default function ServerQueuesPage() {
 		const socket = getWsSocket();
 		const unsub = socket.on("match_update", (data: Record<string, unknown>) => {
 			const payloadGuildId = data.guild_id != null ? String(data.guild_id) : "";
-			if (payloadGuildId === serverId) {
-				queryClient.invalidateQueries({ queryKey: ["matches", serverId] });
-			}
+			if (payloadGuildId !== serverId) return;
+			const gameNum = data.game_num != null ? String(data.game_num) : null;
+			if (!gameNum) return;
+			queryClient.setQueryData<Record<string, ServerMatchPayload>>(
+				["matches", serverId],
+				(old) => ({
+					...old,
+					[gameNum]: data as unknown as ServerMatchPayload,
+				}),
+			);
 		});
 		const unsubMatchDelete = socket.on(
 			"match_deleted",
 			(data: Record<string, unknown>) => {
 				const payloadGuildId =
 					data.guild_id != null ? String(data.guild_id) : "";
-				if (payloadGuildId === serverId) {
-					queryClient.invalidateQueries({ queryKey: ["matches", serverId] });
-				}
+				if (payloadGuildId !== serverId) return;
+				const gameNum = data.game_num != null ? String(data.game_num) : null;
+				if (!gameNum) return;
+				queryClient.setQueryData<Record<string, ServerMatchPayload>>(
+					["matches", serverId],
+					(old) => {
+						if (!old) return old;
+						const { [gameNum]: _, ...rest } = old;
+						return rest;
+					},
+				);
 			},
 		);
 		return () => {

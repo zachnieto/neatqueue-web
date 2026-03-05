@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import WsStatusIndicator from "../components/queue/WsStatusIndicator";
 import ServerCard from "../components/ServerCard";
 import PageLayout from "../components/ui/PageLayout";
 import SectionHeader from "../components/ui/SectionHeader";
@@ -32,7 +31,6 @@ export default function ServersPage() {
 			<SectionHeader
 				title="Your Servers"
 				subtitle="Select a server to view its queues."
-				trailing={<WsStatusIndicator />}
 			/>
 			<div
 				className="grid gap-4"

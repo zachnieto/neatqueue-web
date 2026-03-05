@@ -98,7 +98,7 @@ export function useServerQueues(serverId: string | undefined) {
 	useEffect(() => {
 		if (!serverId) return;
 		const socket = getWsSocket();
-		socket.subscribeServer(serverId);
+		socket.ensureConnected(serverId);
 		const unsub = socket.on("queue_update", (data: Record<string, unknown>) => {
 			queryClient.setQueryData<ServerQueuesData>(["server", serverId], (prev) =>
 				mergeQueueUpdate(prev, data as Parameters<typeof mergeQueueUpdate>[1]),
@@ -125,7 +125,7 @@ export function useServerQueues(serverId: string | undefined) {
 		return () => {
 			unsub();
 			unsubDelete();
-			socket.unsubscribeServer(serverId);
+			socket.disconnect();
 		};
 	}, [serverId, queryClient]);
 

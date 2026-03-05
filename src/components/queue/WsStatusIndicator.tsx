@@ -1,13 +1,7 @@
-import { useEffect } from "react";
 import { useWsConnectionStatus } from "../../hooks/useWsConnectionStatus";
-import { getWsSocket } from "../../services/ws-service";
 
 export default function WsStatusIndicator() {
 	const { connected, lastError } = useWsConnectionStatus();
-
-	useEffect(() => {
-		getWsSocket().ensureConnected();
-	}, []);
 
 	if (connected) return null;
 

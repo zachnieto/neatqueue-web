@@ -36,7 +36,7 @@ class NeatQueueSocket {
 	private reconnectDelayMs = INITIAL_RECONNECT_DELAY_MS;
 	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 	private token: string | null = null;
-	private subscribedServers = new Set<string>();
+	private serverId: string | null = null;
 	private subscribedMatches = new Set<string>();
 	private connectionChangeListeners = new Set<ConnectionChangeListener>();
 	private _lastError: string | null = null;
@@ -62,27 +62,26 @@ class NeatQueueSocket {
 		return this._lastError;
 	}
 
-	connect(token: string): void {
+	connect(token: string, serverId: string): void {
 		if (this.ws?.readyState === WebSocket.OPEN) {
-			if (this.token === token) return;
+			if (this.token === token && this.serverId === serverId) return;
 			this.disconnect();
 		}
 		this.token = token;
+		this.serverId = serverId;
 		// Use /queue-ws so cluster manager can proxy (website -> cluster -> backend); backend also serves /queue-ws.
-		const url = `${WS_BASE}/queue-ws?token=${encodeURIComponent(token)}`;
+		const url = `${WS_BASE}/queue-ws?token=${encodeURIComponent(token)}&server_id=${encodeURIComponent(serverId)}`;
 		this.ws = new WebSocket(url);
 		this.ws.onopen = () => {
 			this.reconnectDelayMs = INITIAL_RECONNECT_DELAY_MS;
 			this._lastError = null;
 			this.notifyConnectionChange(true, null);
-			for (const serverId of this.subscribedServers) {
-				this.send("subscribe_server", { server_id: serverId });
-			}
+			this.send("subscribe_server", { server_id: this.serverId });
 			for (const key of this.subscribedMatches) {
-				const [serverId, gameNum] = key.split(":");
-				if (serverId && gameNum) {
+				const [sid, gameNum] = key.split(":");
+				if (sid && gameNum) {
 					this.send("subscribe_match", {
-						server_id: serverId,
+						server_id: sid,
 						game_num: Number(gameNum),
 					});
 				}
@@ -113,6 +112,7 @@ class NeatQueueSocket {
 			this.ws = null;
 		}
 		this.token = null;
+		this.serverId = null;
 		this._lastError = null;
 		this.notifyConnectionChange(false, null);
 	}
@@ -158,8 +158,8 @@ class NeatQueueSocket {
 		this.reconnectTimer = setTimeout(async () => {
 			this.reconnectTimer = null;
 			const token = this.token ?? globalState.get().auth?.access_token;
-			if (!token) return;
-			this.connect(token);
+			if (!token || !this.serverId) return;
+			this.connect(token, this.serverId);
 			this.reconnectDelayMs = Math.min(
 				this.reconnectDelayMs * 2,
 				MAX_RECONNECT_DELAY_MS,
@@ -184,23 +184,13 @@ class NeatQueueSocket {
 		return this.ws?.readyState === WebSocket.OPEN;
 	}
 
-	ensureConnected(): boolean {
-		if (this.ws?.readyState === WebSocket.OPEN) return true;
+	ensureConnected(serverId: string): boolean {
+		if (this.ws?.readyState === WebSocket.OPEN && this.serverId === serverId)
+			return true;
 		const token = globalState.get().auth?.access_token;
 		if (!token) return false;
-		this.connect(token);
+		this.connect(token, serverId);
 		return false;
-	}
-
-	subscribeServer(serverId: string): void {
-		this.subscribedServers.add(serverId);
-		this.ensureConnected();
-		this.send("subscribe_server", { server_id: serverId });
-	}
-
-	unsubscribeServer(serverId: string): void {
-		this.subscribedServers.delete(serverId);
-		this.send("unsubscribe_server", { server_id: serverId });
 	}
 
 	subscribeMatch(serverId: string, gameNum: number): void {

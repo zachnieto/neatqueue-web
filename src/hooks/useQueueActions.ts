@@ -65,7 +65,7 @@ export function useJoinQueue() {
 
 	const mutation = useMutation({
 		mutationFn: async (params: JoinQueueParams) => {
-			getWsSocket().ensureConnected();
+			getWsSocket().ensureConnected(params.serverId);
 			return new Promise<boolean>((resolve, reject) => {
 				resolveRef.current = resolve;
 				pendingParamsRef.current = {
@@ -86,11 +86,6 @@ export function useJoinQueue() {
 						reject(new Error("Join queue timed out"));
 					}
 				}, 15000);
-			});
-		},
-		onSuccess: (_, variables) => {
-			queryClient.invalidateQueries({
-				queryKey: ["server", variables.serverId],
 			});
 		},
 		onError: (error) => {
@@ -145,7 +140,7 @@ export function useLeaveQueue() {
 
 	const mutation = useMutation({
 		mutationFn: async (params: LeaveQueueParams) => {
-			getWsSocket().ensureConnected();
+			getWsSocket().ensureConnected(params.serverId);
 			return new Promise<boolean>((resolve, reject) => {
 				resolveRef.current = resolve;
 				pendingParamsRef.current = {
@@ -160,11 +155,6 @@ export function useLeaveQueue() {
 						reject(new Error("Leave queue timed out"));
 					}
 				}, 15000);
-			});
-		},
-		onSuccess: (_, variables) => {
-			queryClient.invalidateQueries({
-				queryKey: ["server", variables.serverId],
 			});
 		},
 		onError: (error) => {
@@ -228,9 +218,6 @@ export function useReadyUp() {
 				socket.readyUpMatch(serverId, gameNum);
 			});
 		},
-		onSuccess: (_, { serverId }) => {
-			queryClient.invalidateQueries({ queryKey: ["active-matches", serverId] });
-		},
 		onError: (error) => {
 			toast.showToast(error.message, { variant: "error" });
 		},
@@ -287,10 +274,6 @@ export function useDeclineMatch() {
 
 				socket.declineMatch(serverId, gameNum);
 			});
-		},
-		onSuccess: (_, { serverId }) => {
-			queryClient.invalidateQueries({ queryKey: ["active-matches", serverId] });
-			queryClient.invalidateQueries({ queryKey: ["server-queues", serverId] });
 		},
 		onError: (error) => {
 			toast.showToast(error.message, { variant: "error" });
