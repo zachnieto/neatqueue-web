@@ -1,13 +1,9 @@
 import { useWsConnectionStatus } from "../../hooks/useWsConnectionStatus";
 
 export default function WsStatusIndicator() {
-	const { connected, lastError } = useWsConnectionStatus();
+	const { connected } = useWsConnectionStatus();
 
 	if (connected) return null;
-
-	const title = lastError
-		? `Disconnected: ${lastError}`
-		: "Realtime updates disconnected";
 
 	return (
 		<div
@@ -16,7 +12,7 @@ export default function WsStatusIndicator() {
 				background: "rgba(122, 128, 153, 0.12)",
 				border: "1px solid rgba(255, 71, 87, 0.2)",
 			}}
-			title={title}
+			title="Disconnected"
 		>
 			<span
 				className="inline-block w-1.5 h-1.5 rounded-full shrink-0 opacity-60"
@@ -36,19 +32,6 @@ export default function WsStatusIndicator() {
 			>
 				DISCONNECTED
 			</span>
-			{lastError && (
-				<span
-					className="max-w-[12rem] truncate"
-					style={{
-						fontFamily: "'JetBrains Mono', monospace",
-						fontSize: "9px",
-						color: "#ffa502",
-					}}
-					title={lastError}
-				>
-					{lastError}
-				</span>
-			)}
 		</div>
 	);
 }

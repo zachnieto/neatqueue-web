@@ -12,13 +12,20 @@ import { useJoinQueue, useLeaveQueue } from "../../hooks/useQueueActions";
 import globalState from "../../state";
 import type { QueueInfo } from "../../types";
 import PlayerList from "./PlayerList";
+import { formatQueueName } from "../../util/queueName";
 
-type QueueStatus = "Live" | "Active" | "Test Mode" | "Locked";
+type QueueStatus = "Empty" | "Live" | "Active" | "Test Mode" | "Locked";
 
 const STATUS_CONFIG: Record<
 	QueueStatus,
 	{ label: string; bg: string; text: string; dot: string; badgeClass?: string }
 > = {
+	Empty: {
+		label: "EMPTY",
+		bg: "rgba(255,255,255,0.04)",
+		text: "#9aa0b4",
+		dot: "#9aa0b4",
+	},
 	Live: {
 		label: "LIVE",
 		bg: "rgba(255,71,87,0.12)",
@@ -58,6 +65,7 @@ function deriveStatus(queue: QueueInfo): QueueStatus {
 	const size = queue.current_size ?? queue.players?.length ?? 0;
 	const max = queue.queue_size ?? 10;
 	if (size >= max) return "Live";
+	if (size === 0) return "Empty";
 	return "Active";
 }
 
@@ -156,7 +164,7 @@ export default function QueueCard({ queue, serverId }: QueueCardProps) {
 								textOverflow: "ellipsis",
 							}}
 						>
-							{queue.name}
+							{formatQueueName(queue.name)}
 						</div>
 						{queue.roles?.length > 0 && (
 							<div
@@ -173,7 +181,6 @@ export default function QueueCard({ queue, serverId }: QueueCardProps) {
 						)}
 					</div>
 					<div
-						className={statusCfg.badgeClass ?? ""}
 						style={{
 							padding: "3px 10px",
 							borderRadius: 2,
@@ -217,6 +224,7 @@ export default function QueueCard({ queue, serverId }: QueueCardProps) {
 								fontWeight: 700,
 								color: statusCfg.text,
 								letterSpacing: "0.1em",
+								lineHeight: "normal",
 							}}
 						>
 							{statusCfg.label}

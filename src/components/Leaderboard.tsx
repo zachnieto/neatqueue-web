@@ -13,6 +13,7 @@ import { displayPercent, getWinRateColor } from "../util/utility";
 import ExpandedStats from "./ExpandedStats";
 import Select from "./ui/Select";
 import ServerPageLayout from "./ui/ServerPageLayout";
+import { formatQueueName } from "../util/queueName";
 
 type PlayerData = LeaderboardPlayer["stats"];
 type SortKey =
@@ -239,12 +240,6 @@ const Leaderboard = ({
 		} catch {
 			return month;
 		}
-	};
-
-	const formatQueueName = (queueName: string) => {
-		// Remove YYYY-MM_ prefix pattern if present
-		const cleanedName = queueName.replace(/^\d{4}-\d{2}_/, "");
-		return cleanedName.replace(/_/g, " ").toUpperCase();
 	};
 
 	const getRankBadge = (rank: number) => {
