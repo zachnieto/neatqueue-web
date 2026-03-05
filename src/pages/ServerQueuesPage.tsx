@@ -204,8 +204,8 @@ export default function ServerQueuesPage() {
 			{
 				label: "Matches Today",
 				value:
-					stats?.matches_today != null
-						? stats.matches_today.toLocaleString()
+					stats?.daily_games != null
+						? stats.daily_games.toLocaleString()
 						: String(matches.length),
 				color: "#a55eea",
 			},

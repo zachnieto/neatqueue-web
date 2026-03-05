@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { getWsSocket } from "../services/ws-service";
 import { useToast } from "./useToast";
@@ -26,7 +26,6 @@ type ActionResult = {
 };
 
 export function useJoinQueue() {
-	const queryClient = useQueryClient();
 	const toast = useToast();
 	const resolveRef = useRef<((value: boolean) => void) | null>(null);
 	const pendingParamsRef = useRef<{
@@ -101,7 +100,6 @@ export function useJoinQueue() {
 }
 
 export function useLeaveQueue() {
-	const queryClient = useQueryClient();
 	const toast = useToast();
 	const resolveRef = useRef<((value: boolean) => void) | null>(null);
 	const pendingParamsRef = useRef<{
@@ -170,7 +168,6 @@ export function useLeaveQueue() {
 }
 
 export function useReadyUp() {
-	const queryClient = useQueryClient();
 	const toast = useToast();
 
 	return useMutation({
@@ -225,7 +222,6 @@ export function useReadyUp() {
 }
 
 export function useDeclineMatch() {
-	const queryClient = useQueryClient();
 	const toast = useToast();
 
 	return useMutation({

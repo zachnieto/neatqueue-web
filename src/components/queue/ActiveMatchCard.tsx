@@ -30,7 +30,18 @@ function ChannelLink({
 }
 
 const formatStage = (stage: string | undefined) => {
-	return stage?.replace("_", " ");
+	switch (stage) {
+		case "BEST_OF":
+		case "MAP_BANS":
+		case "MAP_PICKS":
+		case "HERO_BANS":
+		case "CUSTOM_VOTES":
+			return "VOTING";
+		case "WINNER_PICK":
+			return "IN GAME";
+		default:
+			return stage?.replace("_", " ");
+	}
 };
 
 type ActiveMatchCardProps = {

@@ -93,7 +93,7 @@ export default function MatchCardHeader({
 				)}
 				{status && (
 					<span
-						className="badge-live"
+						className="badge-live uppercase"
 						style={{
 							display: "inline-flex",
 							alignItems: "center",

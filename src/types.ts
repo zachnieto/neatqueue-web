@@ -258,8 +258,6 @@ export type ServerQueuesStats = {
 	active_queues: number;
 	/** Players currently in any queue (computed in API). */
 	players_in_queues: number;
-	/** Matches played today (same as daily_games). */
-	matches_today: number;
 };
 
 export type ServerQueuesData = {
