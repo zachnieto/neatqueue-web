@@ -21,3 +21,10 @@
 ::-webkit-scrollbar-thumb:hover {
 	background: rgb(60, 0, 96);
 }
+
+/* Select option styling (used by components/ui/Select) */
+.input-field option {
+	background-color: #1d1d1d;
+	color: #9aa0b4;
+	padding: 8px;
+}

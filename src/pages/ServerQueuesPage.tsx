@@ -1,7 +1,8 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import NumberFlow from "@number-flow/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useQueryState } from "nuqs";
+import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import ActiveMatchCard from "../components/queue/ActiveMatchCard";
 import MatchFoundOverlay from "../components/queue/MatchFoundOverlay";
@@ -22,7 +23,9 @@ export default function ServerQueuesPage() {
 	const { serverId } = useParams();
 	const queryClient = useQueryClient();
 	const userId = globalState.get().user?.id;
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useQueryState("search", {
+		defaultValue: "",
+	});
 
 	const { data, isLoading, error } = useServerQueues(serverId);
 	const { data: matchesData } = useQuery({

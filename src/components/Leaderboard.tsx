@@ -11,6 +11,7 @@ import type {
 import { classNames } from "../util/tailwind";
 import { displayPercent, getWinRateColor } from "../util/utility";
 import ExpandedStats from "./ExpandedStats";
+import Select from "./ui/Select";
 import ServerPageLayout from "./ui/ServerPageLayout";
 
 type PlayerData = LeaderboardPlayer["stats"];
@@ -91,18 +92,16 @@ const MonthSelector = ({
 			>
 				Time Period
 			</span>
-			<select
+			<Select
 				value={selectedMonth}
 				onChange={(e) => onMonthChange(e.target.value)}
-				className="input-field"
-				style={{ cursor: "pointer" }}
 			>
 				{monthList.map((month: string) => (
 					<option key={month} value={month}>
 						{formatMonthDisplay(month)}
 					</option>
 				))}
-			</select>
+			</Select>
 		</div>
 	);
 };

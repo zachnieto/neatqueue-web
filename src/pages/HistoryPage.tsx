@@ -8,6 +8,7 @@ import {
 	LiveMatchCard,
 	MatchPagination,
 } from "../components/history";
+import Select from "../components/ui/Select";
 import ServerPageLayout from "../components/ui/ServerPageLayout";
 import { getHistory, getServerInfo } from "../services/neatqueue-service";
 
@@ -285,10 +286,8 @@ export default function HistoryPage() {
 					>
 						Queue Filter
 					</label>
-					<select
+					<Select
 						id={queueSelectorId}
-						className="input-field"
-						style={{ cursor: "pointer" }}
 						value={selectedQueue}
 						onChange={(e) => {
 							setSelectedQueue(e.target.value);
@@ -301,7 +300,7 @@ export default function HistoryPage() {
 								{formatQueueName(queue)}
 							</option>
 						))}
-					</select>
+					</Select>
 				</div>
 			</div>
 
