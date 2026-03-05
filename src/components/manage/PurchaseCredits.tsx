@@ -16,9 +16,10 @@ const PurchaseCredits = ({
 
 	return (
 		<div className="grid place-items-center">
-			<div className="flex">
+			<div className="flex mb-6">
 				<CurrencyInput
-					className="text-center rounded w-20 text-black px-2 mb-5"
+					className="input-field"
+					style={{ textAlign: "center", width: 80 }}
 					name="input-name"
 					value={purchaseAmountCredits}
 					decimalsLimit={2}
@@ -36,7 +37,8 @@ const PurchaseCredits = ({
 				<h1 className="mx-2">Credits = </h1>
 
 				<CurrencyInput
-					className="text-center rounded w-20 text-black px-2 mb-5"
+					className="input-field"
+					style={{ textAlign: "center", width: 80 }}
 					name="input-name"
 					value={purchaseAmountDollars}
 					decimalsLimit={2}
@@ -64,7 +66,7 @@ const PurchaseCredits = ({
 				min={1}
 				type="range"
 				value={purchaseAmountDollars}
-				className="w-full h-1 mb-6 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
+				className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
 			/>
 		</div>
 	);

@@ -1,12 +1,55 @@
-@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&family=Poppins:wght@100;400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
+
 body {
 	margin: 0;
-	font-family: "Josefin Sans", sans-serif;
+	font-family: "Inter", sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	background-color: rgb(29, 29, 29);
 	color: white;
 	min-height: 100vh;
+}
+
+h1 {
+	font-family: "Rajdhani", sans-serif;
+	font-weight: 700;
+	font-size: 1.75rem;
+	line-height: 1.2;
+	letter-spacing: 0.04em;
+	color: #e8eaf0;
+}
+
+h2 {
+	font-family: "Rajdhani", sans-serif;
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: 0.04em;
+	color: #e8eaf0;
+}
+
+h3 {
+	font-family: "Rajdhani", sans-serif;
+	font-weight: 600;
+}
+
+h4 {
+	font-family: "Rajdhani", sans-serif;
+	font-weight: 600;
+}
+
+h5 {
+	font-family: "Rajdhani", sans-serif;
+	font-weight: 500;
+}
+
+h6 {
+	font-family: "Rajdhani", sans-serif;
+	font-weight: 500;
+}
+
+/* Heavier look for large display headings (e.g. hero "NeatQueue" on home) */
+h1.heading-display {
+	font-weight: 700;
 }
 
 /* Remove number input arrows */
@@ -80,6 +123,7 @@ input[type="number"]::-webkit-outer-spin-button {
 		transform: rotate(360deg);
 	}
 }
+
 .slow-spin {
 	animation: spin 5s linear infinite;
 }
@@ -114,4 +158,459 @@ input[type="number"]::-webkit-outer-spin-button {
 code {
 	@apply rounded p-1;
 	background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================
+   GAMING MATCHMAKING — CUSTOM ANIMATIONS & EFFECTS
+   ============================================================ */
+
+.font-rajdhani {
+	font-family: "Rajdhani", sans-serif;
+}
+
+.font-mono-gaming {
+	font-family: "JetBrains Mono", monospace;
+}
+
+.font-inter {
+	font-family: "Inter", sans-serif;
+}
+
+.queue-card {
+	transition:
+		transform 0.25s ease,
+		box-shadow 0.25s ease,
+		border-color 0.25s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.queue-card::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		135deg,
+		rgba(0, 180, 255, 0.03) 0%,
+		transparent 60%
+	);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.queue-card:hover {
+	transform: translateY(-3px);
+	border-color: rgba(0, 180, 255, 0.35) !important;
+	box-shadow:
+		0 0 0 1px rgba(0, 180, 255, 0.15),
+		0 8px 40px rgba(0, 0, 0, 0.5),
+		0 0 30px rgba(0, 180, 255, 0.08);
+}
+
+.queue-card:hover::before {
+	opacity: 1;
+}
+
+@keyframes live-pulse {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.5);
+	}
+
+	50% {
+		box-shadow: 0 0 0 5px rgba(255, 71, 87, 0);
+	}
+}
+
+.badge-live {
+	animation: live-pulse 2s ease-in-out infinite;
+}
+
+@keyframes fill-pulse {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(57, 217, 138, 0.5);
+	}
+
+	50% {
+		box-shadow: 0 0 0 5px rgba(57, 217, 138, 0);
+	}
+}
+
+.badge-active {
+	animation: fill-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes searching-glow {
+	0%,
+	100% {
+		box-shadow:
+			0 0 0 1px rgba(0, 180, 255, 0.4),
+			0 8px 40px rgba(0, 0, 0, 0.5),
+			0 0 40px rgba(0, 180, 255, 0.15);
+		border-color: rgba(0, 180, 255, 0.5);
+	}
+
+	50% {
+		box-shadow:
+			0 0 0 1px rgba(0, 180, 255, 0.8),
+			0 8px 40px rgba(0, 0, 0, 0.5),
+			0 0 60px rgba(0, 180, 255, 0.35);
+		border-color: rgba(0, 180, 255, 0.9);
+	}
+}
+
+.queue-card-searching {
+	animation: searching-glow 2s ease-in-out infinite;
+}
+
+.queue-card-searching::before {
+	opacity: 1 !important;
+	animation: searching-shimmer 2s ease-in-out infinite;
+}
+
+@keyframes searching-shimmer {
+	0%,
+	100% {
+		background: linear-gradient(
+			135deg,
+			rgba(0, 180, 255, 0.05) 0%,
+			transparent 60%
+		);
+	}
+
+	50% {
+		background: linear-gradient(
+			135deg,
+			rgba(0, 180, 255, 0.12) 0%,
+			transparent 60%
+		);
+	}
+}
+
+@keyframes searching-text {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.4;
+	}
+}
+
+.text-searching {
+	animation: searching-text 1.2s ease-in-out infinite;
+}
+
+@keyframes slot-pop {
+	0% {
+		transform: scale(0) rotate(-15deg);
+		opacity: 0;
+	}
+
+	70% {
+		transform: scale(1.15) rotate(3deg);
+		opacity: 1;
+	}
+
+	100% {
+		transform: scale(1) rotate(0deg);
+		opacity: 1;
+	}
+}
+
+.slot-fill-anim {
+	animation: slot-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes btn-glow {
+	0%,
+	100% {
+		box-shadow:
+			0 0 10px rgba(0, 180, 255, 0.3),
+			0 0 20px rgba(0, 180, 255, 0.1);
+	}
+
+	50% {
+		box-shadow:
+			0 0 20px rgba(0, 180, 255, 0.6),
+			0 0 40px rgba(0, 180, 255, 0.25);
+	}
+}
+
+.btn-join:hover {
+	animation: btn-glow 1.5s ease-in-out infinite;
+}
+
+.scanline-overlay {
+	background: repeating-linear-gradient(
+		0deg,
+		transparent,
+		transparent 2px,
+		rgba(0, 0, 0, 0.03) 2px,
+		rgba(0, 0, 0, 0.03) 4px
+	);
+	pointer-events: none;
+}
+
+@keyframes modal-in {
+	from {
+		opacity: 0;
+		transform: scale(0.92) translateY(10px);
+	}
+
+	to {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+}
+
+.modal-enter {
+	animation: modal-in 0.2s ease forwards;
+}
+
+.navbar-glass {
+	background: rgba(13, 15, 20, 0.85);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card-glass {
+	background: rgba(255, 255, 255, 0.025);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+}
+
+.accent-underline {
+	position: relative;
+}
+
+.accent-underline::after {
+	content: "";
+	position: absolute;
+	bottom: -6px;
+	left: 0;
+	width: 48px;
+	height: 3px;
+	background: linear-gradient(90deg, #00b4ff, transparent);
+	border-radius: 2px;
+}
+
+.avatar-ring {
+	box-shadow: 0 0 0 2px rgba(0, 180, 255, 0.5);
+}
+
+@keyframes status-online {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.5;
+	}
+}
+
+.status-online-dot {
+	animation: status-online 2.5s ease-in-out infinite;
+}
+
+@keyframes bar-fill {
+	from {
+		width: 0%;
+	}
+
+	to {
+		width: var(--bar-target);
+	}
+}
+
+.bar-animate {
+	animation: bar-fill 0.8s ease-out forwards;
+}
+
+/* ============================================================
+   REUSABLE LAYOUT & COMPONENT CLASSES
+   ============================================================ */
+
+/* Page-level wrappers — used on every routed page */
+.page-wrapper {
+	min-height: 100vh;
+	position: relative;
+	font-family: "Inter", sans-serif;
+}
+
+.page-main {
+	position: relative;
+	z-index: 10;
+	max-width: 1400px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 40px 24px 64px;
+}
+
+@media (min-width: 640px) {
+	.page-main {
+		padding-left: 24px;
+		padding-right: 24px;
+	}
+}
+
+/* Section heading — the big uppercase accent-underlined title */
+.section-heading {
+	font-family: "Rajdhani", sans-serif;
+	font-size: 32px;
+	font-weight: 700;
+	color: #e8eaf0;
+	letter-spacing: 0.06em;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+/* Subtitle text beneath headings */
+.section-subtitle {
+	font-family: "Inter", sans-serif;
+	font-size: 13px;
+	color: #5a6078;
+	margin-top: 14px;
+	letter-spacing: 0.02em;
+}
+
+/* Card panel — used for manage panels (Premium, Credits, Instance) */
+.panel {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	padding: 24px;
+	border: 1px solid rgba(255, 255, 255, 0.07);
+	border-radius: 2px;
+}
+
+/* Top accent bar inside a .panel — set --accent-color on the element */
+.panel-accent {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 2px;
+	background: linear-gradient(
+		90deg,
+		var(--accent-color, rgba(0, 180, 255, 0.5)),
+		transparent
+	);
+}
+
+/* Panel title */
+.panel-title {
+	font-family: "Rajdhani", sans-serif;
+	font-size: 24px;
+	font-weight: 700;
+	color: #e8eaf0;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+/* Action button — the gradient-bordered buttons used everywhere.
+   Set --btn-color (hex) and --btn-color-hover (hex) via inline style.
+   Defaults to #00b4ff / #33c6ff (blue). */
+.btn-action {
+	--btn-color: #00b4ff;
+	--btn-color-hover: #33c6ff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 10px 16px;
+	border-radius: 4px;
+	transition: all 0.2s;
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--btn-color) 13%, transparent) 0%,
+		color-mix(in srgb, var(--btn-color) 13%, transparent) 100%
+	);
+	border: 1px solid color-mix(in srgb, var(--btn-color) 40%, transparent);
+	color: var(--btn-color);
+	font-family: "Rajdhani", sans-serif;
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	cursor: pointer;
+}
+
+.btn-action:hover:not(:disabled) {
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--btn-color) 20%, transparent) 0%,
+		color-mix(in srgb, var(--btn-color) 20%, transparent) 100%
+	);
+	color: var(--btn-color-hover);
+}
+
+.btn-action:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* Danger variant: outline-only, red */
+.btn-action-danger {
+	--btn-color: #ff4757;
+	--btn-color-hover: #ff6b81;
+	background: transparent;
+}
+
+.btn-action-danger:hover:not(:disabled) {
+	background: rgba(255, 71, 87, 0.1);
+}
+
+/* Green variant */
+.btn-action-green {
+	--btn-color: #39d98a;
+	--btn-color-hover: #4effa1;
+}
+
+/* Orange variant */
+.btn-action-orange {
+	--btn-color: #ffa502;
+	--btn-color-hover: #ffc048;
+}
+
+/* Purple variant */
+.btn-action-purple {
+	--btn-color: #a55eea;
+	--btn-color-hover: #b87af3;
+}
+
+/* Red variant */
+.btn-action-red {
+	--btn-color: #ff4757;
+	--btn-color-hover: #ff6b81;
+}
+
+/* Mono input field — for search bars and text inputs */
+.input-field {
+	width: 100%;
+	padding: 8px 12px;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 2px;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 11px;
+	color: #9aa0b4;
+	outline: none;
+	transition: border-color 0.2s;
+}
+
+.input-field:focus {
+	border-color: rgba(0, 180, 255, 0.3);
+}
+
+/* Divider line */
+.divider {
+	height: 1px;
+	width: 100%;
+	background: rgba(255, 255, 255, 0.05);
 }

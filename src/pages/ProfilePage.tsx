@@ -2,6 +2,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Loading from "../components/Loading";
+import PageLayout from "../components/ui/PageLayout";
+import Panel from "../components/ui/Panel";
+import SectionHeader from "../components/ui/SectionHeader";
 import { useToast } from "../hooks/useToast";
 import {
 	getProfile,
@@ -64,104 +67,189 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<div className="min-h-screen lg:p-32">
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-				{/* Discord + Account (combined) */}
-				<section className="col-span-1 bg-stone-900 rounded shadow-md p-5">
-					<h2 className="text-3xl mb-4">Discord</h2>
+		<PageLayout>
+			<SectionHeader
+				title="Profile"
+				subtitle="Manage your account and linked services."
+			/>
+
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+				{/* Discord Panel */}
+				<Panel accentColor="rgba(88,101,242,0.6)">
+					<h2 className="panel-title" style={{ marginBottom: 20 }}>
+						Discord
+					</h2>
+					<div className="divider" style={{ marginBottom: 20 }} />
+
 					<div className="flex items-center gap-4">
 						{profile.avatar && (
 							<img
-								className="h-16 w-16 rounded-full"
+								className="w-14 h-14 rounded-full flex-shrink-0 avatar-ring"
 								src={`https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}`}
 								alt=""
 							/>
 						)}
-						<div>
-							<p className="font-medium">
+						<div style={{ minWidth: 0 }}>
+							<div
+								className="font-rajdhani"
+								style={{
+									fontSize: 18,
+									fontWeight: 700,
+									color: "#e8eaf0",
+									letterSpacing: "0.04em",
+									lineHeight: 1.2,
+								}}
+							>
 								{profile.username}
 								{profile.discriminator !== "0" && (
-									<span className="text-gray-400">
+									<span style={{ color: "#5a6078", fontWeight: 500 }}>
 										#{profile.discriminator}
 									</span>
 								)}
-							</p>
-							<p className="text-gray-400 text-sm">ID: {profile.id}</p>
-							<div className="flex items-center gap-2 mt-2">
+							</div>
+							<div
+								className="section-subtitle"
+								style={{ marginTop: 4, fontSize: 12 }}
+							>
+								ID: {profile.id}
+							</div>
+							<div
+								className="flex items-center gap-2"
+								style={{ marginTop: 10 }}
+							>
 								<span
-									className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-										profile.premium
-											? "bg-violet-900 text-white"
-											: "bg-stone-700 text-gray-300"
-									}`}
+									style={{
+										display: "inline-flex",
+										alignItems: "center",
+										padding: "3px 10px",
+										borderRadius: 3,
+										fontSize: 11,
+										fontFamily: "'Rajdhani', sans-serif",
+										fontWeight: 700,
+										letterSpacing: "0.08em",
+										textTransform: "uppercase",
+										border: profile.premium
+											? "1px solid rgba(165,94,234,0.4)"
+											: "1px solid rgba(255,255,255,0.1)",
+										color: profile.premium ? "#b87af3" : "#5a6078",
+										background: profile.premium
+											? "rgba(165,94,234,0.1)"
+											: "rgba(255,255,255,0.03)",
+									}}
 								>
 									{profile.premium ? "Premium" : "Free"}
 								</span>
 								{profile.admin && (
-									<span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-600/80 text-white">
+									<span
+										style={{
+											display: "inline-flex",
+											alignItems: "center",
+											padding: "3px 10px",
+											borderRadius: 3,
+											fontSize: 11,
+											fontFamily: "'Rajdhani', sans-serif",
+											fontWeight: 700,
+											letterSpacing: "0.08em",
+											textTransform: "uppercase",
+											border: "1px solid rgba(255,165,2,0.4)",
+											color: "#ffc048",
+											background: "rgba(255,165,2,0.1)",
+										}}
+									>
 										Admin
 									</span>
 								)}
 							</div>
 						</div>
 					</div>
-				</section>
+				</Panel>
 
-				{/* Steam section */}
-				<section className="col-span-1 bg-stone-900 rounded shadow-md p-5">
-					<h2 className="text-3xl mb-4">Steam</h2>
+				{/* Steam Panel */}
+				<Panel accentColor="rgba(102,192,244,0.5)">
+					<h2 className="panel-title" style={{ marginBottom: 20 }}>
+						Steam
+					</h2>
+					<div className="divider" style={{ marginBottom: 20 }} />
+
 					{profile.steam ? (
-						<div>
-							<div className="flex items-center gap-4 mb-4">
+						<>
+							<div
+								className="flex items-center gap-4"
+								style={{ marginBottom: 20 }}
+							>
 								{profile.steam.avatar && (
 									<img
-										className="h-16 w-16 rounded"
+										className="w-14 h-14 rounded flex-shrink-0"
 										src={profile.steam.avatar}
 										alt=""
+										style={{ border: "1px solid rgba(255,255,255,0.1)" }}
 									/>
 								)}
-								<div className="min-w-0">
-									<p className="font-medium">{profile.steam.username}</p>
-									<p className="text-gray-400 text-sm mt-1">
+								<div style={{ minWidth: 0 }}>
+									<div
+										className="font-rajdhani"
+										style={{
+											fontSize: 18,
+											fontWeight: 700,
+											color: "#e8eaf0",
+											letterSpacing: "0.04em",
+											lineHeight: 1.2,
+										}}
+									>
+										{profile.steam.username}
+									</div>
+									<div
+										className="section-subtitle"
+										style={{ marginTop: 4, fontSize: 12 }}
+									>
 										Steam ID:{" "}
-										<span className="font-mono text-xs break-all">
+										<span className="font-mono-gaming" style={{ fontSize: 11 }}>
 											{profile.steam.id}
 										</span>
-									</p>
+									</div>
 								</div>
 							</div>
 							<button
 								type="button"
 								onClick={handleUnlinkSteam}
 								disabled={unlinkLoading}
-								className="btn-primary"
+								className="btn-action btn-action-danger"
 							>
-								{unlinkLoading ? "Unlinking..." : "Unlink"}
+								{unlinkLoading ? "UNLINKING..." : "UNLINK"}
 							</button>
-						</div>
+						</>
 					) : (
-						<div>
-							<p className="text-gray-400 mb-4">
+						<>
+							<p
+								className="section-subtitle"
+								style={{ marginTop: 0, marginBottom: 20 }}
+							>
 								Link your Steam account to connect it with your NeatQueue
 								profile.
 							</p>
 							<button
 								type="button"
 								onClick={handleLinkSteam}
-								className="rounded-md bg-violet-900 px-3 py-2 text-xl font-medium text-white hover:translate-y-1 transition-all"
+								className="btn-action btn-action-green"
 							>
-								Link
+								LINK STEAM
 							</button>
-						</div>
+						</>
 					)}
-				</section>
+				</Panel>
 			</div>
 
-			<div className="flex justify-center mt-10">
-				<button type="button" onClick={handleLogout} className="btn-primary">
-					Logout
+			{/* Logout */}
+			<div className="flex justify-center" style={{ marginTop: 40 }}>
+				<button
+					type="button"
+					onClick={handleLogout}
+					className="btn-action btn-action-danger"
+					style={{ minWidth: 120 }}
+				>
+					LOGOUT
 				</button>
 			</div>
-		</div>
+		</PageLayout>
 	);
 }

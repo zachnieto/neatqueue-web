@@ -20,7 +20,8 @@
 			"recommended": true,
 			"complexity": { "noImportantStyles": "off" },
 			"correctness": { "useExhaustiveDependencies": "warn" },
-			"suspicious": { "noUnknownAtRules": "off" }
+			"suspicious": { "noUnknownAtRules": "off", "noArrayIndexKey": "off" },
+			"style": { "noNonNullAssertion": "off" }
 		}
 	},
 	"javascript": { "formatter": { "quoteStyle": "double" } },

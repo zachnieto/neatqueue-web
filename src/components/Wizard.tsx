@@ -169,20 +169,50 @@ const Wizard = ({
 		<>
 			<div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
 				<div
-					className={`relative w-full ${widthClasses[width]} my-6 mx-auto px-4`}
+					className={`relative w-full ${widthClasses[width]} my-6 mx-auto px-4 modal-enter`}
 				>
-					<div className="rounded-lg shadow-2xl relative flex flex-col w-full bg-stone-900 outline-none focus:outline-none border border-neutral-700">
+					<div
+						className="card-glass panel"
+						style={{
+							padding: 0,
+							borderRadius: "6px",
+							background: "rgba(24,24,28,0.95)",
+						}}
+					>
+						<div className="panel-accent" />
+
 						{/* Header */}
-						<div className="flex items-center justify-between p-6 border-b border-neutral-700">
-							<h3 className="text-3xl text-white">{title}</h3>
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "space-between",
+								padding: "20px 24px 16px",
+								borderBottom: "1px solid rgba(255,255,255,0.06)",
+							}}
+						>
+							<h3 className="panel-title" style={{ margin: 0 }}>
+								{title}
+							</h3>
 							<button
 								type="button"
-								className="text-gray-400 hover:text-white transition-colors disabled:opacity-50"
 								onClick={handleClose}
 								disabled={isProcessing}
+								style={{
+									background: "none",
+									border: "none",
+									cursor: isProcessing ? "not-allowed" : "pointer",
+									color: "#5a6078",
+									transition: "color 0.2s",
+									padding: 4,
+									opacity: isProcessing ? 0.5 : 1,
+								}}
+								onMouseEnter={(e) => (e.currentTarget.style.color = "#e8eaf0")}
+								onMouseLeave={(e) => (e.currentTarget.style.color = "#5a6078")}
 							>
 								<svg
-									className="w-6 h-6"
+									width="18"
+									height="18"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -201,22 +231,33 @@ const Wizard = ({
 
 						{/* Progress Bar */}
 						{showProgress && (
-							<div className="px-6 pt-4">
+							<div style={{ padding: "16px 24px 0" }}>
 								<div className="flex justify-between items-center mb-2">
-									<span className="text-sm text-gray-400">
+									<span className="section-subtitle" style={{ marginTop: 0 }}>
 										Step {currentStep + 1} of {displayedSteps.length}
 									</span>
-									<span className="text-sm text-gray-400">
+									<span className="section-subtitle" style={{ marginTop: 0 }}>
 										{Math.round(
 											((currentStep + 1) / displayedSteps.length) * 100,
 										)}
 										% Complete
 									</span>
 								</div>
-								<div className="w-full bg-stone-800 rounded-full h-2">
+								<div
+									style={{
+										width: "100%",
+										background: "rgba(255,255,255,0.05)",
+										borderRadius: "9999px",
+										height: "4px",
+									}}
+								>
 									<div
-										className="bg-gradient-to-r from-violet-500 to-purple-500 h-2 rounded-full transition-all duration-300"
 										style={{
+											height: "4px",
+											borderRadius: "9999px",
+											background:
+												"linear-gradient(90deg, rgba(0,180,255,0.7), rgba(0,180,255,0.3))",
+											transition: "width 0.3s ease",
 											width: `${((currentStep + 1) / displayedSteps.length) * 100}%`,
 										}}
 									/>
@@ -225,7 +266,7 @@ const Wizard = ({
 						)}
 
 						{/* Step Indicators */}
-						<div className="px-6 pt-6 pb-2">
+						<div style={{ padding: "20px 24px 8px" }}>
 							<div className="flex justify-between">
 								{displayedSteps.map((step, index) => {
 									const shortLabel =
@@ -262,11 +303,31 @@ const Wizard = ({
 												className={classNames(
 													"w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all",
 													index < currentStep
-														? "bg-green-600 text-white"
+														? "text-white"
 														: index === currentStep
-															? "bg-violet-600 text-white ring-4 ring-violet-500/30"
-															: "bg-stone-700 text-gray-400",
+															? "text-white"
+															: "",
 												)}
+												style={{
+													background:
+														index < currentStep
+															? "rgba(57,217,138,0.25)"
+															: index === currentStep
+																? "rgba(0,180,255,0.25)"
+																: "rgba(255,255,255,0.05)",
+													border:
+														index < currentStep
+															? "1px solid rgba(57,217,138,0.4)"
+															: index === currentStep
+																? "1px solid rgba(0,180,255,0.4)"
+																: "1px solid rgba(255,255,255,0.08)",
+													color:
+														index < currentStep
+															? "#39d98a"
+															: index === currentStep
+																? "#00b4ff"
+																: "#5a6078",
+												}}
 											>
 												{index < currentStep ? (
 													<svg
@@ -288,7 +349,10 @@ const Wizard = ({
 													index + 1
 												)}
 											</div>
-											<span className="text-xs text-center max-w-20 hidden sm:block">
+											<span
+												className="text-xs text-center max-w-20 hidden sm:block font-inter"
+												style={{ color: "#5a6078" }}
+											>
 												{shortLabel}
 											</span>
 										</button>
@@ -298,9 +362,20 @@ const Wizard = ({
 						</div>
 
 						{/* Content */}
-						<div className="relative p-8 flex-auto overflow-y-auto max-h-96">
-							<div className="mb-6">
-								<h2 className="text-2xl mb-4 text-white">
+						<div
+							style={{ padding: "24px", overflow: "auto", maxHeight: "24rem" }}
+						>
+							<div style={{ marginBottom: "16px" }}>
+								<h2
+									className="font-rajdhani"
+									style={{
+										fontSize: "20px",
+										fontWeight: 700,
+										color: "#e8eaf0",
+										letterSpacing: "0.04em",
+										marginBottom: "16px",
+									}}
+								>
 									{displayedSteps[currentStep].title}
 								</h2>
 								{displayedSteps[currentStep].content}
@@ -308,48 +383,56 @@ const Wizard = ({
 						</div>
 
 						{/* Footer */}
-						<div className="flex items-center justify-between p-6 border-t border-neutral-700">
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "space-between",
+								padding: "16px 24px 20px",
+								borderTop: "1px solid rgba(255,255,255,0.06)",
+							}}
+						>
 							<button
 								type="button"
 								className={classNames(
-									"px-6 py-2 rounded-md font-medium transition-all",
-									currentStep === 0
-										? "invisible"
-										: "bg-stone-800 text-white hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed",
+									"btn-action",
+									currentStep === 0 ? "invisible" : "",
 								)}
 								onClick={handlePrevious}
 								disabled={currentStep === 0 || isProcessing}
 							>
-								← Previous
+								← PREVIOUS
 							</button>
 
 							<div className="flex gap-3">
 								<button
 									type="button"
-									className="text-gray-400 hover:text-white px-6 py-2 rounded-md font-medium transition-all disabled:opacity-50"
+									className="btn-action btn-action-danger"
 									onClick={handleClose}
 									disabled={isProcessing}
 								>
-									Cancel
+									CANCEL
 								</button>
 
 								{currentStep < displayedSteps.length - 1 ? (
 									<button
 										type="button"
-										className="bg-neutral-700 hover:bg-neutral-600 text-white px-6 py-2 rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+										className="btn-action btn-join"
 										onClick={handleNext}
 										disabled={isProcessing}
 									>
-										{isProcessing ? "Processing..." : "Next →"}
+										{isProcessing ? "PROCESSING…" : "NEXT →"}
 									</button>
 								) : (
 									<button
 										type="button"
-										className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+										className="btn-action btn-action-green btn-join"
 										onClick={handleComplete}
 										disabled={isProcessing}
 									>
-										{isProcessing ? "Processing..." : `✓ ${completeBtnText}`}
+										{isProcessing
+											? "PROCESSING…"
+											: `✓ ${completeBtnText.toUpperCase()}`}
 									</button>
 								)}
 							</div>

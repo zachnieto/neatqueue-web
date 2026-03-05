@@ -5,7 +5,9 @@ import type {
 	MatchHistory,
 	NodeStatus,
 	PrivateInstance,
+	ServerQueuesData,
 	UserProfile,
+	UserServer,
 } from "../types";
 import { refreshToken } from "./server-service";
 
@@ -231,4 +233,46 @@ export const getHistory = async (
 		data: MatchHistory[];
 		total?: number;
 	};
+};
+
+export const getUserServers = async (): Promise<UserServer[]> => {
+	const resp = await api.get("/api/v1/user/servers");
+	return resp.data;
+};
+
+export const getServerInfo = async (
+	serverId: string,
+): Promise<ServerQueuesData> => {
+	const resp = await api.get(`/api/v2/server/${serverId}`);
+	return resp.data;
+};
+
+export type ServerMatchPayload = {
+	players: unknown[];
+	teams: unknown[];
+	channel: {
+		id: string | number;
+		name: string | null;
+		type?: "text" | "voice";
+	};
+	queue_channel: {
+		id: string | number;
+		name: string | null;
+		type?: "text" | "voice";
+	};
+	voice_channels: {
+		id: string | number;
+		name: string | null;
+		type?: "text" | "voice";
+	}[];
+	ready_players?: number[];
+	ready_up_mode?: number;
+	timer_end?: number;
+};
+
+export const getServerMatches = async (
+	serverId: string,
+): Promise<Record<string, ServerMatchPayload>> => {
+	const resp = await api.get(`/api/v1/matches/${serverId}`);
+	return resp.data;
 };

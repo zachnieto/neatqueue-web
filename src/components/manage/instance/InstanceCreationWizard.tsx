@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "../../../hooks/useToast";
 import type { InstancePricing } from "../../../types";
 import { classNames } from "../../../util/tailwind";
+import Input from "../../ui/Input";
 import Wizard, { type WizardStep } from "../../Wizard";
 
 type InstanceCreationWizardProps = {
@@ -176,16 +177,16 @@ const InstanceCreationWizard = ({
 					</p>
 
 					<div className="space-y-3">
-						<label className="block">
+						<label htmlFor="instance-wizard-bot-token" className="block">
 							<span className="text-lg mb-2 block">Bot Token:</span>
-							<input
+							<Input
+								id="instance-wizard-bot-token"
 								type="password"
 								value={botToken}
 								onChange={(e) => {
 									setBotToken(e.target.value);
 								}}
 								placeholder="Paste your bot token here"
-								className="w-full px-4 py-3 rounded-lg bg-stone-800 border border-stone-700 focus:border-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-500/20 transition-all text-white"
 							/>
 						</label>
 

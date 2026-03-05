@@ -9,10 +9,18 @@ import {
 } from "../pages/LinkAccountPage";
 import { discordAuth } from "../services/server-service";
 import globalState from "../state";
+import { featureFlags } from "../util/featureFlags";
 import { classNames } from "../util/tailwind";
 
 const navigation = [
 	{ name: "Home", href: "/", current: true },
+	{
+		name: "Queues",
+		href: "/servers",
+		current: false,
+		requiresLogin: false,
+		featureFlag: "web-queue",
+	},
 	{
 		name: "Invite",
 		href: import.meta.env.VITE_DISCORD_INVITE,
@@ -35,12 +43,6 @@ const navigation = [
 	{
 		name: "Dashboard",
 		href: "/dashboard",
-		current: false,
-		requiresLogin: true,
-	},
-	{
-		name: "Profile",
-		href: "/profile",
 		current: false,
 		requiresLogin: true,
 	},
@@ -79,9 +81,11 @@ export default function Nav() {
 	useEffect(() => {
 		if (code) {
 			setSearchParams({});
-			discordAuth(code).catch(() => {});
+			discordAuth(code)
+				.then(() => navigate("/servers", { replace: true }))
+				.catch(() => {});
 		}
-	}, [code, setSearchParams]);
+	}, [code, setSearchParams, navigate]);
 
 	useEffect(() => {
 		if (user && getPendingSteamLink()) {
@@ -99,6 +103,10 @@ export default function Nav() {
 	if (!user?.admin) {
 		navBarItems = navBarItems.filter((item) => !item.requiresAdmin);
 	}
+
+	navBarItems = navBarItems.filter(
+		(item) => !item.featureFlag || featureFlags.isEnabled(item.featureFlag),
+	);
 
 	return (
 		<Disclosure as="nav" className="">
@@ -132,7 +140,7 @@ export default function Nav() {
 												)}
 												aria-current={item.current ? "page" : undefined}
 											>
-												{item.name}
+												<h1>{item.name}</h1>
 											</a>
 										))}
 									</div>

@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
 import type { MatchHistory } from "../../types";
 import { classNames } from "../../util/tailwind";
+import MatchCardHeader from "../ui/MatchCardHeader";
 
 interface CompletedMatchCardProps {
 	match: MatchHistory;
@@ -16,36 +16,44 @@ export const CompletedMatchCard = ({
 	return (
 		<div
 			key={`${match.game}_${match.game_num}`}
-			className="bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700 shadow-2xl transition-all duration-200 hover:border-neutral-600"
+			className="card-glass rounded-sm"
+			style={{
+				overflow: "hidden",
+				border: "1px solid rgba(255,255,255,0.07)",
+				transition: "border-color 0.2s",
+			}}
 		>
-			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:justify-between sm:items-center px-4 py-3 bg-neutral-800/50 border-b border-neutral-700 gap-2">
-				<div className="flex-1 min-w-0">
-					<div className="text-white font-semibold text-sm">
-						{formatQueueName(match.game)} - Match #{match.game_num}
-					</div>
-					<div className="text-gray-400 text-xs">
-						{new Date(match.time).toLocaleString()}
-					</div>
-				</div>
-				<Link
-					to={`/leaderboard/${serverId}/${match.queue_channel}`}
-					className="px-3 py-1.5 rounded text-xs font-medium bg-neutral-700 hover:bg-neutral-600 text-white transition-colors whitespace-nowrap"
-				>
-					Leaderboard
-				</Link>
-			</div>
+			<MatchCardHeader
+				title={`${formatQueueName(match.game)} — Match #${match.game_num}`}
+				subtitle={new Date(match.time).toLocaleString()}
+				serverId={serverId}
+				channelId={match.queue_channel}
+			/>
 
 			{/* Content */}
-			<div className="p-4">
+			<div style={{ padding: 16 }}>
 				<div className="grid grid-cols-2 gap-3">
 					{/* Team 1 */}
-					<div className="bg-neutral-900/70 rounded-lg p-3 border border-neutral-700/50">
+					<div
+						style={{
+							background: "rgba(255,255,255,0.02)",
+							border: "1px solid rgba(255,255,255,0.05)",
+							borderRadius: 2,
+							padding: 12,
+						}}
+					>
 						<div
 							className={classNames(
-								"text-xs mb-2 font-semibold flex items-center justify-between uppercase tracking-wide",
+								"font-rajdhani flex items-center justify-between",
 								match.winner === 0 ? "text-green-400" : "text-red-400",
 							)}
+							style={{
+								fontSize: 11,
+								fontWeight: 700,
+								letterSpacing: "0.08em",
+								textTransform: "uppercase",
+								marginBottom: 8,
+							}}
 						>
 							<span>{match.winner === 0 ? "Winner" : "Loser"}</span>
 							<div
@@ -61,16 +69,26 @@ export const CompletedMatchCard = ({
 									key={player.id}
 									className="flex justify-between items-center"
 								>
-									<span className="text-gray-300 text-sm truncate mr-2">
+									<span
+										style={{
+											color: "#9aa0b4",
+											fontSize: 13,
+											overflow: "hidden",
+											textOverflow: "ellipsis",
+											whiteSpace: "nowrap",
+											marginRight: 8,
+										}}
+									>
 										{player.name}
 									</span>
 									<span
 										className={classNames(
-											"text-xs font-semibold",
+											"font-mono-gaming",
 											player.mmr_change >= 0
 												? "text-green-400"
 												: "text-red-400",
 										)}
+										style={{ fontSize: 11, fontWeight: 600 }}
 									>
 										{player.mmr_change > 0 ? "+" : ""}
 										{player.mmr_change.toFixed(1)}
@@ -81,12 +99,26 @@ export const CompletedMatchCard = ({
 					</div>
 
 					{/* Team 2 */}
-					<div className="bg-neutral-900/70 rounded-lg p-3 border border-neutral-700/50">
+					<div
+						style={{
+							background: "rgba(255,255,255,0.02)",
+							border: "1px solid rgba(255,255,255,0.05)",
+							borderRadius: 2,
+							padding: 12,
+						}}
+					>
 						<div
 							className={classNames(
-								"text-xs mb-2 font-semibold flex items-center justify-between uppercase tracking-wide",
+								"font-rajdhani flex items-center justify-between",
 								match.winner === 1 ? "text-green-400" : "text-red-400",
 							)}
+							style={{
+								fontSize: 11,
+								fontWeight: 700,
+								letterSpacing: "0.08em",
+								textTransform: "uppercase",
+								marginBottom: 8,
+							}}
 						>
 							<span>{match.winner === 1 ? "Winner" : "Loser"}</span>
 							<div
@@ -102,16 +134,26 @@ export const CompletedMatchCard = ({
 									key={player.id}
 									className="flex justify-between items-center"
 								>
-									<span className="text-gray-300 text-sm truncate mr-2">
+									<span
+										style={{
+											color: "#9aa0b4",
+											fontSize: 13,
+											overflow: "hidden",
+											textOverflow: "ellipsis",
+											whiteSpace: "nowrap",
+											marginRight: 8,
+										}}
+									>
 										{player.name}
 									</span>
 									<span
 										className={classNames(
-											"text-xs font-semibold",
+											"font-mono-gaming",
 											player.mmr_change >= 0
 												? "text-green-400"
 												: "text-red-400",
 										)}
+										style={{ fontSize: 11, fontWeight: 600 }}
 									>
 										{player.mmr_change > 0 ? "+" : ""}
 										{player.mmr_change.toFixed(1)}

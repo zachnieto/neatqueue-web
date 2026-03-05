@@ -212,3 +212,94 @@ export type MatchHistory = {
 	channel: string;
 	queue_channel: string;
 };
+
+// Queue / server types for WebSocket and server queues page
+export type QueuePlayer = {
+	id: string;
+	name: string;
+	mmr: number;
+	role: string | null;
+	color?: string | null;
+	avatar_url?: string;
+	/** ISO timestamp when the player joined the queue */
+	timestamp?: string;
+	[key: string]: unknown;
+};
+
+export type QueueInfo = {
+	channel_id: string;
+	name: string;
+	players: QueuePlayer[];
+	queue_size: number;
+	locked: boolean;
+	roles: string[];
+	team_size: number;
+	number_of_teams: number;
+	current_size?: number;
+	hide_names?: boolean;
+	test?: boolean;
+	guild_id?: string | number;
+	[key: string]: unknown;
+};
+
+/** Stats returned by GET /api/v2/server/:id (from GuildStats + computed dashboard fields) */
+export type ServerQueuesStats = {
+	players: number;
+	daily_new_players: number;
+	monthly_new_players: number;
+	queues: number;
+	daily_queues: number;
+	monthly_queues: number;
+	games: number;
+	daily_games: number;
+	monthly_games: number;
+	updated_at: number;
+	/** Number of active queues (computed in API). */
+	active_queues: number;
+	/** Players currently in any queue (computed in API). */
+	players_in_queues: number;
+};
+
+export type ServerQueuesData = {
+	info: {
+		id: string;
+		name: string;
+		icon_url: string | null;
+		banner_url?: string | null;
+		member_count: number;
+	};
+	queues: Array<{
+		name: string;
+		channel: { id: number; name: string };
+		players: QueuePlayer[];
+	}>;
+	channels?: Array<{ id: number; name: string; type: string }>;
+	stats?: ServerQueuesStats;
+};
+
+export type UserServer = {
+	id: string;
+	name: string;
+	icon: string | null;
+	member_count: number | null;
+};
+
+export type ChannelRef = {
+	id: string | number;
+	name: string | null;
+	/** "text" (default) or "voice" - controls # vs speaker icon */
+	type?: "text" | "voice";
+};
+
+export type ActiveMatch = {
+	game_num: number;
+	stage?: string;
+	teams: QueuePlayer[][];
+	players?: QueuePlayer[];
+	channel?: ChannelRef;
+	queue_channel?: ChannelRef;
+	voice_channels?: ChannelRef[];
+	ready_players?: string[];
+	ready_up_mode?: number;
+	timer_end?: number;
+};
