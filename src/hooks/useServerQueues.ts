@@ -1,7 +1,9 @@
+import { useHookstate } from "@hookstate/core";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { getServerInfo } from "../services/neatqueue-service";
 import { getWsSocket } from "../services/ws-service";
+import globalState from "../state";
 import type { QueueInfo, ServerQueuesData } from "../types";
 
 function mergeQueueUpdate(
@@ -89,6 +91,9 @@ function mergeQueueUpdate(
 
 export function useServerQueues(serverId: string | undefined) {
 	const queryClient = useQueryClient();
+	const state = useHookstate(globalState);
+	const accessToken = state.auth.get()?.access_token;
+
 	const query = useQuery({
 		queryKey: ["server", serverId],
 		queryFn: () => getServerInfo(serverId ?? ""),
@@ -96,7 +101,7 @@ export function useServerQueues(serverId: string | undefined) {
 	});
 
 	useEffect(() => {
-		if (!serverId) return;
+		if (!serverId || !accessToken) return;
 		const socket = getWsSocket();
 		socket.ensureConnected(serverId);
 		const unsub = socket.on("queue_update", (data: Record<string, unknown>) => {
@@ -127,7 +132,7 @@ export function useServerQueues(serverId: string | undefined) {
 			unsubDelete();
 			socket.disconnect();
 		};
-	}, [serverId, queryClient]);
+	}, [serverId, queryClient, accessToken]);
 
 	return query;
 }
