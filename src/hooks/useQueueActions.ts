@@ -25,6 +25,23 @@ type ActionResult = {
 	game_num?: number;
 };
 
+/** When backend sends success with no message, show action-specific copy; otherwise use message. */
+function actionResultMessage(
+	action: string,
+	message: string | undefined,
+): string {
+	if (!message) {
+		const defaults: Record<string, string> = {
+			join_queue: "Joined queue!",
+			leave_queue: "Left queue!",
+			ready_up: "Match ready!",
+			decline_match: "Match declined!",
+		};
+		return defaults[action] ?? "";
+	}
+	return message;
+}
+
 export function useJoinQueue() {
 	const toast = useToast();
 	const resolveRef = useRef<((value: boolean) => void) | null>(null);
@@ -51,8 +68,12 @@ export function useJoinQueue() {
 						resolveRef.current(result.success === true);
 						resolveRef.current = null;
 					}
-					if (result.message) {
-						toast.showToast(result.message, {
+					const displayMessage = actionResultMessage(
+						result.action,
+						result.message,
+					);
+					if (displayMessage) {
+						toast.showToast(displayMessage, {
 							variant: result.variant ?? "success",
 						});
 					}
@@ -125,8 +146,12 @@ export function useLeaveQueue() {
 						resolveRef.current(result.success === true);
 						resolveRef.current = null;
 					}
-					if (result.message) {
-						toast.showToast(result.message, {
+					const displayMessage = actionResultMessage(
+						result.action,
+						result.message,
+					);
+					if (displayMessage) {
+						toast.showToast(displayMessage, {
 							variant: result.variant ?? "success",
 						});
 					}
@@ -174,9 +199,11 @@ export function useReadyUp() {
 		mutationFn: async ({
 			serverId,
 			gameNum,
+			channelId,
 		}: {
 			serverId: string;
 			gameNum: number;
+			channelId: string | number;
 		}) => {
 			return new Promise<void>((resolve, reject) => {
 				const socket = getWsSocket();
@@ -192,7 +219,7 @@ export function useReadyUp() {
 				const handleResult = (data: Record<string, unknown>) => {
 					const result = data as ActionResult;
 					if (
-						result.action === "web_ready_up" &&
+						result.action === "ready_up" &&
 						String(result.server_id) === serverId &&
 						result.game_num === gameNum
 					) {
@@ -212,7 +239,7 @@ export function useReadyUp() {
 					cleanup1();
 				};
 
-				socket.readyUpMatch(serverId, gameNum);
+				socket.readyUpMatch(serverId, gameNum, channelId);
 			});
 		},
 		onError: (error) => {
@@ -228,9 +255,11 @@ export function useDeclineMatch() {
 		mutationFn: async ({
 			serverId,
 			gameNum,
+			channelId,
 		}: {
 			serverId: string;
 			gameNum: number;
+			channelId: string | number;
 		}) => {
 			return new Promise<void>((resolve, reject) => {
 				const socket = getWsSocket();
@@ -246,7 +275,7 @@ export function useDeclineMatch() {
 				const handleResult = (data: Record<string, unknown>) => {
 					const result = data as ActionResult;
 					if (
-						result.action === "web_decline_match" &&
+						result.action === "decline_match" &&
 						String(result.server_id) === serverId &&
 						result.game_num === gameNum
 					) {
@@ -268,7 +297,7 @@ export function useDeclineMatch() {
 					cleanup1();
 				};
 
-				socket.declineMatch(serverId, gameNum);
+				socket.declineMatch(serverId, gameNum, channelId);
 			});
 		},
 		onError: (error) => {

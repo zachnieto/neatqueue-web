@@ -31,7 +31,7 @@ export default function PlayerList({
 		<div className="flex flex-col gap-1.5">
 			{slots.map((player, i) => {
 				if (player) {
-					const color = getPlayerColor(player);
+					const color = hideNames ? "#ffffff" : getPlayerColor(player);
 					const displayName = hideNames
 						? `Player ${i + 1}`
 						: [
@@ -47,7 +47,7 @@ export default function PlayerList({
 							className="flex items-center gap-2"
 							style={{ minWidth: 0 }}
 						>
-							{player.avatar_url ? (
+							{player.avatar_url && !hideNames ? (
 								<img
 									src={player.avatar_url}
 									alt=""

@@ -4,8 +4,10 @@ import {
 	SpeakerXMarkIcon,
 } from "@heroicons/react/24/outline";
 import NumberFlow from "@number-flow/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useDeclineMatch, useReadyUp } from "../../hooks/useQueueActions";
+import type { ServerMatchPayload } from "../../services/neatqueue-service";
 import type { ActiveMatch } from "../../types";
 import ChannelMention from "../ChannelMention";
 
@@ -24,6 +26,7 @@ export default function MatchFoundOverlay({
 	serverId,
 	currentUserId,
 }: MatchFoundOverlayProps) {
+	const queryClient = useQueryClient();
 	const [timeLeft, setTimeLeft] = useState(0);
 	const [isMuted, setIsMuted] = useState(false);
 	const readyUp = useReadyUp();
@@ -103,11 +106,37 @@ export default function MatchFoundOverlay({
 	}, [timerEnd, timeLeft, isMuted, isReady]);
 
 	const handleReadyUp = () => {
-		readyUp.mutate({ serverId, gameNum: match.game_num });
+		if (match.channel?.id == null) return;
+		readyUp.mutate({
+			serverId,
+			gameNum: match.game_num,
+			channelId: match.channel.id,
+		});
 	};
 
 	const handleCancel = () => {
-		declineMatch.mutate({ serverId, gameNum: match.game_num });
+		if (match.channel?.id == null) return;
+		const gameNum = match.game_num;
+		declineMatch.mutate(
+			{
+				serverId,
+				gameNum,
+				channelId: match.channel.id,
+			},
+			{
+				onSuccess: () => {
+					// Close overlay: remove this match from cache so matchNeedingReadyUp becomes undefined
+					queryClient.setQueryData<Record<string, ServerMatchPayload>>(
+						["matches", serverId],
+						(old) => {
+							if (!old) return old;
+							const { [String(gameNum)]: _, ...rest } = old;
+							return rest;
+						},
+					);
+				},
+			},
+		);
 	};
 
 	return (

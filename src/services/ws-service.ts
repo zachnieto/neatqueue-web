@@ -223,12 +223,28 @@ class NeatQueueSocket {
 		this.send("leave_queue", { server_id: serverId, channel_id: channelId });
 	}
 
-	readyUpMatch(serverId: string, gameNum: number): void {
-		this.send("web_ready_up", { server_id: serverId, game_num: gameNum });
+	readyUpMatch(
+		serverId: string,
+		gameNum: number,
+		channelId: string | number,
+	): void {
+		this.send("ready_up", {
+			server_id: serverId,
+			game_num: gameNum,
+			channel_id: channelId,
+		});
 	}
 
-	declineMatch(serverId: string, gameNum: number): void {
-		this.send("web_decline_match", { server_id: serverId, game_num: gameNum });
+	declineMatch(
+		serverId: string,
+		gameNum: number,
+		channelId: string | number,
+	): void {
+		this.send("decline_match", {
+			server_id: serverId,
+			game_num: gameNum,
+			channel_id: channelId,
+		});
 	}
 
 	private updateContent(content: string): string {
