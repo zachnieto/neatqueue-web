@@ -20,8 +20,8 @@ function stripMarkdown(text: string): string {
 }
 
 const BUTTON_VARIANT: Record<ButtonData["style"], string> = {
-	blurple: "btn-action-purple",
-	green: "btn-action-green",
+	blurple: "",
+	green: "",
 	red: "btn-action-red",
 	grey: "",
 	link: "",
@@ -67,6 +67,90 @@ function FieldsGrid({ fields }: { fields: EmbedField[] }) {
 	);
 }
 
+function PairedFieldButtons({
+	fields,
+	components,
+	onButtonClick,
+}: {
+	fields: EmbedField[];
+	components: ButtonData[];
+	onButtonClick: (customId: string) => void;
+}) {
+	return (
+		<div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+			{fields.map((field, i) => {
+				const btn = components[i];
+				const showLabel =
+					stripMarkdown(field.name).toLowerCase() !== btn.label.toLowerCase();
+				return (
+					<button
+						key={btn.custom_id}
+						type="button"
+						disabled={btn.disabled}
+						onClick={() => onButtonClick(btn.custom_id)}
+						className={`btn-action w-full sm:min-w-[180px] sm:flex-1 ${BUTTON_VARIANT[btn.style] ?? ""}`}
+						style={{
+							display: "flex",
+							alignItems: "center",
+							justifyContent: showLabel ? "space-between" : "center",
+							gap: 12,
+							padding: "10px 14px",
+							textAlign: showLabel ? "left" : "center",
+						}}
+					>
+						<div
+							style={{
+								flex: showLabel ? 1 : undefined,
+								minWidth: 0,
+								textAlign: showLabel ? "left" : "center",
+							}}
+						>
+							<div
+								style={{
+									fontFamily: "'Rajdhani', sans-serif",
+									fontWeight: 700,
+									fontSize: 13,
+									color: "inherit",
+									letterSpacing: "0.04em",
+									textTransform: "uppercase",
+									lineHeight: 1.2,
+								}}
+							>
+								{stripMarkdown(field.name)}
+							</div>
+							<div
+								style={{
+									fontFamily: "'JetBrains Mono', monospace",
+									fontSize: 11,
+									color: "#5a6078",
+									marginTop: 2,
+								}}
+							>
+								{stripMarkdown(field.value)}
+							</div>
+						</div>
+						{showLabel && (
+							<span
+								style={{
+									fontFamily: "'Rajdhani', sans-serif",
+									fontWeight: 700,
+									fontSize: 11,
+									letterSpacing: "0.08em",
+									textTransform: "uppercase",
+									flexShrink: 0,
+									opacity: 0.7,
+								}}
+							>
+								{btn.emoji ? `${btn.emoji} ${btn.label}` : btn.label}
+							</span>
+						)}
+					</button>
+				);
+			})}
+		</div>
+	);
+}
+
 function ButtonsBody({
 	embed,
 	content,
@@ -78,6 +162,9 @@ function ButtonsBody({
 	components: ButtonData[];
 	onButtonClick: (customId: string) => void;
 }) {
+	const fields = embed?.fields ?? [];
+	const isPaired = fields.length > 0 && fields.length === components.length;
+
 	return (
 		<div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 			{content && (
@@ -108,30 +195,38 @@ function ButtonsBody({
 				</p>
 			)}
 
-			{embed?.fields && embed.fields.length > 0 && (
-				<FieldsGrid fields={embed.fields} />
-			)}
+			{isPaired ? (
+				<PairedFieldButtons
+					fields={fields}
+					components={components}
+					onButtonClick={onButtonClick}
+				/>
+			) : (
+				<>
+					{fields.length > 0 && <FieldsGrid fields={fields} />}
 
-			<div
-				style={{
-					display: "flex",
-					flexWrap: "wrap",
-					gap: 8,
-					paddingTop: 4,
-				}}
-			>
-				{components.map((btn) => (
-					<button
-						key={btn.custom_id}
-						type="button"
-						disabled={btn.disabled}
-						onClick={() => onButtonClick(btn.custom_id)}
-						className={`btn-action ${BUTTON_VARIANT[btn.style] ?? ""}`}
+					<div
+						style={{
+							display: "flex",
+							flexWrap: "wrap",
+							gap: 8,
+							paddingTop: 4,
+						}}
 					>
-						{btn.emoji ? `${btn.emoji} ${btn.label}` : btn.label}
-					</button>
-				))}
-			</div>
+						{components.map((btn) => (
+							<button
+								key={btn.custom_id}
+								type="button"
+								disabled={btn.disabled}
+								onClick={() => onButtonClick(btn.custom_id)}
+								className={`btn-action ${BUTTON_VARIANT[btn.style] ?? ""}`}
+							>
+								{btn.emoji ? `${btn.emoji} ${btn.label}` : btn.label}
+							</button>
+						))}
+					</div>
+				</>
+			)}
 		</div>
 	);
 }
@@ -206,7 +301,7 @@ function TextInputBody({
 			>
 				<button
 					type="button"
-					className="btn-action btn-action-green"
+					className="btn-action"
 					onClick={() => onSubmit(values)}
 				>
 					SUBMIT
