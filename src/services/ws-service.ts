@@ -223,6 +223,32 @@ class NeatQueueSocket {
 		this.send("leave_queue", { server_id: serverId, channel_id: channelId });
 	}
 
+	buttonClick(
+		serverId: string,
+		channelId: string,
+		customId: string,
+		gameNum?: number,
+	): void {
+		this.send("button_click", {
+			server_id: serverId,
+			channel_id: channelId,
+			custom_id: customId,
+			...(gameNum != null && { game_num: gameNum }),
+		});
+	}
+
+	modalSubmit(
+		serverId: string,
+		customId: string,
+		textValues: Record<string, string>,
+	): void {
+		this.send("modal_submit", {
+			server_id: serverId,
+			custom_id: customId,
+			text_values: textValues,
+		});
+	}
+
 	readyUpMatch(
 		serverId: string,
 		gameNum: number,

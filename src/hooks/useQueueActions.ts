@@ -45,29 +45,76 @@ function actionResultMessage(
 export function useJoinQueue() {
 	const toast = useToast();
 	const resolveRef = useRef<((value: boolean) => void) | null>(null);
+	const rejectRef = useRef<((reason: Error) => void) | null>(null);
 	const pendingParamsRef = useRef<{
 		serverId: string;
 		channelId: string;
 	} | null>(null);
+	// Retained after followup resolves the promise, used to match action_result for the toast
+	const lastParamsRef = useRef<{
+		serverId: string;
+		channelId: string;
+	} | null>(null);
+	// Holds the active timeout id so it can be reset on each action_followup
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const scheduleTimeout = useRef((ms: number) => {
+		if (timeoutRef.current) clearTimeout(timeoutRef.current);
+		timeoutRef.current = setTimeout(() => {
+			const reject = rejectRef.current;
+			resolveRef.current = null;
+			rejectRef.current = null;
+			pendingParamsRef.current = null;
+			reject?.(new Error("Join queue timed out"));
+		}, ms);
+	});
 
 	useEffect(() => {
 		const socket = getWsSocket();
+
+		// Resolve the pending promise immediately when a followup arrives so
+		// isPending clears and the button returns to its normal state. The
+		// timeout is kept as a safety net in case no further response arrives.
+		const unsubFollowup = socket.on(
+			"action_followup",
+			(_data: Record<string, unknown>) => {
+				if (pendingParamsRef.current) {
+					resolveRef.current?.(true);
+					resolveRef.current = null;
+					rejectRef.current = null;
+					pendingParamsRef.current = null;
+					scheduleTimeout.current(60000);
+				}
+			},
+		);
+
 		const unsub = socket.on(
 			"action_result",
 			(data: Record<string, unknown>) => {
 				const result = data as ActionResult;
 				if (result.action !== "join_queue") return;
+				// Resolve the promise if it hasn't been resolved yet (no followup happened)
 				const pending = pendingParamsRef.current;
 				if (
 					pending &&
 					String(result.server_id) === pending.serverId &&
 					String(result.channel_id) === pending.channelId
 				) {
+					if (timeoutRef.current) clearTimeout(timeoutRef.current);
+					timeoutRef.current = null;
 					pendingParamsRef.current = null;
-					if (resolveRef.current) {
-						resolveRef.current(result.success === true);
-						resolveRef.current = null;
-					}
+					resolveRef.current?.(result.success === true);
+					resolveRef.current = null;
+					rejectRef.current = null;
+				}
+				// Always show the toast — use lastParamsRef so it works even when
+				// the promise was already resolved via a followup
+				const last = lastParamsRef.current;
+				if (
+					last &&
+					String(result.server_id) === last.serverId &&
+					String(result.channel_id) === last.channelId
+				) {
 					const displayMessage = actionResultMessage(
 						result.action,
 						result.message,
@@ -80,7 +127,10 @@ export function useJoinQueue() {
 				}
 			},
 		);
-		return () => unsub();
+		return () => {
+			unsub();
+			unsubFollowup();
+		};
 	}, [toast]);
 
 	const mutation = useMutation({
@@ -88,7 +138,12 @@ export function useJoinQueue() {
 			getWsSocket().ensureConnected(params.serverId);
 			return new Promise<boolean>((resolve, reject) => {
 				resolveRef.current = resolve;
+				rejectRef.current = reject;
 				pendingParamsRef.current = {
+					serverId: params.serverId,
+					channelId: params.channelId,
+				};
+				lastParamsRef.current = {
 					serverId: params.serverId,
 					channelId: params.channelId,
 				};
@@ -98,17 +153,15 @@ export function useJoinQueue() {
 					params.role,
 					params.surveyAnswers,
 				);
-				// Timeout in case no response
-				setTimeout(() => {
-					if (resolveRef.current) {
-						resolveRef.current = null;
-						pendingParamsRef.current = null;
-						reject(new Error("Join queue timed out"));
-					}
-				}, 15000);
+				// Initial timeout; extended on each action_followup
+				scheduleTimeout.current(15000);
 			});
 		},
 		onError: (error) => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+				timeoutRef.current = null;
+			}
 			if (error instanceof Error && error.message.includes("timed out")) {
 				toast.showToast("Join queue timed out — please try again", {
 					variant: "error",

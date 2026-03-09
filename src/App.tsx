@@ -14,6 +14,7 @@ import AdminRoutes from "./components/routes/AdminRoutes";
 import LoggedInRoutes from "./components/routes/LoggedInRoutes";
 import ShortURL from "./components/ShortURL";
 import Status from "./components/Status";
+import ActionFollowupModal from "./components/ActionFollowupModal";
 import ToastContainer from "./components/ToastContainer";
 import Transcript from "./components/Transcript";
 import { ToastProvider } from "./hooks/useToast";
@@ -85,6 +86,7 @@ function App() {
 
 					<Footer />
 					<ToastContainer />
+					<ActionFollowupModal />
 				</div>
 			</ToastProvider>
 		</QueryClientProvider>
